@@ -76,6 +76,7 @@ msg:
 	$(GETTEXT) -o $(LOCALE_DIR)/messages.pot *.py
 	$(MSGMERGE) -U $(LOCALE_DIR)/es/LC_MESSAGES/catatom2osm.po $(LOCALE_DIR)/messages.pot
 	$(MSGFMT) $(LOCALE_DIR)/es/LC_MESSAGES/catatom2osm.po -o $(LOCALE_DIR)/es/LC_MESSAGES/catatom2osm.mo
+	$(MSGFMT) $(LOCALE_DIR)/es/LC_MESSAGES/argparse.po -o $(LOCALE_DIR)/es/LC_MESSAGES/argparse.mo
 	@echo
 	@echo "Translation finished. The language files are in $(LOCALE_DIR)."
 

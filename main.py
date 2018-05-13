@@ -34,7 +34,7 @@ files it will download them for you from the INSPIRE Services of the Spanish
 Cadastre."""))
 
 def process(options):
-    a_path = (options.path or '').decode(setup.encoding)
+    a_path = '' if len(options.path) == 0 else options.path[0].decode(setup.encoding)
     if options.list:
         from catatom import list_municipalities
         list_municipalities('{:>02}'.format(options.list))
@@ -52,11 +52,11 @@ def process(options):
 
 def run():
     parser = ArgumentParser(usage=usage)
-    parser.add_argument("path", nargs="?",
+    parser.add_argument("path", nargs="*",
         help=__(_("Directory for input and output files")))
     parser.add_argument("-v", "--version", action="version",
-        version=setup.app_version,
-        help=__(_("Print CatAtom2Osm version and exit")))
+        help=_("Show program's version number and exit"),
+        version=setup.app_version)
     parser.add_argument("-l", "--list", dest="list", metavar="prov",
         default=False, help=__(_("List available municipalities given the two "
         "digits province code")))
@@ -83,7 +83,7 @@ def run():
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         default=setup.log_level, help=__(_("Select the log level between " \
         "DEBUG, INFO, WARNING, ERROR or CRITICAL.")))
-    options, remainer = parser.parse_known_args()
+    options = parser.parse_args()
     report.options = ' '.join(sys.argv[1:])
     if options.all:
         options.building = True
@@ -99,9 +99,9 @@ def run():
     log_level = getattr(logging, options.log_level.upper())
     log.setLevel(log_level)
 
-    if len(remainer) > 0:
+    if len(options.path) > 1:
         log.error(_("Too many arguments, supply only a directory path."))
-    elif options.path is None and not options.list:
+    elif len(options.path) == 0 and not options.list:
         parser.print_help()
     elif log.getEffectiveLevel() == logging.DEBUG:
         process(options)

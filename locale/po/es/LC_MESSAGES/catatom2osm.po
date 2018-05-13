@@ -5,11 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: CatAtom 2Osm\n"
-"POT-Creation-Date: 2018-05-13 11:43+WEST\n"
+"Project-Id-Version: CatAtom2Osm\n"
+"POT-Creation-Date: 2018-05-13 12:59+WEST\n"
 "PO-Revision-Date: 2017-05-28 19:23+WEST\n"
 "Last-Translator: Javier Sánchez <javiersanp@gmail.com>\n"
-"Language-Team: none\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -365,9 +364,9 @@ msgstr ""
 msgid "Directory for input and output files"
 msgstr "Directorio para los archivos de entrada y salida."
 
-#: main.py:59
-msgid "Print CatAtom2Osm version and exit"
-msgstr "Imprime la versión de CatAtom2Osm y termina"
+#: main.py:58
+msgid "Show program's version number and exit"
+msgstr "Muestra la versión del programa y sale"
 
 #: main.py:61
 msgid "List available municipalities given the two digits province code"
@@ -779,6 +778,9 @@ msgstr ""
 msgid "Sum of building types should be equal to the number of buildings"
 msgstr ""
 "La suma de los tipos de edificios debe ser igual al número de edificios"
+
+#~ msgid "Print CatAtom2Osm version and exit"
+#~ msgstr "Imprime la versión de CatAtom2Osm y termina"
 
 #~ msgid "Invalid log level: %s"
 #~ msgstr "Nivel de registro no válido: %s"
