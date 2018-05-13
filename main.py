@@ -3,8 +3,9 @@
 from argparse import ArgumentParser
 import codecs
 import logging
-import sys
 import os
+import six
+import sys
 from zipfile import BadZipfile
 
 import setup
@@ -12,7 +13,10 @@ from report import instance as report
 
 log = logging.getLogger(setup.app_name)
 fh = logging.FileHandler(setup.log_file)
-ch = logging.StreamHandler(codecs.getwriter(setup.encoding)(sys.stderr))
+if six.PY2:
+    ch = logging.StreamHandler(codecs.getwriter(setup.encoding)(sys.stderr))
+else:
+    ch = logging.StreamHandler(sys.stderr)
 fh.setLevel(logging.DEBUG)
 ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter(setup.log_format)
