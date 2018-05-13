@@ -35,7 +35,7 @@ class TestMain(unittest.TestCase):
     @mock.patch('main.sys.argv', ['catatom2osm.py'])
     def test_no_args(self):
         with capture(main.run) as output:
-            self.assertIn("Usage: catatom2osm", output)
+            self.assertIn("usage: catatom2osm", output)
 
     @mock.patch('main.sys.argv', ['catatom2osm.py', 'foo', 'bar'])
     @mock.patch('main.log.error')
@@ -52,8 +52,7 @@ class TestMain(unittest.TestCase):
         self.assertEquals(mockcat.call_args_list[0][0][0], 'foobar')
         options = mockcat.call_args_list[0][0][1]
         d = {'building': False, 'all': False, 'tasks': True, 'log_level': 'INFO', 
-            'parcel': False, 'list': False, 'zoning': True, 'version': False, 
-            'address': True}
+            'parcel': False, 'list': False, 'zoning': True, 'address': True}
         for (k, v) in d.items():
             self.assertEquals(getattr(options, k), v)
 
@@ -64,8 +63,7 @@ class TestMain(unittest.TestCase):
         self.assertTrue(mockcat.called)
         options = mockcat.call_args_list[0][0][1]
         d = {'building': True, 'all': True, 'tasks': True, 'log_level': 'INFO', 
-            'parcel': True, 'list': False, 'zoning': True, 'version': False, 
-            'address': True}
+            'parcel': True, 'list': False, 'zoning': True, 'address': True}
         for (k, v) in d.items():
             self.assertEquals(getattr(options, k), v)
 
@@ -76,23 +74,9 @@ class TestMain(unittest.TestCase):
         self.assertTrue(mockcat.called)
         options = mockcat.call_args_list[0][0][1]
         d = {'building': True, 'all': False, 'tasks': False, 'log_level': 'INFO', 
-            'parcel': False, 'list': False, 'zoning': False, 'version': False, 
-            'address': False}
+            'parcel': False, 'list': False, 'zoning': False, 'address': False}
         for (k, v) in d.items():
             self.assertEquals(getattr(options, k), v)
-
-    @mock.patch('main.sys.argv', ['catatom2osm.py', 'foobar', '--log=foobar'])
-    @mock.patch('main.log.error')
-    @mock.patch('catatom2osm.CatAtom2Osm')
-    def test_bad_level(self, mockcat, mocklog):
-        main.run()
-        output = mocklog.call_args_list[0][0][0]
-        self.assertIn("Invalid log level", output)
-
-    @mock.patch('main.sys.argv', ['catatom2osm.py', '-v'])
-    def test_version(self):
-        with capture(main.run) as output:
-            self.assertIn(setup.app_version, output)
 
     @mock.patch('main.sys.argv', ['catatom2osm.py', '-w', '33333'])
     @mock.patch('catatom2osm.catatom.Reader')

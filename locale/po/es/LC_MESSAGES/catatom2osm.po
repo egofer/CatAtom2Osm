@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: CatAtom 2Osm\n"
-"POT-Creation-Date: 2018-03-20 09:04+WET\n"
+"POT-Creation-Date: 2018-05-13 11:43+WEST\n"
 "PO-Revision-Date: 2017-05-28 19:23+WEST\n"
 "Last-Translator: Javier Sánchez <javiersanp@gmail.com>\n"
 "Language-Team: none\n"
@@ -361,66 +361,62 @@ msgstr ""
 "del \n"
 "Catastro Español."
 
-#: main.py:57
+#: main.py:56
+msgid "Directory for input and output files"
+msgstr "Directorio para los archivos de entrada y salida."
+
+#: main.py:59
 msgid "Print CatAtom2Osm version and exit"
 msgstr "Imprime la versión de CatAtom2Osm y termina"
 
-#: main.py:59
+#: main.py:61
 msgid "List available municipalities given the two digits province code"
 msgstr ""
 "Lista los municipios disponibles para el código provincial de dos dígitos"
 
-#: main.py:62
+#: main.py:64
 msgid "Splits constructions into tasks files (default, implies -z)"
 msgstr ""
 "Reparte las construcciones en archivos de tareas (predeterminada, implica -z)"
 
-#: main.py:65
+#: main.py:67
 msgid "Process the cadastral zoning dataset"
 msgstr "Procesa el conjunto de datos de zonificación catastral"
 
-#: main.py:67
+#: main.py:69
 msgid "Process buildings to a single file instead of tasks"
 msgstr "Procesa los edificios a un archivo individual en lugar de tareas"
 
-#: main.py:70
+#: main.py:72
 msgid "Process the address dataset (default)"
 msgstr "Procesa el conjunto de datos de direcciones (predeterminada)"
 
-#: main.py:72
+#: main.py:74
 msgid "Process the cadastral parcel dataset"
 msgstr "Procesa el conjunto de datos de parcelas catastrales"
 
-#: main.py:74
+#: main.py:76
 msgid "Process all datasets (equivalent to -bdptz)"
 msgstr "Procesa todos los conjuntos de datos (equivalente a -bdptz)"
 
-#: main.py:77
+#: main.py:79
 msgid "Dissable conflation with OSM data"
 msgstr "Desactiva la combinación con datos de OSM"
 
-#: main.py:79
+#: main.py:81
 msgid "Download only"
 msgstr "Solo descargar"
 
-#: main.py:81
+#: main.py:84
 msgid "Select the log level between DEBUG, INFO, WARNING, ERROR or CRITICAL."
 msgstr ""
 "Selecciona el nivel de registro entre DEBUG, INFO, WARNING, ERROR o CRITICAL."
 
-#: main.py:99
-msgid "Invalid log level: %s"
-msgstr "Nivel de registro no válido: %s"
-
-#: main.py:104
-msgid "%s version %s"
-msgstr "%s versión %s"
-
-#: main.py:106
+#: main.py:103
 msgid "Too many arguments, supply only a directory path."
 msgstr "Demasiados argumentos, proporcione sólo la ruta de un directorio."
 
-#: main.py:117
+#: main.py:114
 msgid "Please, install QGIS"
 msgstr "Por favor, instala QGIS"
 
@@ -783,6 +779,12 @@ msgstr ""
 msgid "Sum of building types should be equal to the number of buildings"
 msgstr ""
 "La suma de los tipos de edificios debe ser igual al número de edificios"
+
+#~ msgid "Invalid log level: %s"
+#~ msgstr "Nivel de registro no válido: %s"
+
+#~ msgid "%s version %s"
+#~ msgstr "%s versión %s"
 
 #~ msgid "Only for testing purposses. Don't upload any result to OSM"
 #~ msgstr "Sólo para fines de prueba. No cargue ningún resultado en OSM"
