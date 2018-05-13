@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Application preferences"""
+import six
 import sys, os, locale
 import csv
 import gettext
@@ -31,9 +32,12 @@ localedir = os.path.join(app_path, 'locale', 'po')
 platform = sys.platform
 winenv()
 
-
-gettext.install(app_name.lower(), localedir=localedir, unicode=1)
-
+if six.PY2:
+    gettext.install(app_name.lower(), localedir=localedir, unicode=1)
+else:
+    gettext.install(app_name.lower(), localedir=localedir)
+gettext.bindtextdomain('argparse', localedir)
+gettext.textdomain('argparse')
 
 log_level = 'INFO' # Default log level
 log_file = 'catatom2osm.log'
