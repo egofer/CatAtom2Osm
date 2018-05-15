@@ -25,7 +25,7 @@ class TestHgwnames(unittest.TestCase):
             {'id':4, 'n':'Madrid'}]
         
     def test_normalize(self):
-        self.assertEquals(hgwnames.normalize('  ABCD  '), 'abcd')
+        self.assertEqual(hgwnames.normalize('  ABCD  '), 'abcd')
 
     def test_parse(self):
         names = {
@@ -46,25 +46,25 @@ class TestHgwnames(unittest.TestCase):
             "XX FooBar": "Xx Foobar"
         }
         for (inp, out) in names.items():
-            self.assertEquals(hgwnames.parse(inp), out)
+            self.assertEqual(hgwnames.parse(inp), out)
 
     def test_fuzzy_match(self):
-        self.assertEquals(hgwnames.match('FOOB', self.choices), 'Foobar')
-        self.assertEquals(hgwnames.match('CL FRANCIA', self.choices), 'Calle Francia')
+        self.assertEqual(hgwnames.match('FOOB', self.choices), 'Foobar')
+        self.assertEqual(hgwnames.match('CL FRANCIA', self.choices), 'Calle Francia')
 
     @mock.patch('hgwnames.fuzz', None)
     def test_nonfyzzy_match(self):
-        self.assertEquals(hgwnames.match('CL FOOBAR', self.choices), 'Calle Foobar')
+        self.assertEqual(hgwnames.match('CL FOOBAR', self.choices), 'Calle Foobar')
 
     def test_fuzzy_dsmatch(self):
-        self.assertEquals(hgwnames.dsmatch('FOOB', self.ds, self.fn)['id'], 1)
-        self.assertEquals(hgwnames.dsmatch('MADRID', self.ds2, self.fn)['id'], 4)
-        self.assertEquals(hgwnames.dsmatch('MADRID', self.ds2, self.fn)['n'], 'Madrid')
+        self.assertEqual(hgwnames.dsmatch('FOOB', self.ds, self.fn)['id'], 1)
+        self.assertEqual(hgwnames.dsmatch('MADRID', self.ds2, self.fn)['id'], 4)
+        self.assertEqual(hgwnames.dsmatch('MADRID', self.ds2, self.fn)['n'], 'Madrid')
 
     @mock.patch('hgwnames.fuzz', None)
     def test_nonfuzzy_match(self):
-        self.assertEquals(hgwnames.dsmatch('FOOBAR', self.ds, self.fn)['id'], 1)
-        self.assertEquals(hgwnames.dsmatch('FOO', self.ds, self.fn), None)
+        self.assertEqual(hgwnames.dsmatch('FOOBAR', self.ds, self.fn)['id'], 1)
+        self.assertEqual(hgwnames.dsmatch('FOO', self.ds, self.fn), None)
 
     def tearDown(self):
         hgwnames.fuzz = self.temp_fuzz
