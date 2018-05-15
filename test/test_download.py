@@ -12,29 +12,29 @@ class TestProgressBar(unittest.TestCase):
 
     def test_init(self):
         p = ProgressBar(1000)
-        self.assertEquals(p.total, 1000)
-        self.assertEquals(p.progress, 0)
+        self.assertEqual(p.total, 1000)
+        self.assertEqual(p.progress, 0)
 
     @mock.patch('download.sys')
     def test_update(self, mock_sys):
         pb = ProgressBar(1000)
         progress = random.randint(0, 9)
         pb.update(100 * progress)
-        self.assertEquals(pb.progress, 100 * progress)
+        self.assertEqual(pb.progress, 100 * progress)
         self.assertTrue(mock_sys.stdout.write.called)
         output = mock_sys.stdout.write.call_args_list[0][0][0]
-        self.assertEquals(output.count('#'), int(pb.bar_len * progress / 10.0))
-        self.assertEquals(output.count('-'), int(pb.bar_len * (10-progress) / 10.0))
+        self.assertEqual(output.count('#'), int(pb.bar_len * progress / 10.0))
+        self.assertEqual(output.count('-'), int(pb.bar_len * (10-progress) / 10.0))
 
     @mock.patch('download.sys')
     def test_update100(self, mock_sys):
         pb = ProgressBar(1000)
         pb.update(1100)
-        self.assertEquals(pb.progress, 1000)
+        self.assertEqual(pb.progress, 1000)
         self.assertTrue(mock_sys.stdout.write.called)
         output = mock_sys.stdout.write.call_args_list[0][0][0]
-        self.assertEquals(output.count('#'), pb.bar_len)
-        self.assertEquals(output.count('-'), 0)
+        self.assertEqual(output.count('#'), pb.bar_len)
+        self.assertEqual(output.count('-'), 0)
     
     @mock.patch('download.sys')
     def test_update0(self, mock_sys):
@@ -43,7 +43,7 @@ class TestProgressBar(unittest.TestCase):
         pb.update(progress)
         self.assertTrue(mock_sys.stdout.write.called)
         output = mock_sys.stdout.write.call_args_list[0][0][0]
-        self.assertEquals(output.split(': ')[1], '%.1fK\r' % (progress / 1024.0))
+        self.assertEqual(output.split(': ')[1], '%.1fK\r' % (progress / 1024.0))
 
 
 class TestGetResponse(unittest.TestCase):
@@ -55,7 +55,7 @@ class TestGetResponse(unittest.TestCase):
         mock_requests.codes.ok = 200
         mock_requests.get.return_value = mock_response
         r = get_response('foo', 'bar')
-        self.assertEquals(r, mock_response)
+        self.assertEqual(r, mock_response)
         mock_requests.get.assert_called_once_with('foo', stream='bar', timeout=30)
 
     @mock.patch('download.requests')
@@ -65,7 +65,7 @@ class TestGetResponse(unittest.TestCase):
         mock_requests.codes.ok = 200
         mock_requests.get.return_value = mock_response
         get_response('foo', 'bar')
-        self.assertEquals(mock_requests.get.call_count, 3)
+        self.assertEqual(mock_requests.get.call_count, 3)
         mock_response.raise_for_status.assert_called_once_with()
 
 
@@ -82,7 +82,7 @@ class TestWget(unittest.TestCase):
         mock_open.return_value = mock.MagicMock()
         mock_open.return_value.__enter__.return_value = file_mock
         wget('foo', 'bar')
-        self.assertEquals(file_mock.write.call_count, chunk_size)
+        self.assertEqual(file_mock.write.call_count, chunk_size)
         mock_pb.assert_called_once_with(99999)
     
     @mock.patch('download.get_response')
@@ -96,6 +96,6 @@ class TestWget(unittest.TestCase):
         mock_open.return_value = mock.MagicMock()
         mock_open.return_value.__enter__.return_value = file_mock
         wget('foo', 'bar')
-        self.assertEquals(file_mock.write.call_count, chunk_size)
+        self.assertEqual(file_mock.write.call_count, chunk_size)
         mock_pb.assert_called_with(0)
 
