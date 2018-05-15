@@ -83,7 +83,7 @@ class Osm(object):
         geomdupes = defaultdict(list)
         for el in self.elements:
             geomdupes[el.geometry()].append(el)
-        for geom, dupes in geomdupes.items():
+        for geom, dupes in list(geomdupes.items()):
             if len(dupes) > 1:
                 i = 0   # first element in dupes with different tags or id
                 while i < len(dupes) - 1 and dupes[i] == geom:
@@ -119,7 +119,7 @@ class Element(object):
         self.container = container
         self.action = 'modify'
         self.visible = 'true'
-        self.tags = dict((k,v) for (k,v) in tags.items())
+        self.tags = dict((k,v) for (k,v) in list(tags.items()))
         self.version = None
         self.timestamp = None
         self.changeset = None
@@ -153,6 +153,9 @@ class Element(object):
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __hash__(self):
+        return id(self)
+
     def is_new(self):
         """Returns true if this element is new to OSM"""
         return self.id <= 0
@@ -178,7 +181,7 @@ class Element(object):
     @attrs.setter
     def attrs(self, attrs):
         """Sets the element attributes from a dictionary"""
-        for (k, v) in attrs.items():
+        for (k, v) in list(attrs.items()):
             if k == 'id': v = int(v)
             if k in self.attr_list:
                 setattr(self, k, v)
@@ -316,6 +319,12 @@ class Way(Element):
             return self.geometry() == other[i:] + other[1:i+1]
         return False
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return id(self)
+
     def geometry(self):
         """Returns tuple of coordinates"""
         g = tuple(n.geometry() for n in self.nodes)
@@ -389,7 +398,7 @@ class Relation(Element):
                 return False
             ends.append(w.nodes[0].geometry())
             ends.append(w.nodes[-1].geometry())
-        is_conected = all([c == 2 for c in Counter(ends).values()])
+        is_conected = all([c == 2 for c in list(Counter(ends).values())])
         return is_conected
 
     def geometry(self):
