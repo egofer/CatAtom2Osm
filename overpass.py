@@ -1,4 +1,6 @@
 """Minimum Overpass API interface"""
+from past.builtins import basestring
+from builtins import object, range
 import re
 
 import download
@@ -47,10 +49,10 @@ class Query(object):
            or area clauses. Example: node["name"="Berlin"]"""
         rsc = lambda s: s[:-1] if s[-1] == ';' else s
         for arg in args:
-            if hasattr(arg, '__iter__'):
-                self.statements += [rsc(s) for s in arg]
-            else:
+            if isinstance(arg, basestring):
                 self.statements += rsc(arg).split(';')
+            else:
+                self.statements += [rsc(s) for s in arg]
         return self
     
     def get_url(self, n=0):
@@ -75,7 +77,7 @@ class Query(object):
                 return
             except IOError as e:
                 pass
-        raise e
+        raise IOError("Can't read from any Overpass server'")
     
     def read(self):
         """Returns query result"""
