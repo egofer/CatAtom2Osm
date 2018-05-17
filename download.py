@@ -1,3 +1,5 @@
+from __future__ import division
+from builtins import object, range
 import sys
 import requests
 import re
@@ -8,7 +10,7 @@ default_timeout = 30
 chunk_size = 1024
 
 
-class ProgressBar():
+class ProgressBar(object):
     """Basic text progress bar"""
 
     def __init__(self, total):
