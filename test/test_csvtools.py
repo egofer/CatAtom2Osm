@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+from builtins import str
 import unittest
 from tempfile import mkstemp
 
@@ -16,9 +18,9 @@ class TestCsvTools(unittest.TestCase):
     def test_csv2dict(self):
         _, tmp_path = mkstemp()
         with codecs.open(tmp_path, 'w', encoding) as csv_file:
-            csv_file.write(u'á%sx%sé%sy%s' % (delimiter, eol, delimiter, eol))
+            csv_file.write(str(u'á%sx%sé%sy%s') % (delimiter, eol, delimiter, eol))
         a_dict = csv2dict(tmp_path, {})
-        self.assertEqual(a_dict, {u'á':u'x', u'é':u'y'})
+        self.assertEqual(a_dict, {str(u'á'):str(u'x'), str(u'é'):str(u'y')})
 
     def test_csv2dict_bad_delimiter(self):
         _, tmp_path = mkstemp()
@@ -29,17 +31,21 @@ class TestCsvTools(unittest.TestCase):
 
     def test_dict2csv(self):
         _, tmp_path = mkstemp()
-        dict2csv(tmp_path, {u'á':'x', u'é':'y'})
+        d = {str(u'á'):'x', str(u'é'):'y'}
+        l = list(d.items())
+        t = str(u'%s%s%s%s%s%s%s%s') % (l[0][0], delimiter, l[0][1], eol,
+            l[1][0], delimiter, l[1][1], eol)
+        dict2csv(tmp_path, d)
         with codecs.open(tmp_path, 'r', encoding) as csv_file:
             text = csv_file.read()
-        self.assertEqual(text, u'á%sx%sé%sy%s' % (delimiter, eol, delimiter, eol))
+        self.assertEqual(text, t)
 
     def test_dict2csv_sort(self):
         _, tmp_path = mkstemp()
         dict2csv(tmp_path, {'b':'1', 'a':'3', 'c': '2'}, sort=1)
         with codecs.open(tmp_path, 'r', encoding) as csv_file:
             text = csv_file.read()
-        self.assertEqual(text, u'b%s1%sc%s2%sa%s3%s' % (delimiter, eol, 
+        self.assertEqual(text, str(u'b%s1%sc%s2%sa%s3%s') % (delimiter, eol, 
             delimiter, eol, delimiter, eol))
 
 
