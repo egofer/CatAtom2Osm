@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Statistics report"""
 
+from __future__ import division, unicode_literals
+from builtins import int, object, str
 from collections import OrderedDict, Counter
 from datetime import datetime
 import codecs
@@ -26,7 +28,7 @@ class Report(object):
             'min_level': {},
             'max_level': {},
         }
-        for k,v in kwargs.items():
+        for k,v in list(kwargs.items()):
             self.values[k] = v
         self.titles = OrderedDict([
             ('mun_name', _('Municipality')),
@@ -34,7 +36,7 @@ class Report(object):
             ('mun_code', _('Code')),
             ('date', _('Date')),
             ('options', _('Options')),
-            ('mun_area', _(u'Area')),
+            ('mun_area', _(str(u'Area'))),
             ('mun_population', _('Population')),
             ('mun_wikipedia', _('Wikipedia')),
             ('mun_wikidata', _('Wikidata')),
@@ -124,7 +126,7 @@ class Report(object):
             ('warnings', _("Warnings:")),
         ])
         self.formats = {
-            'mun_area': lambda v: locale.format_string(u'%.1f km²', v, True),
+            'mun_area': lambda v: locale.format_string(str(u'%.1f km²'), v, True),
             'mun_population': lambda v: '{} hab. ({})'.format(*v),
             'mun_wikipedia': lambda v: 'https://www.wikipedia.org/wiki/' + v,
             'mun_wikidata': lambda v: 'https://www.wikidata.org/wiki/' + v,
@@ -185,18 +187,18 @@ class Report(object):
 
     def cons_end_stats(self):
         self.dlag = ', '.join(["%d: %d" % (l, c) for (l, c) in \
-            OrderedDict(Counter(self.max_level.values())).items()])
+            list(OrderedDict(Counter(list(self.max_level.values()))).items())])
         self.dlbg = ', '.join(["%d: %d" % (l, c) for (l, c) in \
-            OrderedDict(Counter(self.min_level.values())).items()])
+            list(OrderedDict(Counter(list(self.min_level.values()))).items())])
         self.building_types = ', '.join(['%s: %d' % (b, c) \
-            for (b, c) in self.building_counter.items()])
+            for (b, c) in list(self.building_counter.items())])
 
     def fixme_stats(self):
         fixme_count = sum(self.fixme_counter.values())
         if fixme_count:
             self.fixme_count = fixme_count
             self.fixmes = ['%s: %d' % (f, c) \
-                for (f, c) in self.fixme_counter.items()]
+                for (f, c) in list(self.fixme_counter.items())]
         return fixme_count
 
     def get(self, key, default=0):
@@ -268,7 +270,7 @@ class Report(object):
         groups = set()
         last_group = False
         last_subgroup = False
-        for key in self.titles.keys():
+        for key in list(self.titles.keys()):
             exists = key in self.values
             if exists and isinstance(self.values[key], list) and len(self.values[key]) == 0:
                 exists = False
@@ -282,7 +284,7 @@ class Report(object):
             if last_subgroup and exists:
                 groups.add(last_subgroup)
         output = u''
-        for key, title in self.titles.items():
+        for key, title in list(self.titles.items()):
             if key.startswith('group_') and key in groups:
                 output += setup.eol + '=' + self.titles[key] + '=' + setup.eol
             elif key.startswith('subgroup_') and key in groups:
@@ -299,7 +301,7 @@ class Report(object):
                     value = self.values[key]
                     if key in self.formats:
                         value = self.formats[key](value)
-                    elif isinstance(value, int) or isinstance(value, long):
+                    elif isinstance(value, int):
                         value = int_format(value)
                     output += title + SEP + value
                     output += setup.eol
