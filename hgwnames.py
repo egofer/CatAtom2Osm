@@ -2,6 +2,8 @@
 """
 Parsing of highway names
 """
+from __future__ import unicode_literals
+from builtins import str
 
 import os
 import re
@@ -42,8 +44,8 @@ def parse(name):
                 new_word = word.title()
         else:
             new_word = word.title()
-        new_word = new_word.replace(u'·L', u'·l') # Letra ele geminada
-        new_word = new_word.replace(u'.L', u'·l') # Letra ele geminada
+        new_word = new_word.replace(str(u'·L'), str(u'·l')) # Letra ele geminada
+        new_word = new_word.replace(str(u'.L'), str(u'·l')) # Letra ele geminada
         result.append(new_word)
     return ' '.join(result).strip()
 
