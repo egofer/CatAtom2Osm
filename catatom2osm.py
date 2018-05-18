@@ -15,7 +15,7 @@ from collections import defaultdict, Counter, OrderedDict
 from qgis.core import *
 import qgis.utils
 qgis.utils.uninstallErrorHook()
-qgis_utils = getattr(qgis.utils, 'QGis', qgis.utils.Qgis)
+qgis_utils = getattr(qgis.utils, 'QGis', getattr(qgis.utils, 'Qgis', None))
 from osgeo import gdal
 
 import catatom
