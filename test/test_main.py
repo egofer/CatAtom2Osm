@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import mock
 import unittest
 import sys, os
 import logging
 logging.disable(logging.WARNING)
-from cStringIO import StringIO
+from io import StringIO, BytesIO
 import codecs
 from contextlib import contextmanager
 os.environ['LANGUAGE'] = 'C'
@@ -14,7 +18,7 @@ import main
 @contextmanager
 def capture(command, *args, **kwargs):
     out = sys.stdout
-    sys.stdout = codecs.getwriter('utf-8')(StringIO())
+    sys.stdout = codecs.getwriter('utf-8')(BytesIO())
     sys.stdout.encoding = 'utf-8'
     try:
         command(*args, **kwargs)
@@ -35,7 +39,7 @@ class TestMain(unittest.TestCase):
     @mock.patch('main.sys.argv', ['catatom2osm.py'])
     def test_no_args(self):
         with capture(main.run) as output:
-            self.assertIn("usage: catatom2osm", output)
+            self.assertIn("usage: catatom2osm", str(output))
 
     @mock.patch('main.sys.argv', ['catatom2osm.py', 'foo', 'bar'])
     @mock.patch('main.log.error')
@@ -49,12 +53,12 @@ class TestMain(unittest.TestCase):
     def test_default(self, mockcat):
         main.run()
         self.assertTrue(mockcat.called)
-        self.assertEquals(mockcat.call_args_list[0][0][0], 'foobar')
+        self.assertEqual(mockcat.call_args_list[0][0][0], 'foobar')
         options = mockcat.call_args_list[0][0][1]
         d = {'building': False, 'all': False, 'tasks': True, 'log_level': 'INFO', 
             'parcel': False, 'list': False, 'zoning': True, 'address': True}
-        for (k, v) in d.items():
-            self.assertEquals(getattr(options, k), v)
+        for (k, v) in list(d.items()):
+            self.assertEqual(getattr(options, k), v)
 
     @mock.patch('main.sys.argv', ['catatom2osm.py', 'foobar', '-a'])
     @mock.patch('catatom2osm.CatAtom2Osm')
@@ -64,8 +68,8 @@ class TestMain(unittest.TestCase):
         options = mockcat.call_args_list[0][0][1]
         d = {'building': True, 'all': True, 'tasks': True, 'log_level': 'INFO', 
             'parcel': True, 'list': False, 'zoning': True, 'address': True}
-        for (k, v) in d.items():
-            self.assertEquals(getattr(options, k), v)
+        for (k, v) in list(d.items()):
+            self.assertEqual(getattr(options, k), v)
 
     @mock.patch('main.sys.argv', ['catatom2osm.py', 'foobar', '-b'])
     @mock.patch('catatom2osm.CatAtom2Osm')
@@ -75,8 +79,8 @@ class TestMain(unittest.TestCase):
         options = mockcat.call_args_list[0][0][1]
         d = {'building': True, 'all': False, 'tasks': False, 'log_level': 'INFO', 
             'parcel': False, 'list': False, 'zoning': False, 'address': False}
-        for (k, v) in d.items():
-            self.assertEquals(getattr(options, k), v)
+        for (k, v) in list(d.items()):
+            self.assertEqual(getattr(options, k), v)
 
     @mock.patch('main.sys.argv', ['catatom2osm.py', '-w', '33333'])
     @mock.patch('catatom2osm.catatom.Reader')
@@ -93,7 +97,7 @@ class TestMain(unittest.TestCase):
 
     @mock.patch('main.sys.argv', ['catatom2osm.py', '-l', '33'])
     @mock.patch('catatom2osm.catatom.list_municipalities')
-    def test_list(self, mocklist):
+    def test_list2(self, mocklist):
         main.run()
         mocklist.assert_called_once_with('33')
 
@@ -111,7 +115,7 @@ class TestMain(unittest.TestCase):
     def test_IOError(self, mocklog):
         main.run()
         output = mocklog.call_args_list[0][0][0]
-        self.assertEquals(output, 'bartaz')
+        self.assertEqual(output, 'bartaz')
 
     @mock.patch('main.sys.argv', ['catatom2osm.py', 'foobar'])
     @mock.patch('catatom2osm.CatAtom2Osm', raiseImportError)
@@ -120,7 +124,7 @@ class TestMain(unittest.TestCase):
         main.run()
         output1 = mocklog.call_args_list[0][0][0]
         output2 = mocklog.call_args_list[1][0][0]
-        self.assertEquals(output1, 'qgis')
+        self.assertEqual(output1, 'qgis')
         self.assertIn('install QGIS', output2)
 
     @mock.patch('main.sys.argv', ['catatom2osm.py', 'foobar', '--log=DEBUG'])

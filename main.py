@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """CatAtom2Osm command line entry point"""
+from __future__ import unicode_literals
+from builtins import str
 from argparse import ArgumentParser
 import codecs
 import logging
@@ -38,7 +40,7 @@ files it will download them for you from the INSPIRE Services of the Spanish
 Cadastre."""))
 
 def process(options):
-    a_path = '' if len(options.path) == 0 else options.path[0].decode(setup.encoding)
+    a_path = '' if len(options.path) == 0 else options.path[0]
     if options.list:
         from catatom import list_municipalities
         list_municipalities('{:>02}'.format(options.list))
@@ -113,8 +115,9 @@ def run():
         try:
             process(options)
         except (ImportError, IOError, OSError, ValueError, BadZipfile) as e:
-            log.error(e.message if e.message else str(e))
-            if 'qgis' in e.message or 'core' in e.message or 'osgeo' in e.message:
+            msg = e.message if getattr(e, 'message', '') else str(e)
+            log.error(msg)
+            if 'qgis' in msg or 'core' in msg or 'osgeo' in msg:
                 log.error(_("Please, install QGIS"))
 
 if __name__ == "__main__":
