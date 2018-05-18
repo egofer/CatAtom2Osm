@@ -1,8 +1,11 @@
 """Reader of Cadastre ATOM GML files"""
+from __future__ import print_function
+from builtins import next, object
 import json
 import logging
 import os
 import re
+import six
 import zipfile
 from qgis.core import QgsCoordinateReferenceSystem
 
@@ -41,7 +44,7 @@ class Reader(object):
     def get_metadata(self, md_path, zip_path=""):
         """Get the metadata of the source file"""
         if os.path.exists(md_path):
-            text = open(md_path, 'r').read()
+            text = open(md_path, 'rb').read()
         else:
             zf = zipfile.ZipFile(zip_path)
             text = zf.read(os.path.basename(md_path))
@@ -112,14 +115,16 @@ class Reader(object):
             zf = zipfile.ZipFile(zip_path, 'r')
             f = zf.open(os.path.basename(gml_path).split('|')[0], 'r')
         else:
-            f = open(gml_path, 'r')
+            f = open(gml_path, 'rb')
         context = etree.iterparse(f, events=('end',))
         try:
-            event, elem = context.next() # </something>
-            event, elem = context.next() # </featureMember>
-            event, elem = context.next() # </featureCollection>
+            event, elem = next(context) # </something>
+            event, elem = next(context) # </featureMember>
+            event, elem = next(context) # </featureCollection>
+            f.close()
             return False
         except StopIteration:
+            f.close()
             return True
 
     def download(self, layername):
@@ -219,8 +224,9 @@ def list_municipalities(prov_code):
     ns = {'atom': 'http://www.w3.org/2005/Atom'}
     office = root.find('atom:title', ns).text.split('Office ')[1]
     title = _("Territorial office %s") % office
-    print title
-    print "=" * len(title)
+    print(title)
+    print("=" * len(title))
     for entry in root.findall('atom:entry', namespaces=ns):
         row = entry.find('atom:title', ns).text.replace('buildings', '')
-        print row.encode(setup.encoding)
+        print(row.encode(setup.encoding) if six.PY2 else row)
+
