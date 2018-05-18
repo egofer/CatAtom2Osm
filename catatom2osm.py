@@ -2,7 +2,10 @@
 """
 Tool to convert INSPIRE data sets from the Spanish Cadastre ATOM Services to OSM files
 """
-import os
+from __future__ import division
+from builtins import map, object
+from past.builtins import basestring
+import os, sys
 import codecs
 import gzip
 import logging
@@ -12,6 +15,7 @@ from collections import defaultdict, Counter, OrderedDict
 from qgis.core import *
 import qgis.utils
 qgis.utils.uninstallErrorHook()
+qgis_utils = getattr(qgis.utils, 'QGis', qgis.utils.Qgis)
 from osgeo import gdal
 
 import catatom
@@ -49,7 +53,7 @@ class QgsSingleton(QgsApplication):
         return QgsSingleton._qgs
 
 
-class CatAtom2Osm:
+class CatAtom2Osm(object):
     """
     Main application class for a tool to convert the data sets from the
     Spanish Cadastre ATOM Services to OSM files.
@@ -70,14 +74,14 @@ class CatAtom2Osm:
         report.sys_info = True
         self.qgs = QgsSingleton()
         if report.sys_info:
-            report.qgs_version = qgis.utils.QGis.QGIS_VERSION
+            report.qgs_version = qgis_utils.QGIS_VERSION
             report.gdal_version = gdal.__version__
             log.debug(_("Initialized QGIS %s API"), report.qgs_version)
             log.debug(_("Using GDAL %s"), report.gdal_version)
-        if qgis.utils.QGis.QGIS_VERSION_INT < setup.MIN_QGIS_VERSION_INT:
+        if qgis_utils.QGIS_VERSION_INT < setup.MIN_QGIS_VERSION_INT:
             msg = _("Required QGIS version %s or greater") % setup.MIN_QGIS_VERSION
             raise ValueError(msg)
-        gdal_version_int = int('{:02d}{:02d}{:02d}'.format(*map(int, gdal.__version__.split('.'))))
+        gdal_version_int = int('{:02d}{:02d}{:02d}'.format(*list(map(int, gdal.__version__.split('.')))))
         if gdal_version_int < setup.MIN_GDAL_VERSION_INT:
             msg = _("Required GDAL version %s or greater") % setup.MIN_GDAL_VERSION
             raise ValueError(msg)
@@ -301,7 +305,7 @@ class CatAtom2Osm:
 
     def exit(self):
         """Ends properly"""
-        for propname in self.__dict__.keys():
+        for propname in list(self.__dict__.keys()):
             if isinstance(getattr(self, propname), QgsVectorLayer):
                 delattr(self, propname)
         if hasattr(self, 'qgs'):
@@ -451,7 +455,7 @@ class CatAtom2Osm:
 
     def get_auxiliary_addresses(self):
         """If exists, reads and conflate an auxiliary addresses data source"""
-        for source in setup.aux_address.keys():
+        for source in list(setup.aux_address.keys()):
             if self.cat.zip_code[:2] in setup.aux_address[source]:
                 aux_source = globals()[source]
                 aux_path = os.path.join(os.path.dirname(self.path), 'aux')
@@ -485,7 +489,7 @@ class CatAtom2Osm:
             if ad.tags['ref'] in building_index:
                 address_index[ad.tags['ref']].append(ad)
         md = 0
-        for (ref, group) in building_index.items():
+        for (ref, group) in list(building_index.items()):
             address_count = len(address_index[ref])
             if address_count == 0:
                 continue
@@ -547,7 +551,7 @@ class CatAtom2Osm:
         else:
             highway_names = csvtools.csv2dict(highway_names_path, {})
             is_new = False
-        for key, value in highway_names.items():
+        for key, value in list(highway_names.items()):
             highway_names[key] = value.strip()
         return (highway_names, is_new)
 
