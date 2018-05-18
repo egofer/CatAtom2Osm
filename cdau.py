@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Reader of CDAU CSV files"""
+from __future__ import unicode_literals
+from builtins import object, range
 
 import logging
 import locale
@@ -57,7 +59,7 @@ def cod_mun_cat2ine(cod_mun_cat):
     cod_prov = cod_mun_cat[0:2]
     cod_mun = int(cod_mun_cat[2:])
     if cod_prov == '18':
-        if cod_mun in cod_mun_trans[cod_prov].keys():
+        if cod_mun in list(cod_mun_trans[cod_prov].keys()):
             cod_mun = cod_mun_trans[cod_prov][cod_mun]
         else:
             if cod_mun in range(64, 120) or cod_mun in range(137, 143):
@@ -81,7 +83,7 @@ def get_cat_address(ad, cod_mun_cat):
     attr['localId'] = '{}.{}.{}.{}'.format(cod_mun_cat[:2], cod_mun_cat[2:], 
         ad['dgc_via'], ad['refcatparc'])
     nom_tip_via = highway_types_equiv.get(ad['nom_tip_via'], ad['nom_tip_via'])
-    attr['TN_text'] = u'{} {}'.format(nom_tip_via, ad['nom_via'])
+    attr['TN_text'] = str(u'{} {}').format(nom_tip_via, ad['nom_via'])
     attr['postCode'] = ad['cod_postal']
     attr['spec'] = 'Entrance'
     to = ad['num_por_hasta'] + ad['ext_hasta']
@@ -121,7 +123,7 @@ class Reader(object):
                 fo.write(self.src_date)
 
     def read(self, prov_code):
-        if prov_code not in andalucia.keys():
+        if prov_code not in list(andalucia.keys()):
             raise ValueError(_("Province code '%s' not valid") % prov_code)
         csv_fn = csv_name.format(andalucia[prov_code])
         csv_path = os.path.join(self.path, csv_fn)
@@ -166,7 +168,7 @@ def conflate(cdau_address, cat_address, cod_mun_cat):
             fids = index.intersects(area_of_candidates)
             if len(fids) == 0: # no close cadastre address
                 feat = QgsFeature(cat_address.fields())
-                for key, value in attr.items():
+                for key, value in list(attr.items()):
                     feat[key] = value
                 feat.setGeometry(QgsGeometry.fromPoint(pt))
                 to_add.append(feat) # add new
@@ -180,7 +182,7 @@ def conflate(cdau_address, cat_address, cod_mun_cat):
                    candidate = feat
             if candidate is not None: # update existing
                 to_change_g[candidate.id()] = QgsGeometry.fromPoint(pt)
-                for key, value in attr.items():
+                for key, value in list(attr.items()):
                     candidate[key] = value
                 to_change[candidate.id()] = layer.get_attributes(candidate)
     log.info(_("Parsed %d addresses from '%s'"), c, 'CDAU')
