@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 """Application layers"""
 
+from builtins import object
 import os
 import math
 import re
+import six
 from collections import defaultdict
 import logging
 
 from qgis.core import *
-from PyQt4.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant
 
 import hgwnames
 import osm
@@ -26,11 +28,13 @@ get_attributes = lambda feat: \
     dict([(i, feat[i]) for i in range(len(feat.fields().toList()))])
 
 
-class Point(QgsPoint):
+class Point(QgsPoint if six.PY2 else QgsPointXY):
     """Extends QgsPoint with some utility methods"""
 
     def __init__(self, arg1, arg2=None):
-        if arg2 is None:
+        if type(arg1) is QgsPoint:
+            super(Point, self).__init__(arg1)
+        elif arg2 is None:
             super(Point, self).__init__(arg1[0], arg1[1])
         else:
             super(Point, self).__init__(arg1, arg2)
@@ -51,9 +55,9 @@ class Point(QgsPoint):
         Returns:
             (float) Angle between the vertex and their adjacents,
         """
-        (point, ndx, ndxa, ndxb, dist) = geom.closestVertex(self)
-        va = geom.vertexAt(ndxa) # previous vertex
-        vb = geom.vertexAt(ndxb) # next vertex
+        (point, ndx, ndxa, ndxb, dist) = geom.closestVertex(Point(self))
+        va = Point(geom.vertexAt(ndxa)) # previous vertex
+        vb = Point(geom.vertexAt(ndxb)) # next vertex
         angle = abs(point.azimuth(va) - point.azimuth(vb))
         return angle
 
@@ -77,9 +81,9 @@ class Point(QgsPoint):
             (bool)  True for a corner
             (float) Distance from the vertex to the segment formed by their adjacents.
         """
-        (point, ndx, ndxa, ndxb, dist) = geom.closestVertex(self)
-        va = geom.vertexAt(ndxa) # previous vertex
-        vb = geom.vertexAt(ndxb) # next vertex
+        (point, ndx, ndxa, ndxb, dist) = geom.closestVertex(Point(self))
+        va = Point(geom.vertexAt(ndxa)) # previous vertex
+        vb = Point(geom.vertexAt(ndxb)) # next vertex
         angle = abs(point.azimuth(va) - point.azimuth(vb))
         a = abs(va.azimuth(point) - va.azimuth(vb))
         h = math.sqrt(va.sqrDist(point))
@@ -115,9 +119,9 @@ class Point(QgsPoint):
             the distance from va to the segment v-vb is lower than threshold.
             (QgsPoint) vx = projection of va over the segment v-vb.
         """
-        (v, ndx, ndxa, ndxb, dist) = geom.closestVertex(self)
-        va = geom.vertexAt(ndxa) # previous vertex
-        vb = geom.vertexAt(ndxb) # next vertex
+        (v, ndx, ndxa, ndxb, dist) = geom.closestVertex(Point(self))
+        va = Point(geom.vertexAt(ndxa)) # previous vertex
+        vb = Point(geom.vertexAt(ndxb)) # next vertex
         angle_v = abs(v.azimuth(va) - v.azimuth(vb))
         is_acute = angle_v < acute_thr if angle_v < 180 else 360 - angle_v < acute_thr
         if not is_acute:
@@ -147,6 +151,39 @@ class Point(QgsPoint):
         return angle_v, angle_a, ndx, ndxa, is_acute, is_zigzag, is_spike, vx
 
 
+class Geometry(object):
+
+    @staticmethod
+    def fromPointXY(point):
+        try:
+            return QgsGeometry.fromPointXY(QgsPointXY(point))
+        except (AttributeError, NameError):
+            return QgsGeometry.fromPoint(point)
+
+    @staticmethod
+    def fromMultiPointXY(mp):
+        try:
+            return QgsGeometry.fromMultiPointXY([QgsPointXY(p) for p in mp])
+        except AttributeError:
+            return QgsGeometry.fromMultiPoint(mp)
+
+    @staticmethod
+    def fromPolygonXY(polygon):
+        try:
+            return QgsGeometry.fromPolygonXY([[QgsPointXY(p) for p in r] \
+                for r in polygon])
+        except AttributeError:
+            return QgsGeometry.fromPolygon(polygon)
+
+    @staticmethod
+    def fromMultiPolygonXY(mp):
+        try:
+            return QgsGeometry.fromMultiPolygonXY([[[QgsPointXY(p) for p in r] \
+                for r in t] for t in mp])
+        except AttributeError:
+            return QgsGeometry.fromMultiPolygon(mp)
+
+
 class BaseLayer(QgsVectorLayer):
     """Base class for application layers"""
 
@@ -159,7 +196,7 @@ class BaseLayer(QgsVectorLayer):
         self.keep = False
 
     @staticmethod
-    def create_shp(name, crs, fields=QgsFields(), geom_type=QGis.WKBMultiPolygon):
+    def create_shp(name, crs, fields=QgsFields(), geom_type=QgsWkbTypes.MultiPolygon):
         writer = QgsVectorFileWriter(name, 'UTF-8', fields, geom_type, crs, 'ESRI Shapefile')
         if writer.hasError() != QgsVectorFileWriter.NoError:
             msg = _("Error when creating shapefile: '%s'") % writer.errorMessage()
@@ -211,13 +248,13 @@ class BaseLayer(QgsVectorLayer):
         """
         rename = rename if rename is not None else self.rename
         resolve = resolve if resolve is not None else self.resolve
-        if self.pendingFields().isEmpty():
+        if self.fields().isEmpty():
             self.writer.addAttributes(feature.fields().toList())
             self.updateFields()
-        dst_ft = QgsFeature(self.pendingFields())
+        dst_ft = QgsFeature(self.fields())
         dst_ft.setGeometry(feature.geometry())
         src_attrs = [f.name() for f in feature.fields()]
-        for field in self.pendingFields().toList():
+        for field in self.fields().toList():
             dst_attr = field.name()
             if dst_attr in resolve:
                 (src_attr, reference_match) = resolve[dst_attr]
@@ -276,7 +313,8 @@ class BaseLayer(QgsVectorLayer):
         """
         if target_crs is None:
             target_crs = QgsCoordinateReferenceSystem(4326)
-        crs_transform = QgsCoordinateTransform(self.crs(), target_crs)
+        crs_transform = QgsCoordinateTransform(self.crs(), target_crs,
+            QgsProject.instance())
         to_change = {}
         for feature in self.getFeatures():
             geom = QgsGeometry(feature.geometry())
@@ -313,9 +351,9 @@ class BaseLayer(QgsVectorLayer):
             prefix (str): An optional prefix to add to the target fields names
         """
         fields = []
-        target_attrs = [f.name() for f in self.pendingFields()]
+        target_attrs = [f.name() for f in self.fields()]
         for attr in field_names_subset:
-            field = source_layer.pendingFields().field(attr)
+            field = source_layer.fields().field(attr)
             field.setName(prefix + attr)
             if field.name() not in target_attrs:
                 if field.length() > 254:
@@ -358,7 +396,7 @@ class BaseLayer(QgsVectorLayer):
             clean (bool): If true (default), delete features without translation
         """
         to_clean = []
-        field_ndx = self.pendingFields().fieldNameIndex(field_name)
+        field_ndx = self.writer.fieldNameIndex(field_name)
         if field_ndx >= 0:
             to_change = {}
             for feat in self.getFeatures():
@@ -390,10 +428,11 @@ class BaseLayer(QgsVectorLayer):
             else:
                 bbox.combineExtentWith(f.geometry().boundingBox())
         if bbox:
-            p1 = QgsGeometry().fromPoint(Point(bbox.xMinimum(), bbox.yMinimum()))
-            p2 = QgsGeometry().fromPoint(Point(bbox.xMaximum(), bbox.yMaximum()))
+            p1 = Geometry.fromPointXY(Point(bbox.xMinimum(), bbox.yMinimum()))
+            p2 = Geometry.fromPointXY(Point(bbox.xMaximum(), bbox.yMaximum()))
             target_crs = QgsCoordinateReferenceSystem(4326)
-            crs_transform = QgsCoordinateTransform(self.crs(), target_crs)
+            crs_transform = QgsCoordinateTransform(self.crs(), target_crs,
+                QgsProject.instance())
             p1.transform(crs_transform)
             p2.transform(crs_transform)
             bbox = [p1.asPoint().y(), p1.asPoint().x(), p2.asPoint().y(), p2.asPoint().x()]
@@ -446,15 +485,15 @@ class BaseLayer(QgsVectorLayer):
         for feature in self.getFeatures():
             geom = feature.geometry()
             e = None
-            if geom.wkbType() == QGis.WKBPolygon:
+            if geom.wkbType() == QgsWkbTypes.Polygon:
                 pol = geom.asPolygon()
                 if len(pol) == 1:
                     e = data.Way(pol[0])
                 else:
                     e = data.Polygon(pol)
-            elif geom.wkbType() == QGis.WKBMultiPolygon:
+            elif geom.wkbType() == QgsWkbTypes.MultiPolygon:
                 e = data.MultiPolygon(geom.asMultiPolygon())
-            elif geom.wkbType() == QGis.WKBPoint:
+            elif geom.wkbType() == QgsWkbTypes.Point:
                 e = data.Node(geom.asPoint())
             else:
                 msg = _("Detected a %s geometry in the '%s' layer") % \
@@ -505,7 +544,7 @@ class PolygonLayer(BaseLayer):
             geom = feature.geometry()
         else:
             geom = feature
-        if geom.wkbType() == QGis.WKBPolygon:
+        if geom.wkbType() == QgsWkbTypes.Polygon:
             return [geom.asPolygon()]
         return geom.asMultiPolygon()
 
@@ -544,10 +583,10 @@ class PolygonLayer(BaseLayer):
         to_add = []
         for feature in self.getFeatures(request):
             geom = feature.geometry()
-            if geom.wkbType() == QGis.WKBMultiPolygon:
+            if geom.wkbType() == QgsWkbTypes.MultiPolygon:
                 for part in geom.asMultiPolygon():
                     feat = QgsFeature(feature)
-                    feat.setGeometry(QgsGeometry.fromPolygon(part))
+                    feat.setGeometry(Geometry.fromPolygonXY(part))
                     to_add.append(feat)
                 to_clean.append(feature.id())
         if to_clean:
@@ -625,9 +664,9 @@ class PolygonLayer(BaseLayer):
                     for fid in fids:
                         g = QgsGeometry(geometries[fid])
                         (p, ndx, ndxa, ndxb, dist_v) = g.closestVertex(point)
-                        (dist_s, closest, vertex) = g.closestSegmentWithContext(point)
-                        va = g.vertexAt(ndxa)
-                        vb = g.vertexAt(ndxb)
+                        (dist_s, closest, vertex) = g.closestSegmentWithContext(point)[:3]
+                        va = Point(g.vertexAt(ndxa))
+                        vb = Point(g.vertexAt(ndxb))
                         note = ""
                         if dist_v == 0:
                             dist_a = va.sqrDist(point)
@@ -659,8 +698,8 @@ class PolygonLayer(BaseLayer):
                                 nodes.add(p)
                                 td += 1
                         elif dist_s < threshold**2 and closest != va and closest != vb:
-                            va = g.vertexAt(vertex)
-                            vb = g.vertexAt(vertex - 1)
+                            va = Point(g.vertexAt(vertex))
+                            vb = Point(g.vertexAt(vertex - 1))
                             angle = abs(point.azimuth(va) - point.azimuth(vb))
                             note = "Topo refused by angle: %.2f" % angle
                             if abs(180 - angle) <= straight_thr:
@@ -700,7 +739,7 @@ class PolygonLayer(BaseLayer):
             fpath = os.path.join(os.path.dirname(self.writer.dataSourceUri()), 
                 'debug_notvalid.shp')
             debshp = QgsVectorFileWriter(fpath, 'UTF-8', QgsFields(),
-                QGis.WKBPolygon, self.crs(), 'ESRI Shapefile')
+                QgsWkbTypes.Polygon, self.crs(), 'ESRI Shapefile')
             debshp2 = DebugWriter("debug_spikes.shp", self)
         to_change = {}
         to_clean = []
@@ -720,7 +759,7 @@ class PolygonLayer(BaseLayer):
                     if skip or not is_acute:
                         skip = False
                         continue
-                    g = QgsGeometry().fromPolygon([ring])
+                    g = Geometry.fromPolygonXY([ring])
                     f = QgsFeature(QgsFields())
                     f.setGeometry(QgsGeometry(g))
                     g.deleteVertex(n)
@@ -879,7 +918,7 @@ class PolygonLayer(BaseLayer):
                 geom = geom.combine(geometries[fid])
             if geom.isMultipart():
                 for i, part in enumerate(geom.asMultiPolygon()):
-                    g = QgsGeometry.fromPolygon(part)
+                    g = Geometry.fromPolygonXY(part)
                     to_change[group[i]] = g
                     count_com += 1
                 to_clean += group[i+1:]
@@ -923,7 +962,7 @@ class ParcelLayer(BaseLayer):
     def __init__(self, path="Polygon", baseName="cadastralparcel",
             providerLib="memory", source_date=None):
         super(ParcelLayer, self).__init__(path, baseName, providerLib)
-        if self.pendingFields().isEmpty():
+        if self.fields().isEmpty():
             self.writer.addAttributes([
                 QgsField('localId', QVariant.String, len=254),
                 QgsField('label', QVariant.String, len=254),
@@ -939,7 +978,7 @@ class ZoningLayer(PolygonLayer):
     def __init__(self, pattern='{}', path="Polygon", baseName="cadastralzoning",
             providerLib="memory", source_date=None):
         super(ZoningLayer, self).__init__(path, baseName, providerLib)
-        if self.pendingFields().isEmpty():
+        if self.fields().isEmpty():
             self.writer.addAttributes([
                 QgsField('localId', QVariant.String, len=254),
                 QgsField('label', QVariant.String, len=254),
@@ -970,17 +1009,17 @@ class ZoningLayer(PolygonLayer):
         multi = 0
         final = 0
         for feature in layer.getFeatures():
-            if layer.fieldNameIndex('levelName') > 0:
+            if layer.dataProvider().fieldNameIndex('levelName') > 0:
                 zone = feature['levelName'][3]
             else:
                 zone = feature['LocalisedCharacterString'][0]
             if level == None or level == zone:
                 feat = self.copy_feature(feature)
                 geom = feature.geometry()
-                if geom.wkbType() == QGis.WKBMultiPolygon:
+                if geom.wkbType() == QgsWkbTypes.MultiPolygon:
                     for part in geom.asMultiPolygon():
                         f = QgsFeature(feat)
-                        f.setGeometry(QgsGeometry.fromPolygon(part))
+                        f.setGeometry(Geometry.fromPolygonXY(part))
                         to_add.append(f)
                         final += 1
                     multi += 1
@@ -1023,7 +1062,7 @@ class AddressLayer(BaseLayer):
     def __init__(self, path="Point", baseName="address", providerLib="memory",
             source_date=None):
         super(AddressLayer, self).__init__(path, baseName, providerLib)
-        if self.pendingFields().isEmpty():
+        if self.fields().isEmpty():
             self.writer.addAttributes([
                 QgsField('localId', QVariant.String, len=254),
                 QgsField('spec', QVariant.String, len=254),
@@ -1043,7 +1082,7 @@ class AddressLayer(BaseLayer):
         self.source_date = source_date
 
     @staticmethod
-    def create_shp(name, crs, fields=QgsFields(), geom_type=QGis.WKBPoint):
+    def create_shp(name, crs, fields=QgsFields(), geom_type=QgsWkbTypes.Point):
         QgsVectorFileWriter(name, 'UTF-8', fields, geom_type, crs, 'ESRI Shapefile')
 
     def to_osm(self, data=None, tags={}, upload='never'):
@@ -1091,7 +1130,7 @@ class AddressLayer(BaseLayer):
             for f in self.getFeatures():
                 highway_names[f['TN_text']].append(f.geometry().asPoint())
             for name, points in highway_names.items():
-                bbox = QgsGeometry().fromMultiPoint(points).boundingBox()
+                bbox = Geometry.fromMultiPointXY(points).boundingBox()
                 choices = [features[fid]['name'] for fid in index.intersects(bbox)]
                 highway_names[name] = hgwnames.match(name, choices)
         return highway_names
@@ -1111,7 +1150,7 @@ class ConsLayer(PolygonLayer):
     def __init__(self, path="Polygon", baseName="building",
             providerLib = "memory", source_date=None):
         super(ConsLayer, self).__init__(path, baseName, providerLib)
-        if self.pendingFields().isEmpty():
+        if self.fields().isEmpty():
             self.writer.addAttributes([
                 QgsField('localId', QVariant.String, len=254),
                 QgsField('condition', QVariant.String, len=254),
@@ -1296,7 +1335,7 @@ class ConsLayer(PolygonLayer):
                     if not is_inside(feat, bu):
                         to_clean_o.append(feat.id())
         for ref, parts in parts_for_ref.items():
-            feat = QgsFeature(QgsFields(self.pendingFields()))
+            feat = QgsFeature(QgsFields(self.fields()))
             feat['localId'] = ref
             geom = self.merge_adjacent_features(parts)
             feat.setGeometry(geom)
@@ -1370,7 +1409,7 @@ class ConsLayer(PolygonLayer):
                 if len(poly) < len(parts):
                     for (i, part) in enumerate(parts):
                         if i < len(poly):
-                            g = QgsGeometry().fromPolygon(poly[i])
+                            g = Geometry.fromPolygonXY(poly[i])
                             to_change_g[part.id()] = g
                         else:
                             to_clean_g.append(part.id())
@@ -1388,7 +1427,7 @@ class ConsLayer(PolygonLayer):
         new_geom = None
         delete_rings = []
         for i, ring in enumerate(geom1.asPolygon()):
-            if QgsGeometry().fromPolygon([ring]).equals(geom2):
+            if Geometry.fromPolygonXY([ring]).equals(geom2):
                 if i == 0:
                     delete = True
                     break
@@ -1516,9 +1555,9 @@ class ConsLayer(PolygonLayer):
                 if ad['spec'] == 'Entrance':
                     point = ad.geometry().asPoint()
                     bg = building.geometry()
-                    distance, closest, vertex = bg.closestSegmentWithContext(point)
-                    va = bg.vertexAt(vertex - 1)
-                    vb = bg.vertexAt(vertex)
+                    distance, closest, vertex = bg.closestSegmentWithContext(point)[:3]
+                    va = Point(bg.vertexAt(vertex - 1))
+                    vb = Point(bg.vertexAt(vertex))
                     if distance < setup.addr_thr**2:
                         if vertex > len(bg.asPolygon()[0]):
                             ad['spec'] = 'inner'
@@ -1528,7 +1567,7 @@ class ConsLayer(PolygonLayer):
                             ad['spec'] = 'corner'
                             to_change[ad.id()] = get_attributes(ad)
                         else:
-                            dg = QgsGeometry.fromPoint(closest)
+                            dg = Geometry.fromPointXY(closest)
                             to_move[ad.id()] = dg
                             bg.insertVertex(closest.x(), closest.y(), vertex)
                             to_insert[building.id()] = QgsGeometry(bg)
@@ -1610,7 +1649,7 @@ class ConsLayer(PolygonLayer):
                 poly = [[map(Point, w)] for w in el.outer_geometry()]
             if poly:
                 num_buildings += 1
-                geom = QgsGeometry().fromMultiPolygon(poly)
+                geom = Geometry().fromMultiPolygonXY(poly)
                 if geom is None or not geom.isGeosValid():
                     msg = _("OSM building with id %s is not valid") % el.fid
                     log.warning(msg)
@@ -1642,7 +1681,7 @@ class HighwayLayer(BaseLayer):
     def __init__(self, path="LineString", baseName="highway",
             providerLib="memory"):
         super(HighwayLayer, self).__init__(path, baseName, providerLib)
-        if self.pendingFields().isEmpty():
+        if self.fields().isEmpty():
             self.writer.addAttributes([
                 QgsField('name', QVariant.String, len=254),
             ])
@@ -1660,7 +1699,7 @@ class HighwayLayer(BaseLayer):
             if 'name' in w.tags:
                 points = [QgsPoint(n.x, n.y) for n in w.nodes]
                 geom = QgsGeometry.fromPolyline(points)
-                feat = QgsFeature(QgsFields(self.pendingFields()))
+                feat = QgsFeature(QgsFields(self.fields()))
                 feat.setGeometry(geom)
                 feat.setAttribute("name", w.tags['name'])
                 to_add.append(feat)
@@ -1682,12 +1721,12 @@ class DebugWriter(QgsVectorFileWriter):
         self.fields = QgsFields()
         self.fields.append(QgsField("note", QVariant.String, len=100))
         QgsVectorFileWriter.__init__(self, fpath, "utf-8", self.fields,
-                QGis.WKBPoint, layer.crs(), driver_name)
+                QgsWkbTypes.Point, layer.crs(), driver_name)
 
     def add_point(self, point, note=None):
         """Adds a point to the layer with the attribute note."""
         feat = QgsFeature(QgsFields(self.fields))
-        geom = QgsGeometry.fromPoint(point)
+        geom = Geometry.fromPointXY(point)
         feat.setGeometry(geom)
         if note:
             feat.setAttribute("note", note[:254])
