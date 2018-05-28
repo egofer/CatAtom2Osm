@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
 """Application layers"""
 
-from builtins import object
+from builtins import object, str
 import os
 import math
 import re
-import six
 from collections import defaultdict
 import logging
 
 from qgis.core import *
-from qgis.PyQt.QtCore import QVariant
+from qgiscompat import *
 
 import hgwnames
 import osm
@@ -28,7 +27,7 @@ get_attributes = lambda feat: \
     dict([(i, feat[i]) for i in range(len(feat.fields().toList()))])
 
 
-class Point(QgsPoint if six.PY2 else QgsPointXY):
+class Point(Qgs2DPoint):
     """Extends QgsPoint with some utility methods"""
 
     def __init__(self, arg1, arg2=None):
@@ -196,7 +195,7 @@ class BaseLayer(QgsVectorLayer):
         self.keep = False
 
     @staticmethod
-    def create_shp(name, crs, fields=QgsFields(), geom_type=QgsWkbTypes.MultiPolygon):
+    def create_shp(name, crs, fields=QgsFields(), geom_type=WKBMultiPolygon):
         writer = QgsVectorFileWriter(name, 'UTF-8', fields, geom_type, crs, 'ESRI Shapefile')
         if writer.hasError() != QgsVectorFileWriter.NoError:
             msg = _("Error when creating shapefile: '%s'") % writer.errorMessage()
@@ -313,8 +312,7 @@ class BaseLayer(QgsVectorLayer):
         """
         if target_crs is None:
             target_crs = QgsCoordinateReferenceSystem(4326)
-        crs_transform = QgsCoordinateTransform(self.crs(), target_crs,
-            QgsProject.instance())
+        crs_transform = ggs2coordinate_transform(self.crs(), target_crs)
         to_change = {}
         for feature in self.getFeatures():
             geom = QgsGeometry(feature.geometry())
@@ -431,8 +429,7 @@ class BaseLayer(QgsVectorLayer):
             p1 = Geometry.fromPointXY(Point(bbox.xMinimum(), bbox.yMinimum()))
             p2 = Geometry.fromPointXY(Point(bbox.xMaximum(), bbox.yMaximum()))
             target_crs = QgsCoordinateReferenceSystem(4326)
-            crs_transform = QgsCoordinateTransform(self.crs(), target_crs,
-                QgsProject.instance())
+            crs_transform = ggs2coordinate_transform(self.crs(), target_crs)
             p1.transform(crs_transform)
             p2.transform(crs_transform)
             bbox = [p1.asPoint().y(), p1.asPoint().x(), p2.asPoint().y(), p2.asPoint().x()]
@@ -485,15 +482,15 @@ class BaseLayer(QgsVectorLayer):
         for feature in self.getFeatures():
             geom = feature.geometry()
             e = None
-            if geom.wkbType() == QgsWkbTypes.Polygon:
+            if geom.wkbType() == WKBPolygon:
                 pol = geom.asPolygon()
                 if len(pol) == 1:
                     e = data.Way(pol[0])
                 else:
                     e = data.Polygon(pol)
-            elif geom.wkbType() == QgsWkbTypes.MultiPolygon:
+            elif geom.wkbType() == WKBMultiPolygon:
                 e = data.MultiPolygon(geom.asMultiPolygon())
-            elif geom.wkbType() == QgsWkbTypes.Point:
+            elif geom.wkbType() == WKBPoint:
                 e = data.Node(geom.asPoint())
             else:
                 msg = _("Detected a %s geometry in the '%s' layer") % \
@@ -544,7 +541,7 @@ class PolygonLayer(BaseLayer):
             geom = feature.geometry()
         else:
             geom = feature
-        if geom.wkbType() == QgsWkbTypes.Polygon:
+        if geom.wkbType() == WKBPolygon:
             return [geom.asPolygon()]
         return geom.asMultiPolygon()
 
@@ -583,7 +580,7 @@ class PolygonLayer(BaseLayer):
         to_add = []
         for feature in self.getFeatures(request):
             geom = feature.geometry()
-            if geom.wkbType() == QgsWkbTypes.MultiPolygon:
+            if geom.wkbType() == WKBMultiPolygon:
                 for part in geom.asMultiPolygon():
                     feat = QgsFeature(feature)
                     feat.setGeometry(Geometry.fromPolygonXY(part))
@@ -739,7 +736,7 @@ class PolygonLayer(BaseLayer):
             fpath = os.path.join(os.path.dirname(self.writer.dataSourceUri()), 
                 'debug_notvalid.shp')
             debshp = QgsVectorFileWriter(fpath, 'UTF-8', QgsFields(),
-                QgsWkbTypes.Polygon, self.crs(), 'ESRI Shapefile')
+                WKBPolygon, self.crs(), 'ESRI Shapefile')
             debshp2 = DebugWriter("debug_spikes.shp", self)
         to_change = {}
         to_clean = []
@@ -1016,7 +1013,7 @@ class ZoningLayer(PolygonLayer):
             if level == None or level == zone:
                 feat = self.copy_feature(feature)
                 geom = feature.geometry()
-                if geom.wkbType() == QgsWkbTypes.MultiPolygon:
+                if geom.wkbType() == WKBMultiPolygon:
                     for part in geom.asMultiPolygon():
                         f = QgsFeature(feat)
                         f.setGeometry(Geometry.fromPolygonXY(part))
@@ -1082,7 +1079,7 @@ class AddressLayer(BaseLayer):
         self.source_date = source_date
 
     @staticmethod
-    def create_shp(name, crs, fields=QgsFields(), geom_type=QgsWkbTypes.Point):
+    def create_shp(name, crs, fields=QgsFields(), geom_type=WKBPoint):
         QgsVectorFileWriter(name, 'UTF-8', fields, geom_type, crs, 'ESRI Shapefile')
 
     def to_osm(self, data=None, tags={}, upload='never'):
@@ -1721,7 +1718,7 @@ class DebugWriter(QgsVectorFileWriter):
         self.fields = QgsFields()
         self.fields.append(QgsField("note", QVariant.String, len=100))
         QgsVectorFileWriter.__init__(self, fpath, "utf-8", self.fields,
-                QgsWkbTypes.Point, layer.crs(), driver_name)
+                WKBPoint, layer.crs(), driver_name)
 
     def add_point(self, point, note=None):
         """Adds a point to the layer with the attribute note."""

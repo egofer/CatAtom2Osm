@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from builtins import next
+from __future__ import unicode_literals
+from builtins import next, range, str, zip
 import unittest
 import mock
 import os
@@ -11,7 +12,7 @@ logging.disable(logging.WARNING)
 
 import gdal
 from qgis.core import *
-from qgis.PyQt.QtCore import QVariant
+from qgiscompat import *
 
 os.environ['LANGUAGE'] = 'C'
 import setup
@@ -270,8 +271,7 @@ class TestBaseLayer(unittest.TestCase):
         feature_out = next(layer.getFeatures())
         self.assertEqual(layer.featureCount(), features_before)
         self.assertEqual(layer.crs(), QgsCoordinateReferenceSystem(4326))
-        crs_transform = QgsCoordinateTransform(layer.crs(), crs_before,
-            QgsProject.instance())
+        crs_transform = ggs2coordinate_transform(layer.crs(), crs_before)
         geom_out = feature_out.geometry()
         geom_out.transform(crs_transform)
         self.assertLess(abs(geom_in.area() - geom_out.area()), 1E8)
@@ -971,7 +971,7 @@ class TestConsLayer(unittest.TestCase):
         c = Counter()
         for feat in self.layer.getFeatures():
             g = feat.geometry()
-            if g.wkbType() == QgsWkbTypes.Polygon:
+            if g.wkbType() == WKBPolygon:
                 p = g.asPolygon()
                 ways += len(p)
                 rels += (1 if len(p) > 1 else 0)
@@ -1139,9 +1139,9 @@ class TestAddressLayer(unittest.TestCase):
         highway_names = layer.get_highway_names(highway)
         test = {
             'AV PAZ (FASNIA)': 'Avenida la Paz',
-            'CL SAN JOAQUIN (FASNIA)': 'Calle San Joaquín',
+            'CL SAN JOAQUIN (FASNIA)': str(u'Calle San Joaquín'),
             'CL HOYO (FASNIA)': 'Calle el Hoyo',
-            'CJ CALLEJON (FASNIA)': 'Calleja/Callejón Callejon (Fasnia)'
+            'CJ CALLEJON (FASNIA)': str(u'Calleja/Callejón Callejon (Fasnia)')
         }
         for (k, v) in list(highway_names.items()):
             self.assertEqual(v, test[k])
