@@ -137,6 +137,40 @@ class TestPoint(unittest.TestCase):
         self.assertFalse(is_zigzag)
 
 
+class TestGeometry(unittest.TestCase):
+
+    def test_get_multipolygon(self):
+        p = [[Point(0,0), Point(1,0), Point(1,1), Point(0,0)]]
+        mp = [[[Point(2,0), Point(3,0), Point(3,1), Point(2,0)]], p]
+        f = QgsFeature(QgsFields())
+        g = Geometry.fromPolygonXY(p)
+        f.setGeometry(g)
+        self.assertEqual(Geometry.get_multipolygon(f), [p])
+        self.assertEqual(Geometry.get_multipolygon(g), [p])
+        g = Geometry.fromMultiPolygonXY(mp)
+        f.setGeometry(g)
+        self.assertEqual(Geometry.get_multipolygon(f), mp)
+        self.assertEqual(Geometry.get_multipolygon(g), mp)
+
+    def test_get_vertices_list(self):
+        p = [[Point(0,0), Point(1,0), Point(1,1), Point(0,0)]]
+        mp = [[[Point(2,0), Point(3,0), Point(3,1), Point(2,0)]], p]
+        f = QgsFeature(QgsFields())
+        f.setGeometry(Geometry.fromMultiPolygonXY(mp))
+        v = [mp[0][0][0], mp[0][0][1], mp[0][0][2], p[0][0], p[0][1], p[0][2]]
+        self.assertEqual(Geometry.get_vertices_list(f), v)
+
+    def test_get_outer_vertices(self):
+        p1 = [Point(1,1), Point(2,1), Point(2,2), Point(1,1)]
+        p2 = [Point(0,0), Point(3,0), Point(3,3), Point(0,0)]
+        p3 = [Point(4,0), Point(5,0), Point(5,1), Point(4,0)]
+        mp = [[p1, p2], [p3]]
+        f = QgsFeature(QgsFields())
+        f.setGeometry(Geometry.fromMultiPolygonXY(mp))
+        v = p1[:-1] + p3[:-1]
+        self.assertEqual(Geometry.get_outer_vertices(f), v)
+
+
 class TestBaseLayer(unittest.TestCase):
 
     def setUp(self):
@@ -295,11 +329,11 @@ class TestBaseLayer(unittest.TestCase):
 
     def test_to_osm(self):
         data = self.layer.to_osm(upload='always', tags={'comment': 'tryit'})
-        for (key, value) in list(setup.changeset_tags.items()):
+        for (key, value) in setup.changeset_tags.items():
             if key == 'comment':
-                self.assertEqual(data.tags[key], 'tryit')
+                self.assertEquals(data.tags[key], 'tryit')
             else:
-                self.assertEqual(data.tags[key], value)
+                self.assertEquals(data.tags[key], value)
 
 class TestBaseLayer2(unittest.TestCase):
 
@@ -345,60 +379,29 @@ class TestPolygonLayer(unittest.TestCase):
         del self.layer
         PolygonLayer.delete_shp('test_layer.shp')
 
-    def test_get_multipolygon(self):
-        p = [[Point(0,0), Point(1,0), Point(1,1), Point(0,0)]]
-        mp = [[[Point(2,0), Point(3,0), Point(3,1), Point(2,0)]], p]
-        f = QgsFeature(QgsFields())
-        g = Geometry.fromPolygonXY(p)
-        f.setGeometry(g)
-        self.assertEqual(PolygonLayer.get_multipolygon(f), [p])
-        self.assertEqual(PolygonLayer.get_multipolygon(g), [p])
-        g = Geometry.fromMultiPolygonXY(mp)
-        f.setGeometry(g)
-        self.assertEqual(PolygonLayer.get_multipolygon(f), mp)
-        self.assertEqual(PolygonLayer.get_multipolygon(g), mp)
-
-    def test_get_vertices_list(self):
-        p = [[Point(0,0), Point(1,0), Point(1,1), Point(0,0)]]
-        mp = [[[Point(2,0), Point(3,0), Point(3,1), Point(2,0)]], p]
-        f = QgsFeature(QgsFields())
-        f.setGeometry(Geometry.fromMultiPolygonXY(mp))
-        v = [mp[0][0][0], mp[0][0][1], mp[0][0][2], p[0][0], p[0][1], p[0][2]]
-        self.assertEqual(PolygonLayer.get_vertices_list(f), v)
-
-    def test_get_outer_vertices(self):
-        p1 = [Point(1,1), Point(2,1), Point(2,2), Point(1,1)]
-        p2 = [Point(0,0), Point(3,0), Point(3,3), Point(0,0)]
-        p3 = [Point(4,0), Point(5,0), Point(5,1), Point(4,0)]
-        mp = [[p1, p2], [p3]]
-        f = QgsFeature(QgsFields())
-        f.setGeometry(Geometry.fromMultiPolygonXY(mp))
-        v = p1[:-1] + p3[:-1]
-        self.assertEqual(PolygonLayer.get_outer_vertices(f), v)
-
     def test_get_area(self):
         area = self.layer.get_area()
         self.assertEqual(round(area, 1), 1140234.8)
 
     def test_explode_multi_parts(self):
-        mp = [f for f in self.layer.getFeatures()
-            if f.geometry().isMultipart()]
-        self.assertGreater(len(mp), 0, "There are multipart features")
+        multiparts = [f for f in self.layer.getFeatures()
+            if len(Geometry.get_multipolygon(f)) > 1]
+        self.assertGreater(len(multiparts), 0, "There are multipart features")
         features_before = self.layer.featureCount()
         request = QgsFeatureRequest()
-        request.setFilterFid(mp[0].id())
-        nparts = len(mp[0].geometry().asMultiPolygon())
+        request.setFilterFid(multiparts[0].id())
+        nparts = len(Geometry.get_multipolygon(multiparts[0]))
         self.layer.explode_multi_parts(request)
         self.assertEqual(features_before + nparts - 1, self.layer.featureCount())
-        nparts = sum([len(f.geometry().asMultiPolygon()) for f in mp])
-        self.assertGreater(nparts, len(mp), "With more than one part")
+        nparts = sum([len(Geometry.get_multipolygon(f)) for f in multiparts])
+        self.assertGreater(nparts, len(multiparts), "With more than one part")
         self.assertTrue(nparts > 1, "Find a multipart feature")
         self.layer.explode_multi_parts()
         m = "After exploding there must be more features than before"
         self.assertGreater(self.layer.featureCount(), features_before, m)
         m = "Number of features before plus number of parts minus multiparts " \
             "equals actual number of features"
-        self.assertEqual(features_before + nparts - len(mp),
+        self.assertEqual(features_before + nparts - len(multiparts),
             self.layer.featureCount(), m)
         mp = [f for f in self.layer.getFeatures()
             if f.geometry().isMultipart()]
@@ -475,12 +478,12 @@ class TestPolygonLayer(unittest.TestCase):
         f1 = next(layer1.getFeatures(request))
         request = QgsFeatureRequest().setFilterFid(2)
         f2 = next(layer1.getFeatures(request))
-        self.assertEqual(f1.geometry().asPolygon(), [[Point(10,10), 
+        self.assertEqual(Geometry.get_multipolygon(f1)[0], [[Point(10,10), 
             Point(10,20), Point(20,20), Point(20,10), Point(10,10)],
             [Point(14,14), Point(16,14), Point(16,16), Point(14,16),
             Point(14,14)]]
         )
-        self.assertEqual(f2.geometry().asPolygon(), [[Point(30,20), 
+        self.assertEqual(Geometry.get_multipolygon(f2)[0], [[Point(30,20), 
             Point(38,20), Point(38,10), Point(30,10), Point(30,20)]]
         )
 
@@ -608,11 +611,11 @@ class TestConsLayer(unittest.TestCase):
 
     def test_merge_adjacent_features(self):
         parts = [p for p in self.layer.search("localId like '8840501CS5284S_part%%'")]
-        geom = self.layer.merge_adjacent_features(parts)
+        geom = Geometry.merge_adjacent_features(parts)
         area = sum([p.geometry().area() for p in parts])
         self.assertEqual(100*round(geom.area(), 2), 100*round(area, 2))
-        self.assertGreater(len(geom.asMultiPolygon()), 0)
-        self.assertLess(len(geom.asMultiPolygon()), len(parts))
+        self.assertGreater(len(Geometry.get_multipolygon(geom)), 0)
+        self.assertLess(len(Geometry.get_multipolygon(geom)), len(parts))
 
     def test_explode_multi_parts(self):
         mp0 = [f for f in self.layer.getFeatures()
@@ -766,8 +769,8 @@ class TestConsLayer(unittest.TestCase):
             if len(parts_for_level) > 1:
                 areap = 0
                 for level, group in list(parts_for_level.items()):
-                    geom = ConsLayer.merge_adjacent_features(group)
-                    poly = geom.asMultiPolygon() if geom.isMultipart() else [geom.asPolygon()]
+                    geom = Geometry.merge_adjacent_features(group)
+                    poly = Geometry.get_multipolygon(geom)
                     if len(poly) < len(group):
                         areap += geom.area()
                 aream = sum([g.area() for g in list(chg.values())])
@@ -794,12 +797,12 @@ class TestConsLayer(unittest.TestCase):
         ]
         for ref in refs:
             building = next(self.layer.search("localId = '%s'" % ref[0]))
-            poly = PolygonLayer.get_multipolygon(building)
+            poly = Geometry.get_multipolygon(building)
             self.assertNotIn(ref[1], poly[ref[2]][0])
         self.layer.topology()
         for ref in refs:
             building = next(self.layer.search("localId = '%s'" % ref[0]))
-            poly = PolygonLayer.get_multipolygon(building)
+            poly = Geometry.get_multipolygon(building)
             self.assertIn(ref[1], poly[ref[2]][0])
 
     def test_delete_invalid_geometries(self):
@@ -865,11 +868,11 @@ class TestConsLayer(unittest.TestCase):
         self.assertEqual(fc, self.layer.featureCount() - 3)
         request = QgsFeatureRequest().setFilterFid(self.layer.featureCount() - 3)
         f = next(self.layer.getFeatures(request))
-        g = f.geometry()
-        self.assertEqual(len(g.asPolygon()), 1)
+        mp = Geometry.get_multipolygon(f)
+        self.assertEqual(len(mp[0]), 1)
         request = QgsFeatureRequest().setFilterFid(self.layer.featureCount() - 2)
         f = next(self.layer.getFeatures(request))
-        g = f.geometry()
+        mp = Geometry.get_multipolygon(f)
         r = [(357410.00, 3124305.00), 
             (357405.00, 3124305.00), 
             (357405.00, 3124309.98), 
@@ -877,16 +880,16 @@ class TestConsLayer(unittest.TestCase):
             (357410.01, 3124310.02), 
             (357410.02, 3124306.00), 
             (357410.00, 3124305.00)]
-        self.assertEqual(r, [(round(p.x(), 2), round(p.y(), 2)) for p in g.asPolygon()[0]])
+        self.assertEqual(r, [(round(p.x(), 2), round(p.y(), 2)) for p in mp[0][0]])
         request = QgsFeatureRequest().setFilterFid(self.layer.featureCount() - 1)
         f = next(self.layer.getFeatures(request))
-        g = f.geometry()
+        mp = Geometry.get_multipolygon(f)
         r = [(357400.00, 3124305.00), 
             (357400.00, 3124310.00), 
             (357405.00, 3124310.00), 
             (357405.00, 3124305.00), 
             (357400.00, 3124305.00)]
-        self.assertEqual(r, [(round(p.x(), 2), round(p.y(), 2)) for p in g.asPolygon()[0]])
+        self.assertEqual(r, [(round(p.x(), 2), round(p.y(), 2)) for p in mp[0][0]])
 
     def test_simplify1(self):
         refs = [
@@ -898,7 +901,7 @@ class TestConsLayer(unittest.TestCase):
         self.layer.simplify()
         for ref in refs:
             building = next(self.layer.search("localId = '%s'" % ref[0]))
-            self.assertEqual(ref[1] in building.geometry().asPolygon()[0], ref[2])
+            self.assertEqual(ref[1] in Geometry.get_multipolygon(building)[0][0], ref[2])
 
     def test_simplify2(self):
         layer = ConsLayer()
@@ -965,22 +968,16 @@ class TestConsLayer(unittest.TestCase):
     
     def test_to_osm(self):
         data = self.layer.to_osm(upload='always')
-        self.assertEqual(data.upload, 'always')
+        self.assertEquals(data.upload, 'always')
         ways = 0
         rels = 0
         c = Counter()
         for feat in self.layer.getFeatures():
-            g = feat.geometry()
-            if g.wkbType() == WKBPolygon:
-                p = g.asPolygon()
-                ways += len(p)
-                rels += (1 if len(p) > 1 else 0)
-            else:
-                p = g.asMultiPolygon()
-                ways += sum([len(s) for s in p])
-                rels += (1 if len(p) > 1 else 0)
-        self.assertEqual(ways, len(data.ways))
-        self.assertEqual(rels, len(data.relations))
+            p = Geometry.get_multipolygon(feat)
+            ways += sum([len(s) for s in p])
+            rels += (1 if len(p) + len(p[0]) > 2 else 0)
+        self.assertEquals(ways, len(data.ways))
+        self.assertEquals(rels, len(data.relations))
 
     def test_conflate(self):
         self.layer.reproject()

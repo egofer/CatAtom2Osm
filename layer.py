@@ -151,6 +151,7 @@ class Point(Qgs2DPoint):
 
 
 class Geometry(object):
+    """Methods for QGIS 2-3 compatibility and geometry utilities"""
 
     @staticmethod
     def fromPointXY(point):
@@ -181,6 +182,37 @@ class Geometry(object):
                 for r in t] for t in mp])
         except AttributeError:
             return QgsGeometry.fromMultiPolygon(mp)
+
+    @staticmethod
+    def get_multipolygon(feature_or_geometry):
+        """Returns feature geometry always as a multipolygon"""
+        if isinstance(feature_or_geometry, QgsFeature):
+            geom = feature_or_geometry.geometry()
+        else:
+            geom = feature_or_geometry
+        if geom.wkbType() == WKBPolygon:
+            return [geom.asPolygon()]
+        return geom.asMultiPolygon()
+
+    @staticmethod
+    def get_vertices_list(feature):
+        """Returns list of all distinct vertices in feature geometry"""
+        return [point for part in Geometry.get_multipolygon(feature) \
+            for ring in part for point in ring[0:-1]]
+
+    @staticmethod
+    def get_outer_vertices(feature):
+        """Returns list of all distinct vertices in feature geometry outer rings"""
+        return [point for part in Geometry.get_multipolygon(feature) \
+            for point in part[0][0:-1]]
+
+    @staticmethod
+    def merge_adjacent_features(group):
+        """Combine all geometries in group of features"""
+        geom = group[0].geometry()
+        for p in group[1:]:
+            geom = geom.combine(p.geometry())
+        return geom
 
 
 class BaseLayer(QgsVectorLayer):
@@ -482,16 +514,14 @@ class BaseLayer(QgsVectorLayer):
         for feature in self.getFeatures():
             geom = feature.geometry()
             e = None
-            if geom.wkbType() == WKBPolygon:
-                pol = geom.asPolygon()
-                if len(pol) == 1:
-                    e = data.Way(pol[0])
-                else:
-                    e = data.Polygon(pol)
-            elif geom.wkbType() == WKBMultiPolygon:
-                e = data.MultiPolygon(geom.asMultiPolygon())
-            elif geom.wkbType() == WKBPoint:
+            if geom.wkbType() == WKBPoint:
                 e = data.Node(geom.asPoint())
+            elif geom.wkbType() in [WKBPolygon, WKBMultiPolygon]:
+                mp = Geometry.get_multipolygon(geom)
+                if len(mp) == 1:
+                    e = data.Way(mp[0]) if len(mp[0]) == 1 else data.Polygon(mp[0])
+                else:
+                    e = data.MultiPolygon(mp)
             else:
                 msg = _("Detected a %s geometry in the '%s' layer") % \
                     (geom.wkbType(), self.name())
@@ -534,37 +564,6 @@ class PolygonLayer(BaseLayer):
         self.straight_thr = setup.straight_thr # Threshold in degrees from straight angle to delete a vertex
         self.dist_thr = setup.dist_thr # Threshold for topological points.
 
-    @staticmethod
-    def get_multipolygon(feature):
-        """Returns feature geometry always as a multipolgon"""
-        if isinstance(feature, QgsFeature):
-            geom = feature.geometry()
-        else:
-            geom = feature
-        if geom.wkbType() == WKBPolygon:
-            return [geom.asPolygon()]
-        return geom.asMultiPolygon()
-
-    @staticmethod
-    def get_vertices_list(feature):
-        """Returns list of all distinct vertices in feature geometry"""
-        return [point for part in PolygonLayer.get_multipolygon(feature) \
-            for ring in part for point in ring[0:-1]]
-
-    @staticmethod
-    def get_outer_vertices(feature):
-        """Returns list of all distinct vertices in feature geometry outer rings"""
-        return [point for part in PolygonLayer.get_multipolygon(feature) \
-            for point in part[0][0:-1]]
-
-    @staticmethod
-    def merge_adjacent_features(group):
-        """Combine all geometries in group of features"""
-        geom = group[0].geometry()
-        for p in group[1:]:
-            geom = geom.combine(p.geometry())
-        return geom
-
     def get_area(self):
         """Returns total area"""
         return sum([f.geometry().area() for f in self.getFeatures()])
@@ -579,11 +578,11 @@ class PolygonLayer(BaseLayer):
         to_clean = []
         to_add = []
         for feature in self.getFeatures(request):
-            geom = feature.geometry()
-            if geom.wkbType() == WKBMultiPolygon:
-                for part in geom.asMultiPolygon():
+            mp = Geometry.get_multipolygon(feature)
+            if len(mp) > 1:
+                for part in mp:
                     feat = QgsFeature(feature)
-                    feat.setGeometry(Geometry.fromPolygonXY(part))
+                    feat.setGeometry(QgsGeometry.fromPolygon(part))
                     to_add.append(feat)
                 to_clean.append(feature.id())
         if to_clean:
@@ -605,7 +604,7 @@ class PolygonLayer(BaseLayer):
         for feature in self.getFeatures():
             geom = QgsGeometry(feature.geometry())
             geometries[feature.id()] = geom
-            for point in self.get_vertices_list(feature):
+            for point in Geometry.get_vertices_list(feature):
                 parents_per_vertex[point].append(feature.id())
         return (parents_per_vertex, geometries)
 
@@ -654,7 +653,7 @@ class PolygonLayer(BaseLayer):
         to_change = {}
         nodes = set()
         for (gid, geom) in geometries.items():
-            for point in frozenset(self.get_outer_vertices(geom)):
+            for point in frozenset(Geometry.get_outer_vertices(geom)):
                 if point not in nodes:
                     area_of_candidates = Point(point).boundingBox(threshold)
                     fids = index.intersects(area_of_candidates)
@@ -747,70 +746,71 @@ class PolygonLayer(BaseLayer):
         geometries = {f.id(): QgsGeometry(f.geometry()) for f in self.getFeatures()}
         for fid, geom in geometries.items():
             badgeom = False
-            for i, ring in enumerate(geom.asPolygon()):
-                if badgeom: break
-                skip = False
-                for n, v in enumerate(ring[0:-1]):
-                    angle_v, angle_a, ndx, ndxa, is_acute, is_zigzag, is_spike, vx = \
-                        Point(v).get_spike_context(geom)
-                    if skip or not is_acute:
-                        skip = False
-                        continue
-                    g = Geometry.fromPolygonXY([ring])
-                    f = QgsFeature(QgsFields())
-                    f.setGeometry(QgsGeometry(g))
-                    g.deleteVertex(n)
-                    if not g.isGeosValid() or g.area() < setup.min_area:
-                        if i > 0:
-                            rings += 1
-                            geom.deleteRing(i)
-                            to_change[fid] = geom
-                            geometries[fid] = geom
-                            if log.getEffectiveLevel() <= logging.DEBUG:
-                                debshp.addFeature(f)
-                        else:
-                            badgeom = True
-                            to_clean.append(fid)
-                            if fid in to_change: del to_change[fid]
-                            if log.getEffectiveLevel() <= logging.DEBUG:
-                                debshp.addFeature(f)
-                        break
-                    if len(ring) > 4: # (can delete vertexs)
-                        va = geom.vertexAt(ndxa)
-                        if is_zigzag:
-                            g = QgsGeometry(geom)
-                            if ndxa > ndx:
-                                g.deleteVertex(ndxa)
-                                g.deleteVertex(ndx)
-                                skip = True
+            for polygon in Geometry.get_multipolygon(geom):
+                for i, ring in enumerate(polygon):
+                    if badgeom: break
+                    skip = False
+                    for n, v in enumerate(ring[0:-1]):
+                        angle_v, angle_a, ndx, ndxa, is_acute, is_zigzag, is_spike, vx = \
+                            Point(v).get_spike_context(geom)
+                        if skip or not is_acute:
+                            skip = False
+                            continue
+                        g = Geometry.fromPolygonXY([ring])
+                        f = QgsFeature(QgsFields())
+                        f.setGeometry(QgsGeometry(g))
+                        g.deleteVertex(n)
+                        if not g.isGeosValid() or g.area() < setup.min_area:
+                            if i > 0:
+                                rings += 1
+                                geom.deleteRing(i)
+                                to_change[fid] = geom
+                                geometries[fid] = geom
+                                if log.getEffectiveLevel() <= logging.DEBUG:
+                                    debshp.addFeature(f)
                             else:
+                                badgeom = True
+                                to_clean.append(fid)
+                                if fid in to_change: del to_change[fid]
+                                if log.getEffectiveLevel() <= logging.DEBUG:
+                                    debshp.addFeature(f)
+                            break
+                        if len(ring) > 4: # (can delete vertexs)
+                            va = geom.vertexAt(ndxa)
+                            if is_zigzag:
+                                g = QgsGeometry(geom)
+                                if ndxa > ndx:
+                                    g.deleteVertex(ndxa)
+                                    g.deleteVertex(ndx)
+                                    skip = True
+                                else:
+                                    g.deleteVertex(ndx)
+                                    g.deleteVertex(ndxa)
+                                valid = g.isGeosValid()
+                                if valid:
+                                    geom = g
+                                    zz += 1
+                                    to_change[fid] = g
+                                    geometries[fid] = geom
+                                if log.getEffectiveLevel() <= logging.DEBUG:
+                                    debshp2.add_point(va, 'zza %d %d %d %f' % (fid, ndx, ndxa, angle_a))
+                                    debshp2.add_point(v, 'zz %d %d %d %s' % (fid, ndx, len(ring), valid))
+                            elif is_spike:
+                                g = QgsGeometry(geom)
+                                to_move[va] = vx #!
+                                g.moveVertex(vx.x(), vx.y(), ndxa)
                                 g.deleteVertex(ndx)
-                                g.deleteVertex(ndxa)
-                            valid = g.isGeosValid()
-                            if valid:
-                                geom = g
-                                zz += 1
-                                to_change[fid] = g
-                                geometries[fid] = geom
-                            if log.getEffectiveLevel() <= logging.DEBUG:
-                                debshp2.add_point(va, 'zza %d %d %d %f' % (fid, ndx, ndxa, angle_a))
-                                debshp2.add_point(v, 'zz %d %d %d %s' % (fid, ndx, len(ring), valid))
-                        elif is_spike:
-                            g = QgsGeometry(geom)
-                            to_move[va] = vx #!
-                            g.moveVertex(vx.x(), vx.y(), ndxa)
-                            g.deleteVertex(ndx)
-                            valid = g.isGeosValid()
-                            if valid:
-                                spikes += 1
-                                skip = ndxa > ndx
-                                geom = g
-                                to_change[fid] = g
-                                geometries[fid] = geom
-                            if log.getEffectiveLevel() <= logging.DEBUG:
-                                debshp2.add_point(vx, 'vx %d %d' % (fid, ndx))
-                                debshp2.add_point(va, 'va %d %d %d %f' % (fid, ndx, ndxa, angle_a))
-                                debshp2.add_point(v, 'v %d %d %d %s' % (fid, ndx, len(ring), valid))
+                                valid = g.isGeosValid()
+                                if valid:
+                                    spikes += 1
+                                    skip = ndxa > ndx
+                                    geom = g
+                                    to_change[fid] = g
+                                    geometries[fid] = geom
+                                if log.getEffectiveLevel() <= logging.DEBUG:
+                                    debshp2.add_point(vx, 'vx %d %d' % (fid, ndx))
+                                    debshp2.add_point(va, 'va %d %d %d %f' % (fid, ndx, ndxa, angle_a))
+                                    debshp2.add_point(v, 'v %d %d %d %s' % (fid, ndx, len(ring), valid))
         if to_move:
             for fid, geom in geometries.items():
                 if fid in to_clean: continue
@@ -913,16 +913,12 @@ class PolygonLayer(BaseLayer):
             geom = geometries[group[0]]
             for fid in group[1:]:
                 geom = geom.combine(geometries[fid])
-            if geom.isMultipart():
-                for i, part in enumerate(geom.asMultiPolygon()):
-                    g = Geometry.fromPolygonXY(part)
-                    to_change[group[i]] = g
-                    count_com += 1
-                to_clean += group[i+1:]
-            else:
-                to_change[group[0]] = geom
-                to_clean += group[1:]
+            mp = Geometry.get_multipolygon(geom)
+            for i, part in enumerate(mp):
+                g = QgsGeometry.fromPolygon(part)
+                to_change[group[i]] = g
                 count_com += 1
+            to_clean += group[i+1:]
         if to_clean:
             self.writer.changeGeometryValues(to_change)
             self.writer.deleteFeatures(to_clean)
@@ -1013,10 +1009,11 @@ class ZoningLayer(PolygonLayer):
             if level == None or level == zone:
                 feat = self.copy_feature(feature)
                 geom = feature.geometry()
-                if geom.wkbType() == WKBMultiPolygon:
-                    for part in geom.asMultiPolygon():
+                mp = Geometry.get_multipolygon(geom)
+                if len(mp) > 1:
+                    for part in mp:
                         f = QgsFeature(feat)
-                        f.setGeometry(Geometry.fromPolygonXY(part))
+                        f.setGeometry(QgsGeometry.fromPolygon(part))
                         to_add.append(f)
                         final += 1
                     multi += 1
@@ -1037,8 +1034,8 @@ class ZoningLayer(PolygonLayer):
 
     def export_poly(self, filename):
         """Export as polygon file for Osmosis"""
-        mun = self.merge_adjacent_features([f for f in self.getFeatures()])
-        mun = self.get_multipolygon(mun)
+        mun = Geometry.merge_adjacent_features([f for f in self.getFeatures()])
+        mun = Geometry.get_multipolygon(mun)
         with open(filename, 'w') as fo:
             fo.write('admin_boundary\n')
             i = 0
@@ -1334,7 +1331,7 @@ class ConsLayer(PolygonLayer):
         for ref, parts in parts_for_ref.items():
             feat = QgsFeature(QgsFields(self.fields()))
             feat['localId'] = ref
-            geom = self.merge_adjacent_features(parts)
+            geom = Geometry.merge_adjacent_features(parts)
             feat.setGeometry(geom)
             to_add.append(feat)
         if len(to_clean_o) + len(to_clean_b) > 0:
@@ -1401,8 +1398,8 @@ class ConsLayer(PolygonLayer):
             if level == (max_level, min_level):
                 to_clean = [p.id() for p in parts_for_level[max_level, min_level]]
             else:
-                geom = self.merge_adjacent_features(parts)
-                poly = geom.asMultiPolygon() if geom.isMultipart() else [geom.asPolygon()]
+                geom = Geometry.merge_adjacent_features(parts)
+                poly = Geometry.get_multipolygon(geom)
                 if len(poly) < len(parts):
                     for (i, part) in enumerate(parts):
                         if i < len(poly):
@@ -1418,12 +1415,12 @@ class ConsLayer(PolygonLayer):
         Returns True if feat1 must be deleted and new geometry if any ring is
         removed.
         """
-        geom1 = feat1.geometry()
-        geom2 = feat2.geometry()
+        poly = Geometry.get_multipolygon(feat1)[0]
+        geom2 = Geometry.fromPolygonXY(Geometry.get_multipolygon(feat2)[0])
         delete = False
         new_geom = None
         delete_rings = []
-        for i, ring in enumerate(geom1.asPolygon()):
+        for i, ring in enumerate(poly):
             if Geometry.fromPolygonXY([ring]).equals(geom2):
                 if i == 0:
                     delete = True
@@ -1431,9 +1428,9 @@ class ConsLayer(PolygonLayer):
                 else:
                     delete_rings.append(i)
         if delete_rings:
-            poly = [ring for i, ring in enumerate(geom1.asPolygon()) \
+            new_poly = [ring for i, ring in enumerate(poly) \
                 if i not in delete_rings]
-            new_geom = QgsGeometry().fromPolygon(poly)
+            new_geom = QgsGeometry().fromPolygon(new_poly)
         return delete, new_geom
 
     def merge_building_parts(self):
@@ -1556,7 +1553,7 @@ class ConsLayer(PolygonLayer):
                     va = Point(bg.vertexAt(vertex - 1))
                     vb = Point(bg.vertexAt(vertex))
                     if distance < setup.addr_thr**2:
-                        if vertex > len(bg.asPolygon()[0]):
+                        if vertex > len(Geometry.get_multipolygon(bg)[0][0]):
                             ad['spec'] = 'inner'
                             to_change[ad.id()] = get_attributes(ad)
                         elif closest.sqrDist(va) < setup.entrance_thr**2 \
@@ -1570,7 +1567,8 @@ class ConsLayer(PolygonLayer):
                             to_insert[building.id()] = QgsGeometry(bg)
                             for part in it_parts:
                                 pg = part.geometry()
-                                for (i, vpa) in enumerate(pg.asPolygon()[0][0:-1]):
+                                r = Geometry.get_multipolygon(pg)[0][0]
+                                for (i, vpa) in enumerate(r[0:-1]):
                                     vpb = pg.vertexAt(i+1)
                                     if va in (vpa, vpb) and vb in (vpa, vpb):
                                         pg.insertVertex(closest.x(), closest.y(), i+1)
