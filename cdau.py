@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Reader of CDAU CSV files"""
 from __future__ import unicode_literals
-from builtins import object, range
+from builtins import object, range, str
 
 import logging
 import locale
@@ -83,7 +83,7 @@ def get_cat_address(ad, cod_mun_cat):
     attr['localId'] = '{}.{}.{}.{}'.format(cod_mun_cat[:2], cod_mun_cat[2:], 
         ad['dgc_via'], ad['refcatparc'])
     nom_tip_via = highway_types_equiv.get(ad['nom_tip_via'], ad['nom_tip_via'])
-    attr['TN_text'] = str(u'{} {}').format(nom_tip_via, ad['nom_via'])
+    attr['TN_text'] = str(u'{} {}').format(str(nom_tip_via), str(ad['nom_via']))
     attr['postCode'] = ad['cod_postal']
     attr['spec'] = 'Entrance'
     to = ad['num_por_hasta'] + ad['ext_hasta']
