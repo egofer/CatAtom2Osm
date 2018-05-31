@@ -620,7 +620,7 @@ class PolygonLayer(BaseLayer):
                 for fid in parents:
                     geom = geometries[fid]
                     (point, ndx, ndxa, ndxb, dist) = geom.closestVertex(point)
-                    next = geom.vertexAt(ndxb)
+                    next = Point(geom.vertexAt(ndxb))
                     parents_next = parents_per_vertex[next]
                     common = set(x for x in parents if x in parents_next)
                     if len(common) > 1:
@@ -776,7 +776,7 @@ class PolygonLayer(BaseLayer):
                                     debshp.addFeature(f)
                             break
                         if len(ring) > 4: # (can delete vertexs)
-                            va = geom.vertexAt(ndxa)
+                            va = Point(geom.vertexAt(ndxa))
                             if is_zigzag:
                                 g = QgsGeometry(geom)
                                 if ndxa > ndx:
@@ -815,8 +815,8 @@ class PolygonLayer(BaseLayer):
             for fid, geom in geometries.items():
                 if fid in to_clean: continue
                 n = 0
-                v = geom.vertexAt(n)
-                while v != QgsPoint(0, 0):
+                v = Point(geom.vertexAt(n))
+                while v != Point(0, 0):
                     if v in to_move:
                         g = QgsGeometry(geom)
                         vx = to_move[v]
@@ -828,7 +828,7 @@ class PolygonLayer(BaseLayer):
                             geom = g
                             to_change[fid] = g
                     n += 1
-                    v = geom.vertexAt(n)
+                    v = Point(geom.vertexAt(n))
         if to_change:
             self.writer.changeGeometryValues(to_change)
         if rings:
@@ -1360,7 +1360,7 @@ class ConsLayer(PolygonLayer):
         parts_for_level = defaultdict(list)
         for part in parts:
             if is_inside(part, footprint):
-                level = (part['lev_above'], part['lev_below'])
+                level = (part['lev_above'] or 0, part['lev_below'] or 0)
                 if level[0] > max_level: max_level = level[0]
                 if level[1] > min_level: min_level = level[1]
                 parts_for_level[level].append(part)

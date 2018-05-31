@@ -403,8 +403,6 @@ class TestPolygonLayer(unittest.TestCase):
             "equals actual number of features"
         self.assertEqual(features_before + nparts - len(multiparts),
             self.layer.featureCount(), m)
-        mp = [f for f in self.layer.getFeatures()
-            if f.geometry().isMultipart()]
         m = "Parts must be single polygons"
         self.assertTrue(all([len(Geometry.get_multipolygon(f)) == 1
             for f in self.layer.getFeatures()]), m)
@@ -412,8 +410,9 @@ class TestPolygonLayer(unittest.TestCase):
     def test_get_parents_per_vertex_and_geometries(self):
         (parents_per_vertex, geometries) = self.layer.get_parents_per_vertex_and_geometries()
         self.assertEqual(len(geometries), self.layer.featureCount())
-        self.assertTrue(all([geometries[f.id()].equals(f.geometry())
-            for f in self.layer.getFeatures()]))
+        self.assertTrue(all([Geometry.get_multipolygon(geometries[f.id()]) == \
+            Geometry.get_multipolygon(f)
+                for f in self.layer.getFeatures()]))
         self.assertGreater(len(parents_per_vertex), 0)
         self.assertTrue(all([Geometry.fromPointXY(vertex).intersects(geometries[fid])
             for (vertex, fids) in list(parents_per_vertex.items()) for fid in fids]))
@@ -520,12 +519,10 @@ class TestZoningLayer(unittest.TestCase):
             self.fixture.featureCount())
         for f in self.layer1.getFeatures():
             self.assertEqual(f['levelName'][3], 'M')
-            g = f.geometry()
-            self.assertFalse(g.isMultipart())
+            self.assertFalse(len(Geometry.get_multipolygon(f)) > 1)
         for f in self.layer2.getFeatures():
             self.assertEqual(f['levelName'][3], 'P')
-            g = f.geometry()
-            self.assertFalse(g.isMultipart())
+            self.assertFalse(len(Geometry.get_multipolygon(f)) > 1)
 
     def tearDown(self):
         del self.layer1
