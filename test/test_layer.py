@@ -406,7 +406,7 @@ class TestPolygonLayer(unittest.TestCase):
         mp = [f for f in self.layer.getFeatures()
             if f.geometry().isMultipart()]
         m = "Parts must be single polygons"
-        self.assertTrue(all([not f.geometry().isMultipart()
+        self.assertTrue(all([len(Geometry.get_multipolygon(f)) == 1
             for f in self.layer.getFeatures()]), m)
 
     def test_get_parents_per_vertex_and_geometries(self):
@@ -619,18 +619,18 @@ class TestConsLayer(unittest.TestCase):
 
     def test_explode_multi_parts(self):
         mp0 = [f for f in self.layer.getFeatures()
-            if f.geometry().isMultipart()]
+            if len(Geometry.get_multipolygon(f)) > 1]
         self.assertGreater(len(mp0), 0)
         address = AddressLayer()
         address_gml = QgsVectorLayer('test/address.gml', 'address', 'ogr')
         address.append(address_gml)
         refs = {ad['localId'].split('.')[-1] for ad in address.getFeatures()}
         mp1 = [f for f in self.layer.getFeatures() if f['localId'] in refs and
-            f.geometry().isMultipart()]
+            len(Geometry.get_multipolygon(f)) > 1]
         self.assertGreater(len(mp1), 0)
         self.layer.explode_multi_parts(address)
         mp2 = [f for f in self.layer.getFeatures()
-            if f.geometry().isMultipart()]
+            if len(Geometry.get_multipolygon(f)) > 1]
         self.assertEqual(len(mp1), len(mp2))
 
     def test_append_building(self):

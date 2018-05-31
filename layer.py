@@ -582,7 +582,7 @@ class PolygonLayer(BaseLayer):
             if len(mp) > 1:
                 for part in mp:
                     feat = QgsFeature(feature)
-                    feat.setGeometry(QgsGeometry.fromPolygon(part))
+                    feat.setGeometry(Geometry.fromPolygonXY(part))
                     to_add.append(feat)
                 to_clean.append(feature.id())
         if to_clean:
@@ -915,7 +915,7 @@ class PolygonLayer(BaseLayer):
                 geom = geom.combine(geometries[fid])
             mp = Geometry.get_multipolygon(geom)
             for i, part in enumerate(mp):
-                g = QgsGeometry.fromPolygon(part)
+                g = Geometry.fromPolygonXY(part)
                 to_change[group[i]] = g
                 count_com += 1
             to_clean += group[i+1:]
@@ -1013,7 +1013,7 @@ class ZoningLayer(PolygonLayer):
                 if len(mp) > 1:
                     for part in mp:
                         f = QgsFeature(feat)
-                        f.setGeometry(QgsGeometry.fromPolygon(part))
+                        f.setGeometry(Geometry.fromPolygonXY(part))
                         to_add.append(f)
                         final += 1
                     multi += 1
@@ -1430,7 +1430,7 @@ class ConsLayer(PolygonLayer):
         if delete_rings:
             new_poly = [ring for i, ring in enumerate(poly) \
                 if i not in delete_rings]
-            new_geom = QgsGeometry().fromPolygon(new_poly)
+            new_geom = Geometry().fromPolygonXY(new_poly)
         return delete, new_geom
 
     def merge_building_parts(self):
