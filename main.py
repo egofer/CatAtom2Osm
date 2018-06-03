@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """CatAtom2Osm command line entry point"""
 from __future__ import unicode_literals
-from builtins import str
+from builtins import str, bytes
 from argparse import ArgumentParser
 import codecs
 import logging
@@ -29,8 +29,8 @@ log.addHandler(fh)
 
 
 def __(msg):
-    return msg if not sys.stdout.encoding else \
-        msg.encode(setup.encoding).decode(sys.stdout.encoding)
+    return str(msg) if sys.stdout.encoding == 'utf-8' else \
+        bytes(msg, setup.encoding).decode(sys.stdout.encoding)
 
 usage = __(_("""catatom2osm [OPTION]... [PATH]
 The argument path states the directory for input and output files. 
