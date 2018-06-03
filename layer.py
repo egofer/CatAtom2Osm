@@ -486,8 +486,12 @@ class BaseLayer(QgsVectorLayer):
                 QgsVectorFileWriter.deleteShapeFile(path)
             else:
                 os.remove(path)
-        return QgsVectorFileWriter.writeAsVectorFormat(self, path, "utf-8",
-                target_crs, driver_name) == QgsVectorFileWriter.NoError
+        result = QgsVectorFileWriter.writeAsVectorFormat(self, path, "utf-8",
+                target_crs, driver_name)
+        try:
+            return result[0] == QgsVectorFileWriter.NoError
+        except TypeError:
+            return result == QgsVectorFileWriter.NoError
 
     def to_osm(self, tags_translation=translate.all_tags, data=None, tags={}, 
             upload='never', comment=None):
