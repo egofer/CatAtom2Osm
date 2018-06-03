@@ -1,6 +1,6 @@
+# -*- coding: utf-8 -*-
 from builtins import range
 from past.builtins import reload
-# -*- coding: utf-8 -*-
 import mock
 import unittest
 import os, sys
@@ -400,10 +400,10 @@ class TestCatAtom2Osm(unittest.TestCase):
         self.m_app.read_address(self.m_app)
         self.m_app.address.append.assert_called_once_with(self.m_app.cat.read())
         self.m_app.address.append.reset_mock()
-        self.m_app.cat.read.return_value.fieldNameIndex.return_value = -1
+        self.m_app.cat.read.return_value.writer.fieldNameIndex.return_value = -1
         with self.assertRaises(IOError):
             self.m_app.read_address(self.m_app)
-        self.m_app.cat.read.return_value.fieldNameIndex.side_effect = [-1, 0]
+        self.m_app.cat.read.return_value.writer.fieldNameIndex.side_effect = [-1, 0]
         self.m_app.read_address(self.m_app)
         self.m_app.address.append.assert_called_once_with(self.m_app.cat.read())
 

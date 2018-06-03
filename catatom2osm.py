@@ -424,9 +424,9 @@ class CatAtom2Osm(object):
         """Reads Address GML dataset"""
         address_gml = self.cat.read("address")
         report.address_date = address_gml.source_date
-        if address_gml.fieldNameIndex('component_href') == -1:
+        if address_gml.writer.fieldNameIndex('component_href') == -1:
             address_gml = self.cat.read("address", force_zip=True)
-            if address_gml.fieldNameIndex('component_href') == -1:
+            if address_gml.writer.fieldNameIndex('component_href') == -1:
                 msg = _("Could not resolve joined tables for the "
                     "'%s' layer") % address_gml.name()
                 raise IOError(msg)
