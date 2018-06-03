@@ -1,6 +1,6 @@
 """Reader of Cadastre ATOM GML files"""
-from __future__ import print_function
-from builtins import next, object
+from __future__ import print_function, unicode_literals
+from builtins import next, object, str
 import json
 import logging
 import os
@@ -8,6 +8,7 @@ import re
 import six
 import zipfile
 from qgis.core import QgsCoordinateReferenceSystem
+from requests.exceptions import ConnectionError
 
 import download
 import hgwnames
@@ -197,10 +198,10 @@ class Reader(object):
             query.add('rel["admin_level"="8"]')
         matching = False
         try:
-            data = json.loads(query.read())
+            data = json.loads(str(query.read()))
             matching = hgwnames.dsmatch(self.cat_mun, data['elements'], 
                 lambda e: e['tags']['name'])
-        except Exception:
+        except ConnectionError:
             pass
         if matching:
             self.boundary_search_area = str(matching['id'])
