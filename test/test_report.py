@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division, unicode_literals
 from builtins import str, bytes
+import io
 import mock
 import unittest
 import os
@@ -153,8 +154,8 @@ class TestReport(unittest.TestCase):
         output = r.to_string()
         fn = 'test_report.txt'
         r.to_file(fn)
-        with open(fn, 'r') as fo:
-            text = fo.read()
+        with io.open(fn, 'r', encoding='utf-8') as fo:
+            text = str(fo.read())
             text = text.replace('\n', setup.eol)
         self.assertEqual(output, text)
         if os.path.exists(fn):
