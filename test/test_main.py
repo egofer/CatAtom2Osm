@@ -5,27 +5,15 @@ standard_library.install_aliases()
 from builtins import str
 import mock
 import unittest
-import sys, os
+import os
 import logging
 logging.disable(logging.WARNING)
-from io import StringIO, BytesIO
-import codecs
-from contextlib import contextmanager
 os.environ['LANGUAGE'] = 'C'
+
 import setup
 import main
+from tools import capture
 
-@contextmanager
-def capture(command, *args, **kwargs):
-    out = sys.stdout
-    sys.stdout = codecs.getwriter('utf-8')(BytesIO())
-    sys.stdout.encoding = 'utf-8'
-    try:
-        command(*args, **kwargs)
-        sys.stdout.seek(0)
-        yield sys.stdout.read()
-    finally:
-        sys.stdout = out
 
 def raiseIOError(*args, **kwargs):
     raise IOError('bartaz')

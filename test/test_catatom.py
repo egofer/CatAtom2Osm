@@ -3,27 +3,14 @@ from future import standard_library
 standard_library.install_aliases()
 import unittest
 import mock
-from io import TextIOWrapper, BytesIO
-from contextlib import contextmanager
 from requests.exceptions import ConnectionError
-import codecs
 import random
-import os, sys
+import os
 os.environ['LANGUAGE'] = 'C'
 
 import setup
 import catatom
-
-@contextmanager
-def capture(command, *args, **kwargs):
-    out = sys.stdout
-    sys.stdout = TextIOWrapper(BytesIO(), 'utf-8')
-    try:
-        command(*args, **kwargs)
-        sys.stdout.seek(0)
-        yield sys.stdout.read()
-    finally:
-        sys.stdout = out
+from tools import capture
 
 def raiseException():
     raise ConnectionError
