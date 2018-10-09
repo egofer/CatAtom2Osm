@@ -12,7 +12,7 @@ os.environ['LANGUAGE'] = 'C'
 
 import setup
 import main
-from tools import capture
+from test.tools import capture
 
 
 def raiseIOError(*args, **kwargs):

@@ -10,7 +10,7 @@ os.environ['LANGUAGE'] = 'C'
 
 import setup
 import catatom
-from tools import capture
+from test.tools import capture
 
 def raiseException():
     raise ConnectionError
