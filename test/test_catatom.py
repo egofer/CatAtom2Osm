@@ -3,9 +3,10 @@ from future import standard_library
 standard_library.install_aliases()
 import unittest
 import mock
-import codecs
 from io import BytesIO
 from contextlib import contextmanager
+from requests.exceptions import ConnectionError
+import codecs
 import random
 import os, sys
 os.environ['LANGUAGE'] = 'C'
@@ -25,7 +26,7 @@ def capture(command, *args, **kwargs):
         sys.stdout = out
 
 def raiseException():
-    raise Exception
+    raise ConnectionError
 
 def get_func(f):
     return getattr(f, '__func__', f)
