@@ -331,9 +331,9 @@ class TestBaseLayer(unittest.TestCase):
         data = self.layer.to_osm(upload='always', tags={'comment': 'tryit'})
         for (key, value) in setup.changeset_tags.items():
             if key == 'comment':
-                self.assertEquals(data.tags[key], 'tryit')
+                self.assertEqual(data.tags[key], 'tryit')
             else:
-                self.assertEquals(data.tags[key], value)
+                self.assertEqual(data.tags[key], value)
 
 class TestBaseLayer2(unittest.TestCase):
 
@@ -965,7 +965,7 @@ class TestConsLayer(unittest.TestCase):
     
     def test_to_osm(self):
         data = self.layer.to_osm(upload='always')
-        self.assertEquals(data.upload, 'always')
+        self.assertEqual(data.upload, 'always')
         ways = 0
         rels = 0
         c = Counter()
@@ -973,8 +973,8 @@ class TestConsLayer(unittest.TestCase):
             p = Geometry.get_multipolygon(feat)
             ways += sum([len(s) for s in p])
             rels += (1 if len(p) + len(p[0]) > 2 else 0)
-        self.assertEquals(ways, len(data.ways))
-        self.assertEquals(rels, len(data.relations))
+        self.assertEqual(ways, len(data.ways))
+        self.assertEqual(rels, len(data.relations))
 
     def test_conflate(self):
         self.layer.reproject()
