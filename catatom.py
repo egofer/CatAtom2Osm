@@ -5,7 +5,6 @@ import json
 import logging
 import os
 import re
-import six
 import zipfile
 from qgis.core import QgsCoordinateReferenceSystem
 from requests.exceptions import ConnectionError
@@ -229,5 +228,5 @@ def list_municipalities(prov_code):
     print("=" * len(title))
     for entry in root.findall('atom:entry', namespaces=ns):
         row = entry.find('atom:title', ns).text.replace('buildings', '')
-        print(row.encode(setup.encoding) if six.PY2 else row)
+        print(row)
 

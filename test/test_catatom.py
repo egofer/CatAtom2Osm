@@ -3,7 +3,7 @@ from future import standard_library
 standard_library.install_aliases()
 import unittest
 import mock
-from io import BytesIO
+from io import TextIOWrapper, BytesIO
 from contextlib import contextmanager
 from requests.exceptions import ConnectionError
 import codecs
@@ -17,7 +17,7 @@ import catatom
 @contextmanager
 def capture(command, *args, **kwargs):
     out = sys.stdout
-    sys.stdout = codecs.getwriter('utf-8')(BytesIO())
+    sys.stdout = TextIOWrapper(BytesIO(), 'utf-8')
     try:
         command(*args, **kwargs)
         sys.stdout.seek(0)
