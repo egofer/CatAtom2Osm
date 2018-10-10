@@ -17,15 +17,15 @@ MATCH_THR = 60
 
 
 def normalize(text):
-    return re.sub(' *\(.*\)', '', text.lower().strip())
+    return re.sub(r' *\(.*\)', '', text.lower().strip())
 
 def parse(name):
     """Transform the name of a street from Cadastre conventions to OSM ones."""
     name = name.split(';')[0] # Remove additional information
-    name = re.sub('[,]+', ', ', name).strip() # Avoids comma without trailing space
+    name = re.sub(r'[,]+', ', ', name).strip() # Avoids comma without trailing space
     result = []
-    for (i, word) in enumerate(re.split('[ ]+', name.strip())):
-        nude_word = re.sub('^\(|\)$', '', word) # Remove enclosing parenthesis
+    for (i, word) in enumerate(re.split(r'[ ]+', name.strip())):
+        nude_word = re.sub(r'^\(|\)$', '', word) # Remove enclosing parenthesis
         if i == 0:
             if word in setup.excluded_types:
                 return ""

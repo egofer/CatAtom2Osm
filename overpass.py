@@ -34,10 +34,10 @@ class Query(object):
     def set_search_area(self, search_area):
         """Set the area to search in. It could either the osm id of a named area
            or a bounding box (bottom, left, top, right) clause."""
-        if re.match('^\d{1,8}$', search_area):
+        if re.match(r'^\d{1,8}$', search_area):
             self.area_id = search_area
             self.bbox = ''
-        elif re.match('^(-?\d{1,3}(\.\d+)?,\s*){3}-?\d{1,3}(\.\d+)?$', search_area):
+        elif re.match(r'^(-?\d{1,3}(\.\d+)?,\s*){3}-?\d{1,3}(\.\d+)?$', search_area):
             self.bbox = search_area
             self.area_id = ''
         else:

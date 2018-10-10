@@ -28,7 +28,7 @@ class Reader(object):
             a_path (str): Directory where the source files are located.
         """
         self.path = a_path
-        m = re.match("^\d{5}$", os.path.split(a_path)[-1])
+        m = re.match(r"^\d{5}$", os.path.split(a_path)[-1])
         if not m:
             raise ValueError(_("Last directory name must be a 5 digits ZIP code"))
         self.zip_code = m.group()
@@ -70,11 +70,11 @@ class Reader(object):
         Given the url of a Cadastre ATOM service, tries to download the ZIP
         file for self.zip_code
         """
-        s = re.search('INSPIRE/(\w+)/', url)
+        s = re.search(r'INSPIRE/(\w+)/', url)
         log.debug(_("Searching the url for the '%s' layer of '%s'..."), 
             s.group(1), self.zip_code)
         response = download.get_response(url)
-        s = re.search('http.+/%s.+zip' % self.zip_code, response.text)
+        s = re.search(r'http.+/%s.+zip' % self.zip_code, response.text)
         if not s:
             raise ValueError(_("Zip code '%s' don't exists") % self.zip_code)
         url = s.group(0)

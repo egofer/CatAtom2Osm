@@ -114,7 +114,7 @@ class Reader(object):
             self.src_date = open(md_path, 'r').read()
         else:
             response = download.get_response(meta_url)
-            s = re.search('fecha de referencia.*([0-9]{1,2} de .+ de [0-9]{4})', response.text)
+            s = re.search(r'fecha de referencia.*([0-9]{1,2} de .+ de [0-9]{4})', response.text)
             try:
                 self.src_date = datetime.strptime(s.group(1), '%d de %B de %Y').strftime('%Y-%m-%d')
             except:
