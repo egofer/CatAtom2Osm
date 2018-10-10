@@ -356,7 +356,7 @@ class TestCatAtom2Osm(unittest.TestCase):
         self.m_app.write_osm(self.m_app, data, 'bar', compress=True)
         m_gz.open.assert_called_once_with('foo/bar.gz', 'w')
         f_gz = m_gz.open.return_value
-        m_codecs.EncodedFile.assert_called_once_with(f_gz, 'utf-8')
+        m_codecs.getwriter.return_value.assert_called_once_with(f_gz)
 
     @mock.patch('catatom2osm.layer')
     @mock.patch('catatom2osm.report')
