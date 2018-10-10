@@ -377,9 +377,7 @@ class CatAtom2Osm(object):
         if compress:
             filename += '.gz'
             osm_path = os.path.join(self.path, filename)
-            #file_obj = codecs.EncodedFile(gzip.open(osm_path, "w"), "utf-8")
-            ft = gzip.open(osm_path, "w")
-            file_obj = io.open(ft, "w", encoding="utf-8")
+            file_obj = codecs.EncodedFile(gzip.open(osm_path, "w"), "utf-8")
         else:
             osm_path = os.path.join(self.path, filename)
             file_obj = io.open(osm_path, "w", encoding="utf-8")
