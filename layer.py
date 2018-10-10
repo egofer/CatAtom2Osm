@@ -523,7 +523,7 @@ class BaseLayer(QgsVectorLayer):
             elif geom.wkbType() in [WKBPolygon, WKBMultiPolygon]:
                 mp = Geometry.get_multipolygon(geom)
                 if len(mp) == 1:
-                    e = data.Way(mp[0]) if len(mp[0]) == 1 else data.Polygon(mp[0])
+                    e = data.Way(mp[0][0]) if len(mp[0]) == 1 else data.Polygon(mp[0])
                 else:
                     e = data.MultiPolygon(mp)
             else:
