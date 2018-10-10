@@ -17,7 +17,7 @@ def raiseException():
 
 def get_func(f):
     return getattr(f, '__func__', f)
-    
+
 prov_atom = b"""<feed xmlns="http://www.w3.org/2005/Atom" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:georss="http://www.georss.org/georss"  xmlns:inspire_dls = "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0" xml:lang="en"> 
 <title>Download Office foobar</title>
 <entry>
@@ -275,7 +275,7 @@ class TestCatAtom(unittest.TestCase):
         zoning = mock.MagicMock()
         bbox = "28.0655571972128,-16.7996857087189,28.1788414990302,-16.6878650661333"
         zoning.bounding_box.return_value = bbox
-        data = {"id": 2, "tags": {"name": "Tazmania"}}
+        data = {"id": "2", "tags": {"name": "Tazmania"}}
         m_hgw.fuzz = True
         m_hgw.dsmatch.return_value = data
         m_overpass.Query.return_value.read.return_value = '{"elements": "foobar"}'
@@ -289,18 +289,18 @@ class TestCatAtom(unittest.TestCase):
         self.assertEqual(m_hgw.dsmatch.call_args_list[0][0][2](data), 'Tazmania')
         self.assertEqual(self.m_cat.boundary_search_area, '2')
         self.assertEqual(self.m_cat.boundary_name, 'Tazmania')
-        
+
         m_hgw.dsmatch.return_value = None
         self.m_cat.get_boundary(self.m_cat, zoning)
         output = m_log.call_args_list[0][0][0]
         self.assertIn("Failed to find", output)
         self.assertEqual(self.m_cat.boundary_search_area, bbox)
-        
+
         m_overpass.Query.return_value.read = raiseException
         self.m_cat.get_boundary(self.m_cat, zoning)
         output = m_log.call_args_list[1][0][0]
         self.assertIn("Failed to find", output)
-        
+
         m_hgw.fuzz = False
         self.m_cat.zip_code = '07032'
         self.m_cat.get_boundary(self.m_cat, zoning)
@@ -317,4 +317,3 @@ class TestCatAtom(unittest.TestCase):
             self.assertIn('foobar', str(output))
             self.assertIn('FOO', str(output))
             self.assertIn('BAR', str(output))
-

@@ -153,7 +153,7 @@ class Reader(object):
             allow_empty (bool): If False (default), raise a exception for empty
                 layer, else returns None
             force_zip (bool): Force to use ZIP file.
-                
+
         Returns:
             QgsVectorLayer: Vector layer.
         """
@@ -197,13 +197,13 @@ class Reader(object):
             query.add('rel["admin_level"="8"]')
         matching = False
         try:
-            data = json.loads(str(query.read()))
+            data = json.loads(query.read())
             matching = hgwnames.dsmatch(self.cat_mun, data['elements'], 
                 lambda e: e['tags']['name'])
         except ConnectionError:
             pass
         if matching:
-            self.boundary_search_area = str(matching['id'])
+            self.boundary_search_area = matching['id']
             self.boundary_name = matching['tags']['name']
             self.boundary_data = matching['tags']
             log.info(_("Municipality: '%s'"), self.boundary_name)
