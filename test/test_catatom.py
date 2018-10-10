@@ -183,8 +183,9 @@ class TestCatAtom(unittest.TestCase):
         (md_path, gml_path, zip_path, vsizip_path, g) = self.m_cat.get_layer_paths(self.m_cat, ln)
         self.assertEqual(g, 'AD')
         self.assertEqual(md_path, 'foo/A.ES.SDGC.AD.MD.bar.xml')
-        self.assertEqual(gml_path, 'foo/A.ES.SDGC.AD.bar.gml|layername=' + ln)
+        self.assertEqual(gml_path, 'foo/A.ES.SDGC.AD.bar.gml')
         self.assertEqual(zip_path, 'foo/A.ES.SDGC.AD.bar.zip')
+        self.assertEqual(vsizip_path.split('|')[-1], 'layername=' + ln)
 
     @mock.patch('catatom.os')
     @mock.patch('catatom.log')

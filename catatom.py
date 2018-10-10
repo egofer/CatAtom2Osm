@@ -94,9 +94,8 @@ class Reader(object):
         else:
             raise ValueError(_("Unknow layer name '%s'") % layername)
         gml_fn = ".".join((setup.fn_prefix, group, self.zip_code, layername, "gml"))
-        if group == 'AD':    
-            gml_fn = ".".join((setup.fn_prefix, group, self.zip_code, 
-                "gml|layername=%s" % layername))
+        if group == 'AD':
+            gml_fn = ".".join((setup.fn_prefix, group, self.zip_code, "gml"))
         md_fn = ".".join((setup.fn_prefix, group, "MD", self.zip_code, "xml"))
         if group == 'CP':
             md_fn = ".".join((setup.fn_prefix, group, "MD.", self.zip_code, "xml"))
@@ -105,6 +104,8 @@ class Reader(object):
         gml_path = os.path.join(self.path, gml_fn)
         zip_path = os.path.join(self.path, zip_fn)
         vsizip_path = "/".join(('/vsizip', self.path, zip_fn, gml_fn))
+        if group == 'AD':
+            vsizip_path += "|layername=" + layername
         return (md_path, gml_path, zip_path, vsizip_path, group)
 
     def is_empty(self, gml_path, zip_path):
