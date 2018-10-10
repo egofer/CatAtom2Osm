@@ -5,7 +5,7 @@ import unittest
 from tempfile import mkstemp
 
 import csv
-import codecs
+import io
 import os
 os.environ['LANGUAGE'] = 'C'
 
@@ -17,14 +17,14 @@ class TestCsvTools(unittest.TestCase):
 
     def test_csv2dict(self):
         _, tmp_path = mkstemp()
-        with codecs.open(tmp_path, 'w', encoding) as csv_file:
+        with io.open(tmp_path, 'w', encoding=encoding) as csv_file:
             csv_file.write(str(u'á%sx%sé%sy%s') % (delimiter, eol, delimiter, eol))
         a_dict = csv2dict(tmp_path, {})
         self.assertEqual(a_dict, {str(u'á'):str(u'x'), str(u'é'):str(u'y')})
 
     def test_csv2dict_bad_delimiter(self):
         _, tmp_path = mkstemp()
-        with codecs.open(tmp_path, 'w', encoding) as csv_file:
+        with io.open(tmp_path, 'w', encoding=encoding) as csv_file:
             csv_file.write('a;1%sb;2' % eol)
         with self.assertRaises(IOError):
             a_dict = csv2dict(tmp_path, {})
@@ -36,14 +36,14 @@ class TestCsvTools(unittest.TestCase):
         t = str(u'%s%s%s%s%s%s%s%s') % (l[0][0], delimiter, l[0][1], eol,
             l[1][0], delimiter, l[1][1], eol)
         dict2csv(tmp_path, d)
-        with codecs.open(tmp_path, 'r', encoding) as csv_file:
+        with io.open(tmp_path, 'r', encoding=encoding) as csv_file:
             text = csv_file.read()
         self.assertEqual(text, t)
 
     def test_dict2csv_sort(self):
         _, tmp_path = mkstemp()
         dict2csv(tmp_path, {'b':'1', 'a':'3', 'c': '2'}, sort=1)
-        with codecs.open(tmp_path, 'r', encoding) as csv_file:
+        with io.open(tmp_path, 'r', encoding=encoding) as csv_file:
             text = csv_file.read()
         self.assertEqual(text, str(u'b%s1%sc%s2%sa%s3%s') % (delimiter, eol, 
             delimiter, eol, delimiter, eol))

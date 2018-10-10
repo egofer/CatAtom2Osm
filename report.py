@@ -5,7 +5,7 @@ from __future__ import division, unicode_literals
 from builtins import int, object, str
 from collections import OrderedDict, Counter
 from datetime import datetime
-import codecs
+import io
 import locale
 import platform
 import time
@@ -308,9 +308,8 @@ class Report(object):
         return output
 
     def to_file(self, fn):
-        with codecs.open(fn, "w", setup.encoding) as fo:
+        with io.open(fn, "w", encoding=setup.encoding) as fo:
             fo.write(self.to_string())
-        
+
 
 instance = Report()
-

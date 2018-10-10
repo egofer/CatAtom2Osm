@@ -19,7 +19,7 @@ import report
 
 def get_func(f):
     return getattr(f, '__func__', f)
-    
+ 
 class TestQgsSingleton(unittest.TestCase):
 
     @mock.patch('catatom2osm.QgsSingleton._qgs', None)
@@ -337,8 +337,9 @@ class TestCatAtom2Osm(unittest.TestCase):
     @mock.patch('catatom2osm.os')
     @mock.patch('catatom2osm.osmxml')
     @mock.patch('catatom2osm.codecs')
+    @mock.patch('catatom2osm.io')
     @mock.patch('catatom2osm.gzip')
-    def test_write_osm(self, m_gz, m_codecs, m_xml, m_os):
+    def test_write_osm(self, m_gz, m_io, m_codecs, m_xml, m_os):
         m_os.path.join = lambda *args: '/'.join(args)
         m_xml.serialize.return_value = 'taz'
         data = osm.Osm()
@@ -348,8 +349,8 @@ class TestCatAtom2Osm(unittest.TestCase):
         self.m_app.write_osm = get_func(cat.CatAtom2Osm.write_osm)
         self.m_app.write_osm(self.m_app, data, 'bar')
         self.assertNotIn('ref', [k for el in data.elements for k in list(el.tags.keys())])
-        m_codecs.open.assert_called_once_with('foo/bar', 'w', 'utf-8')
-        file_obj = m_codecs.open.return_value
+        m_io.open.assert_called_once_with('foo/bar', 'w', encoding='utf-8')
+        file_obj = m_io.open.return_value
         m_xml.serialize.assert_called_once_with(file_obj, data)
         m_xml.reset_mock()
         self.m_app.write_osm(self.m_app, data, 'bar', compress=True)
@@ -414,7 +415,7 @@ class TestCatAtom2Osm(unittest.TestCase):
         self.m_app.get_auxiliary_addresses = get_func(cat.CatAtom2Osm.get_auxiliary_addresses)
         self.m_app.get_auxiliary_addresses(self.m_app)
         m_cdau.Reader.assert_called_once_with(os.path.join('/foo', 'aux'))
-   
+
     @mock.patch('catatom2osm.report')
     def test_merge_address(self, m_report):
         address = osm.Osm()
@@ -517,3 +518,4 @@ class TestCatAtom2Osm(unittest.TestCase):
         self.m_app.read_osm.return_value = d
         address = self.m_app.get_current_ad_osm(self.m_app)
         self.assertEqual(m_report.osm_addresses_whithout_number, 2)
+

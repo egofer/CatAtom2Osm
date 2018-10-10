@@ -6,7 +6,7 @@ from __future__ import division
 from builtins import map, object
 from past.builtins import basestring
 import os, sys
-import codecs
+import io, codecs
 import gzip
 import logging
 import shutil
@@ -377,10 +377,12 @@ class CatAtom2Osm(object):
         if compress:
             filename += '.gz'
             osm_path = os.path.join(self.path, filename)
-            file_obj = codecs.EncodedFile(gzip.open(osm_path, "w"), "utf-8")
+            #file_obj = codecs.EncodedFile(gzip.open(osm_path, "w"), "utf-8")
+            ft = gzip.open(osm_path, "w")
+            file_obj = io.open(ft, "w", encoding="utf-8")
         else:
             osm_path = os.path.join(self.path, filename)
-            file_obj = codecs.open(osm_path, "w", "utf-8")
+            file_obj = io.open(osm_path, "w", encoding="utf-8")
         osmxml.serialize(file_obj, data)
         file_obj.close()
         log.info(_("Generated '%s': %d nodes, %d ways, %d relations"),
@@ -471,7 +473,7 @@ class CatAtom2Osm(object):
         the address tags to the building if it isn't a 'entrace' type address or
         else to the entrance if there exist a node with the address coordinates
         in the building.
-        
+
         Precondition: building.move_address deleted addresses belonging to multiple buildings
 
         Args:
@@ -606,4 +608,3 @@ class CatAtom2Osm(object):
         if log.getEffectiveLevel() > logging.DEBUG:
             path = os.path.join(self.path, name) if relative else name
             layer.BaseLayer.delete_shp(path)
-

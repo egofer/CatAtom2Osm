@@ -7,7 +7,7 @@ oldstr = str
 from builtins import str
 
 import csv
-import codecs
+import io
 import six
 from setup import eol, encoding, delimiter
 
@@ -17,7 +17,7 @@ def dict2csv(csv_path, a_dict, sort=None):
     Writes a dictionary to a csv file, optinally sorted by key (sort=0) or 
     value (sort=1)
     """
-    with codecs.open(csv_path, 'w', encoding) as csv_file:
+    with io.open(csv_path, 'w', encoding=encoding) as csv_file:
         dictitems = list(a_dict.items())
         if sort in [0, 1]:
             dictitems.sort(key=lambda x:x[sort])
@@ -36,4 +36,3 @@ def csv2dict(csv_path, a_dict, encoding=encoding):
             else:
                 a_dict[row[0]] = row[1]
     return a_dict
-

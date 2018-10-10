@@ -32,7 +32,7 @@ class TestReport(unittest.TestCase):
         r = report.Report()
         r.values['mun_name'] = 'foobar'
         self.assertEqual(r.mun_name, 'foobar')
-    
+
     def test_get(self):
         r = report.Report()
         self.assertEqual(r.get('foo', 'bar'), 'bar')
@@ -65,7 +65,7 @@ class TestReport(unittest.TestCase):
         r.inp_pools = 1
         r.building_counter = {'a': 1, 'b': 2}
         r.out_buildings = 3
-        r.out_features = 8 
+        r.out_features = 8
         r.orphand_parts = 1
         r.underground_parts = 1
         r.new_footprints = 2
@@ -94,7 +94,7 @@ class TestReport(unittest.TestCase):
         r.inp_pools = 1
         r.building_counter = {'a': 1, 'b': 2}
         r.out_buildings = 4
-        r.out_features = 8 
+        r.out_features = 8
         r.validate()
         msgs = [
             "Sum of address types should be equal to the input addresses",
@@ -141,7 +141,7 @@ class TestReport(unittest.TestCase):
             + "Warnings: 2" + setup.eol \
             + report.TAB + "w1" + setup.eol + report.TAB + "w2" + setup.eol
         self.assertEqual(output, expected)
-    
+
     def test_to_string3(self):
         r = report.Report(sys_info=True)
         output = r.to_string()
