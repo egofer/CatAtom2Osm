@@ -203,7 +203,7 @@ class Reader(object):
         except ConnectionError:
             pass
         if matching:
-            self.boundary_search_area = matching['id']
+            self.boundary_search_area = str(matching['id'])
             self.boundary_name = matching['tags']['name']
             self.boundary_data = matching['tags']
             log.info(_("Municipality: '%s'"), self.boundary_name)
