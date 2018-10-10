@@ -347,8 +347,8 @@ class CatAtom2Osm(object):
                 query.download(osm_path, log)
             else:
                 query.download(osm_path)
-        fo = open(osm_path, 'rb')
-        data = osmxml.deserialize(fo)
+        with open(osm_path, 'rb') as fo:
+            data = osmxml.deserialize(fo)
         if len(data.elements) == 0:
             msg = _("No OSM data were obtained from '%s'") % filename
             log.warning(msg)

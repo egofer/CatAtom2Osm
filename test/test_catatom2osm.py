@@ -19,7 +19,7 @@ import report
 
 def get_func(f):
     return getattr(f, '__func__', f)
- 
+
 class TestQgsSingleton(unittest.TestCase):
 
     @mock.patch('catatom2osm.QgsSingleton._qgs', None)
@@ -316,11 +316,10 @@ class TestCatAtom2Osm(unittest.TestCase):
         m_os.path.join = lambda *args: '/'.join(args)
         m_os.path.exists.return_value = True
         m_xml.deserialize.return_value.elements = []
-        m_open.return_value = 123
         self.m_app.read_osm(self.m_app, 'bar', 'taz')
         m_overpass.Query.assert_not_called()
         m_open.assert_called_with('foo/taz', 'rb')
-        m_xml.deserialize.assert_called_once_with(123)
+        m_xml.deserialize.assert_called_once_with(m_open().__enter__())
         output = m_log.warning.call_args_list[0][0][0]
         self.assertIn('No OSM data', output)
 
