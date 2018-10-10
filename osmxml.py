@@ -13,9 +13,9 @@ log = logging.getLogger(setup.app_name + "." + __name__)
 
 
 def write_elem(outfile, e):
-    try:
+    if 'pretty_print' in etree.tostring.func_code.co_varnames:
         outfile.write(str(etree.tostring(e, pretty_print=True)))
-    except TypeError: # pragma: no cover
+    else:
         outfile.write(str(etree.tostring(e)))
 
 def serialize(outfile, data):
