@@ -319,7 +319,7 @@ class TestCatAtom2Osm(unittest.TestCase):
         m_open.return_value = 123
         self.m_app.read_osm(self.m_app, 'bar', 'taz')
         m_overpass.Query.assert_not_called()
-        m_open.assert_called_with('foo/taz', 'r')
+        m_open.assert_called_with('foo/taz', 'rb')
         m_xml.deserialize.assert_called_once_with(123)
         output = m_log.warning.call_args_list[0][0][0]
         self.assertIn('No OSM data', output)

@@ -347,7 +347,7 @@ class CatAtom2Osm(object):
                 query.download(osm_path, log)
             else:
                 query.download(osm_path)
-        fo = open(osm_path, 'r')
+        fo = open(osm_path, 'rb')
         data = osmxml.deserialize(fo)
         if len(data.elements) == 0:
             msg = _("No OSM data were obtained from '%s'") % filename
@@ -462,7 +462,7 @@ class CatAtom2Osm(object):
                 reader = aux_source.Reader(aux_path)
                 aux = reader.read(self.cat.zip_code[:2])
                 aux_source.conflate(aux, self.address, self.cat.zip_code)
-    
+
     def merge_address(self, building_osm, address_osm):
         """
         Copy address from address_osm to building_osm using 'ref' tag.
