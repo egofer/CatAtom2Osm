@@ -116,7 +116,7 @@ class Point(Qgs2DPoint):
             the distance from va to the segment v-vb is lower than threshold.
             (bool) is_spike = True if is_acute and angle_a is not straight and
             the distance from va to the segment v-vb is lower than threshold.
-            (QgsPoint) vx = projection of va over the segment v-vb.
+            (Point) vx = projection of va over the segment v-vb.
         """
         (v, ndx, ndxa, ndxb, dist) = geom.closestVertex(Point(self))
         va = Point(geom.vertexAt(ndxa)) # previous vertex
@@ -146,7 +146,7 @@ class Point(Qgs2DPoint):
             + math.tan(math.radians(gamma)) * math.sin(math.radians(angle_v))))
         x = v.x() + (vb.x() - v.x()) * dx / dist_b
         y = v.y() + (vb.y() - v.y()) * dx / dist_b
-        vx = QgsPoint(x, y)
+        vx = Point(x, y)
         return angle_v, angle_a, ndx, ndxa, is_acute, is_zigzag, is_spike, vx
 
 
@@ -255,9 +255,9 @@ class BaseLayer(QgsVectorLayer):
 
             >>> rename = {'spec': 'specification'}
             >>> resolve = {
-            ...     'PD_id': ('component_href', '[\w\.]+PD[\.0-9]+'),
-            ...     'TN_id': ('component_href', '[\w\.]+TN[\.0-9]+'),
-            ...     'AU_id': ('component_href', '[\w\.]+AU[\.0-9]+')
+            ...     'PD_id': ('component_href', r'[\w\.]+PD[\.0-9]+'),
+            ...     'TN_id': ('component_href', r'[\w\.]+TN[\.0-9]+'),
+            ...     'AU_id': ('component_href', r'[\w\.]+AU[\.0-9]+')
             ... }
 
             You get:
@@ -1073,9 +1073,9 @@ class AddressLayer(BaseLayer):
             self.updateFields()
         self.rename = {'spec': 'specification'}
         self.resolve = {
-            'PD_id': ('component_href', '[\w\.]+PD[\.0-9]+'),
-            'TN_id': ('component_href', '[\w\.]+TN[\.0-9]+'),
-            'AU_id': ('component_href', '[\w\.]+AU[\.0-9]+')
+            'PD_id': ('component_href', r'[\w\.]+PD[\.0-9]+'),
+            'TN_id': ('component_href', r'[\w\.]+TN[\.0-9]+'),
+            'AU_id': ('component_href', r'[\w\.]+AU[\.0-9]+')
         }
         self.source_date = source_date
 
