@@ -11,8 +11,8 @@ set GDAL_FILENAME_IS_UTF8=YES
 set VSI_CACHE=TRUE
 set VSI_CACHE_SIZE=1000000
 set QT_PLUGIN_PATH=%OSGEO4W_ROOT%\apps\qgis\qtplugins;%OSGEO4W_ROOT%\apps\Qt5\plugins
-set PYTHONHOME=%OSGEO4W_ROOT%\apps\Python36
+set PYTHONHOME=%OSGEO4W_ROOT%\apps\Python37
 set PYTHONPATH=%OSGEO4W_ROOT%\apps\qgis\python;%PYTHONPATH%
-set PYTHONPATH=%OSGEO4W_ROOT%\apps\Python36\Lib\site-packages;%PYTHONPATH%
+set PYTHONPATH=%OSGEO4W_ROOT%\apps\Python37\Lib\site-packages;%PYTHONPATH%
 rem cd <path to cadastre files>
 cmd.exe
