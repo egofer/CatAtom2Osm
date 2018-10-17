@@ -161,9 +161,7 @@ def conflate(cdau_address, cat_address, cod_mun_cat):
         c += 1
         attr = get_cat_address(ad, cod_mun_cat)
         ref = attr['localId']
-        pt = QgsPoint()
-        pt.setX(float(ad['x']))
-        pt.setY(float(ad['y']))
+        pt = layer.Point(float(ad['x']), float(ad['y']))
         if len(addresses[ref]) == 0: # can't resolve cadastral reference
             area_of_candidates = layer.Point(pt).boundingBox(cdau_thr)
             fids = index.intersects(area_of_candidates)
@@ -171,7 +169,7 @@ def conflate(cdau_address, cat_address, cod_mun_cat):
                 feat = QgsFeature(cat_address.fields())
                 for key, value in list(attr.items()):
                     feat[key] = value
-                feat.setGeometry(QgsGeometry.fromPoint(pt))
+                feat.setGeometry(layer.Geometry.fromPointXY(pt))
                 to_add.append(feat) # add new
         else: # get nearest
             min_dist = 100
@@ -182,7 +180,7 @@ def conflate(cdau_address, cat_address, cod_mun_cat):
                    min_dist = dist
                    candidate = feat
             if candidate is not None: # update existing
-                to_change_g[candidate.id()] = QgsGeometry.fromPoint(pt)
+                to_change_g[candidate.id()] = layer.Geometry.fromPointXY(pt)
                 for key, value in list(attr.items()):
                     candidate[key] = value
                 to_change[candidate.id()] = layer.get_attributes(candidate)
