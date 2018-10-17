@@ -13,7 +13,7 @@ try:
 except ImportError: # pragma: no cover
     try:
         import xml.etree.ElementTree as etree
-        log.debug(_("Running with ElementTree on Python 2.5+"))
+        log.debug(_("Running with ElementTree"))
     except ImportError:
         try:
             import cElementTree as etree
