@@ -22,7 +22,7 @@ def dict2csv(csv_path, a_dict, sort=None):
         if sort in [0, 1]:
             dictitems.sort(key=lambda x:x[sort])
         for (k, v) in dictitems:
-            csv_file.write(str(u'%s%s%s%s') % (k, delimiter, v, eol))
+            csv_file.write(str(u'%s%s%s%s') % (k, delimiter, v, '\n'))
 
 def csv2dict(csv_path, a_dict, encoding=encoding):
     """Read a dictionary from a csv file"""
