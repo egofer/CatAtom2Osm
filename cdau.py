@@ -111,7 +111,8 @@ class Reader(object):
 
     def get_metadata(self, md_path):
         if os.path.exists(md_path):
-            self.src_date = open(md_path, 'r').read()
+            with open(md_path, 'r') as fo:
+                self.src_date = fo.read()
         else:
             response = download.get_response(meta_url)
             s = re.search(r'fecha de referencia.*([0-9]{1,2} de .+ de [0-9]{4})', response.text)

@@ -15,7 +15,7 @@ qgs = QgsSingleton()
 
 def get_func(f):
     return getattr(f, '__func__', f)
-    
+
 class TestCdau(unittest.TestCase):
 
     def setUp(self):
@@ -112,7 +112,7 @@ class TestCdau(unittest.TestCase):
         with self.assertRaises(IOError):
             self.m_cdau.get_metadata(self.m_cdau, 'xxx')
         m_open.reset_mock()
-        m_open.return_value.read.return_value = 'foobar'
+        m_open.return_value.__enter__.return_value.read.return_value = 'foobar'
         m_os.path.exists.return_value = True
         self.m_cdau.get_metadata(self.m_cdau, 'xxx')
         self.assertEqual(self.m_cdau.src_date, 'foobar')
