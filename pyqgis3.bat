@@ -1,5 +1,5 @@
 @echo off 
-set OSGEO4W_ROOT=C:\OSGeo4W3
+set OSGEO4W_ROOT=C:\OSGeo4W
 @IF EXIST C:\OsGeo4W64\nul set OSGEO4W_ROOT=C:\OSGeo4W64
 @IF EXIST C:\OsGeo4W32\nul set OSGEO4W_ROOT="C:\OSGeo4W32
 call "%OSGEO4W_ROOT%\bin\o4w_env.bat" 
