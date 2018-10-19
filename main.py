@@ -52,7 +52,7 @@ def run():
     parser.add_argument("path", nargs="*",
         help=setup.terminal_decode(_("Directory for input and output files")))
     parser.add_argument("-v", "--version", action="version",
-        help=_("Show program's version number and exit"),
+        help=setup.terminal_decode(_("Show program's version number and exit")),
         version=setup.app_version)
     parser.add_argument("-l", "--list", dest="list", metavar="prov",
         default=False, help=setup.terminal_decode(_("List available municipalities given the two "
