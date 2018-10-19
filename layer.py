@@ -242,7 +242,7 @@ class BaseLayer(QgsVectorLayer):
             os.remove(path)
 
     def copy_feature(self, feature, rename=None, resolve=None):
-        """
+        r"""
         Return a copy of feature renaming attributes or resolving xlink references.
 
         Args:
