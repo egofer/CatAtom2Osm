@@ -17,8 +17,7 @@ import download
 import layer
 import setup
 from report import instance as report
-
-log = logging.getLogger(setup.app_name + "." + __name__)
+log = setup.log
 
 
 andalucia = {'04': 'Almeria', '11': 'Cadiz', '14': 'Cordova', '18': 'Granada',

@@ -16,8 +16,8 @@ import overpass
 import setup
 from compat import etree
 from report import instance as report
+log = setup.log
 
-log = logging.getLogger(setup.app_name + "." + __name__)
 
 class Reader(object):
     """Class to download and read Cadastre ATOM GML files"""

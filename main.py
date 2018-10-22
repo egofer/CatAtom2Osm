@@ -10,17 +10,7 @@ from zipfile import BadZipfile
 
 import setup
 from report import instance as report
-
-log = logging.getLogger(setup.app_name)
-fh = logging.FileHandler(setup.log_file)
-ch = logging.StreamHandler(sys.stderr)
-fh.setLevel(logging.DEBUG)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter(setup.log_format)
-ch.setFormatter(formatter)
-fh.setFormatter(formatter)
-log.addHandler(ch)
-log.addHandler(fh)
+log = setup.log
 
 
 def __(msg):
@@ -99,6 +89,7 @@ def run():
         options.zoning = True
     log_level = getattr(logging, options.log_level.upper())
     log.setLevel(log_level)
+    log.debug(_("Using Python %s.%s.%s"), *sys.version_info[:3])
 
     if len(options.path) > 1:
         log.error(_("Too many arguments, supply only a directory path."))

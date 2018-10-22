@@ -16,7 +16,7 @@ import osm
 import setup
 import translate
 from report import instance as report
-log = logging.getLogger(setup.app_name + "." + __name__)
+log = setup.log
 
 BUFFER_SIZE = 512
 

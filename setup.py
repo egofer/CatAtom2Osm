@@ -2,10 +2,11 @@
 """Application preferences"""
 from __future__ import unicode_literals
 from builtins import range, str, bytes
-import six
-import sys, os, locale
 import csv
 import gettext
+import logging
+import six
+import sys, os, locale
 
 app_name = 'CatAtom2Osm'
 app_version = '1.2dev'
@@ -49,6 +50,16 @@ gettext.textdomain('argparse')
 log_level = 'INFO' # Default log level
 log_file = 'catatom2osm.log'
 log_format = '%(asctime)s - %(levelname)s - %(message)s'
+log = logging.getLogger(app_name)
+fh = logging.FileHandler(log_file)
+ch = logging.StreamHandler(sys.stderr)
+fh.setLevel(logging.DEBUG)
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter(log_format)
+ch.setFormatter(formatter)
+fh.setFormatter(formatter)
+log.addHandler(ch)
+log.addHandler(fh)
 
 fn_prefix = 'A.ES.SDGC' # Inspire Atom file name prefix
 

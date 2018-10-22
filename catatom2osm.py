@@ -30,7 +30,7 @@ import translate
 from compat import etree
 from report import instance as report
 
-log = logging.getLogger(setup.app_name + "." + __name__)
+log = setup.log
 if setup.silence_gdal:
     gdal.PushErrorHandler('CPLQuietErrorHandler')
 

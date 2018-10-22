@@ -9,7 +9,7 @@ import setup
 import logging
 import osm
 from compat import etree
-log = logging.getLogger(setup.app_name + "." + __name__)
+log = setup.log
 
 
 def write_elem(outfile, e):
