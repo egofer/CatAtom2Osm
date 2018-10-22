@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """CatAtom2Osm command line entry point"""
 from __future__ import unicode_literals
-from builtins import str
+from builtins import str, bytes
 from argparse import ArgumentParser
 import logging
 import os
@@ -23,7 +23,11 @@ log.addHandler(ch)
 log.addHandler(fh)
 
 
-usage = setup.terminal_decode(_("""catatom2osm [OPTION]... [PATH]
+def __(msg):
+    return str(msg) if sys.stdout.encoding == 'utf-8' else \
+        bytes(msg, setup.encoding).decode(sys.stdout.encoding)
+
+usage = __(_("""catatom2osm [OPTION]... [PATH]
 The argument path states the directory for input and output files. 
 The directory name shall start with 5 digits (GGMMM) matching the Cadastral 
 Provincial Office and Municipality Code. If the program don't find the input 
@@ -50,35 +54,35 @@ def process(options):
 def run():
     parser = ArgumentParser(usage=usage)
     parser.add_argument("path", nargs="*",
-        help=setup.terminal_decode(_("Directory for input and output files")))
+        help=__(_("Directory for input and output files")))
     parser.add_argument("-v", "--version", action="version",
-        help=setup.terminal_decode(_("Show program's version number and exit")),
+        help=_("Show program's version number and exit"),
         version=setup.app_version)
     parser.add_argument("-l", "--list", dest="list", metavar="prov",
-        default=False, help=setup.terminal_decode(_("List available municipalities given the two "
+        default=False, help=__(_("List available municipalities given the two "
         "digits province code")))
     parser.add_argument("-t", "--tasks", dest="tasks", default=False,
-        action="store_true", help=setup.terminal_decode(_("Splits constructions into tasks files " \
+        action="store_true", help=__(_("Splits constructions into tasks files " \
         "(default, implies -z)")))
     parser.add_argument("-z", "--zoning", dest="zoning", default=False,
-        action="store_true", help=setup.terminal_decode(_("Process the cadastral zoning dataset")))
+        action="store_true", help=__(_("Process the cadastral zoning dataset")))
     parser.add_argument("-b", "--building", dest="building", default=False,
-        action="store_true", help=setup.terminal_decode(_("Process buildings to a single file " \
+        action="store_true", help=__(_("Process buildings to a single file " \
         "instead of tasks")))
     parser.add_argument("-d", "--address", dest="address", default=False,
-        action="store_true", help=setup.terminal_decode(_("Process the address dataset (default)")))
+        action="store_true", help=__(_("Process the address dataset (default)")))
     parser.add_argument("-p", "--parcel", dest="parcel", default=False,
-        action="store_true", help=setup.terminal_decode(_("Process the cadastral parcel dataset")))
+        action="store_true", help=__(_("Process the cadastral parcel dataset")))
     parser.add_argument("-a", "--all", dest="all", default=False,
-        action="store_true", help=setup.terminal_decode(_("Process all datasets (equivalent " \
+        action="store_true", help=__(_("Process all datasets (equivalent " \
         "to -bdptz)")))
     parser.add_argument("-m", "--manual", dest="manual", default=False,
-        action="store_true", help=setup.terminal_decode(_("Dissable conflation with OSM data")))
+        action="store_true", help=__(_("Dissable conflation with OSM data")))
     parser.add_argument("-w", "--download", dest="download", default=False,
-        action="store_true", help=setup.terminal_decode(_("Download only")))
+        action="store_true", help=__(_("Download only")))
     parser.add_argument("--log", dest="log_level", metavar="log_level",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-        default=setup.log_level, help=setup.terminal_decode(_("Select the log level between " \
+        default=setup.log_level, help=__(_("Select the log level between " \
         "DEBUG, INFO, WARNING, ERROR or CRITICAL.")))
     options = parser.parse_args()
     report.options = ' '.join(sys.argv[1:])
