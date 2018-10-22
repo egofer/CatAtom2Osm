@@ -46,3 +46,8 @@ class Terminal(object):
         return str(msg) if sys.stdout.encoding == 'utf-8' else \
             bytes(msg, self.encoding).decode(sys.stdout.encoding)
 
+    def decode(self, msg):
+        """Decode strings from W$ terminal with Python2"""
+        return str(msg) if sys.stdout.encoding == 'utf-8' else \
+            bytes(msg, sys.stdout.encoding).decode(self.encoding)
+
