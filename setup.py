@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """Application preferences"""
 from __future__ import unicode_literals
-from builtins import range, str, bytes
+from builtins import range
 import csv
-import gettext
 import logging
-import six
 import sys, os, locale
+
+import compat
 
 app_name = 'CatAtom2Osm'
 app_version = '1.2dev'
@@ -28,24 +28,16 @@ def winenv():
         if os.getenv('LANG') is None:
             os.environ['LANG'] = language
 
-def terminal_decode(msg):
-    """Decode strings from W$ and Python2"""
-    return str(msg) if sys.stdout.encoding == 'utf-8' else \
-        bytes(msg, encoding).decode(sys.stdout.encoding)
-
 locale.setlocale(locale.LC_ALL, '')
 language, encoding = locale.getdefaultlocale()
-app_path = terminal_decode(os.path.dirname(__file__))
+terminal = compat.Terminal(encoding)
+app_path = terminal.decode(os.path.dirname(__file__))
 localedir = os.path.join(app_path, 'locale', 'po')
 platform = sys.platform
 winenv()
 
-if six.PY2:
-    gettext.install(app_name.lower(), localedir=localedir, unicode=1)
-else:
-    gettext.install(app_name.lower(), localedir=localedir)
-gettext.bindtextdomain('argparse', localedir)
-gettext.textdomain('argparse')
+
+compat.install_gettext(app_name, localedir)
 
 log_level = 'INFO' # Default log level
 log_file = 'catatom2osm.log'

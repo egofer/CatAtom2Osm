@@ -14,9 +14,10 @@ import hgwnames
 import layer
 import overpass
 import setup
-from compat import etree
+import compat
 from report import instance as report
 log = setup.log
+etree = compat.get_etree(log)
 
 
 class Reader(object):

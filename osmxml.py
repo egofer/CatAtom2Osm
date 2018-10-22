@@ -8,8 +8,9 @@ from past.builtins import basestring
 import setup
 import logging
 import osm
-from compat import etree
+import compat
 log = setup.log
+etree = compat.get_etree(log)
 
 
 def write_elem(outfile, e):

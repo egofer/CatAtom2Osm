@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
 """CatAtom2Osm command line entry point"""
 from __future__ import unicode_literals
-from builtins import str, bytes
+from builtins import str
 from argparse import ArgumentParser
 import logging
 import os
 import sys
 from zipfile import BadZipfile
 
+import compat
 import setup
 from report import instance as report
 log = setup.log
+terminal = compat.Terminal(setup.encoding)
 
 
-def __(msg):
-    return str(msg) if sys.stdout.encoding == 'utf-8' else \
-        bytes(msg, setup.encoding).decode(sys.stdout.encoding)
-
-usage = __(_("""catatom2osm [OPTION]... [PATH]
+usage = terminal.encode(_("""catatom2osm [OPTION]... [PATH]
 The argument path states the directory for input and output files. 
 The directory name shall start with 5 digits (GGMMM) matching the Cadastral 
 Provincial Office and Municipality Code. If the program don't find the input 
@@ -44,36 +42,40 @@ def process(options):
 def run():
     parser = ArgumentParser(usage=usage)
     parser.add_argument("path", nargs="*",
-        help=__(_("Directory for input and output files")))
+        help=terminal.encode(_("Directory for input and output files")))
     parser.add_argument("-v", "--version", action="version",
-        help=_("Show program's version number and exit"),
+        help=terminal.encode(_("Show program's version number and exit")),
         version=setup.app_version)
     parser.add_argument("-l", "--list", dest="list", metavar="prov",
-        default=False, help=__(_("List available municipalities given the two "
-        "digits province code")))
+        default=False, help=terminal.encode(_("List available municipalities "
+        "given the two digits province code")))
     parser.add_argument("-t", "--tasks", dest="tasks", default=False,
-        action="store_true", help=__(_("Splits constructions into tasks files " \
-        "(default, implies -z)")))
-    parser.add_argument("-z", "--zoning", dest="zoning", default=False,
-        action="store_true", help=__(_("Process the cadastral zoning dataset")))
+        action="store_true", help=terminal.encode(_("Splits constructions into "
+        "tasks files (default, implies -z)")))
+    parser.add_argument("-z", "--zoning", dest="zoning", 
+        default=False, action="store_true", 
+        help=terminal.encode(_("Process the cadastral zoning dataset")))
     parser.add_argument("-b", "--building", dest="building", default=False,
-        action="store_true", help=__(_("Process buildings to a single file " \
-        "instead of tasks")))
-    parser.add_argument("-d", "--address", dest="address", default=False,
-        action="store_true", help=__(_("Process the address dataset (default)")))
-    parser.add_argument("-p", "--parcel", dest="parcel", default=False,
-        action="store_true", help=__(_("Process the cadastral parcel dataset")))
+        action="store_true", help=terminal.encode(_("Process buildings to a "
+        "single file instead of tasks")))
+    parser.add_argument("-d", "--address", dest="address", 
+        default=False, action="store_true", 
+        help=terminal.encode(_("Process the address dataset (default)")))
+    parser.add_argument("-p", "--parcel", dest="parcel", 
+        default=False, action="store_true",
+        help=terminal.encode(_("Process the cadastral parcel dataset")))
     parser.add_argument("-a", "--all", dest="all", default=False,
-        action="store_true", help=__(_("Process all datasets (equivalent " \
-        "to -bdptz)")))
-    parser.add_argument("-m", "--manual", dest="manual", default=False,
-        action="store_true", help=__(_("Dissable conflation with OSM data")))
+        action="store_true", help=terminal.encode(_("Process all datasets ("
+        "equivalent to -bdptz)")))
+    parser.add_argument("-m", "--manual", dest="manual",
+        default=False, action="store_true", 
+        help=terminal.encode(_("Dissable conflation with OSM data")))
     parser.add_argument("-w", "--download", dest="download", default=False,
-        action="store_true", help=__(_("Download only")))
+        action="store_true", help=terminal.encode(_("Download only")))
     parser.add_argument("--log", dest="log_level", metavar="log_level",
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-        default=setup.log_level, help=__(_("Select the log level between " \
-        "DEBUG, INFO, WARNING, ERROR or CRITICAL.")))
+        default=setup.log_level, help=terminal.encode(_("Select the log level "
+        "between DEBUG, INFO, WARNING, ERROR or CRITICAL.")))
     options = parser.parse_args()
     report.options = ' '.join(sys.argv[1:])
     if options.all:
