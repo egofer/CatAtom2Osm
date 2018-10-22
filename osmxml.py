@@ -5,12 +5,11 @@ from __future__ import unicode_literals
 from builtins import str
 from past.builtins import basestring
 
-import setup
+from compat import etree
 import logging
 import osm
-import compat
+import setup
 log = setup.log
-etree = compat.get_etree(log)
 
 
 def write_elem(outfile, e):

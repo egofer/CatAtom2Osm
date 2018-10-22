@@ -92,6 +92,7 @@ def run():
     log_level = getattr(logging, options.log_level.upper())
     log.setLevel(log_level)
     log.debug(_("Using Python %s.%s.%s"), *sys.version_info[:3])
+    log.debug(_(compat.etreemsg))
 
     if len(options.path) > 1:
         log.error(_("Too many arguments, supply only a directory path."))

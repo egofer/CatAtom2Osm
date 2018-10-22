@@ -27,11 +27,10 @@ import osmxml
 import overpass
 import setup
 import translate
-import compat
+from compat import etree
 from report import instance as report
 
 log = setup.log
-etree = compat.get_etree(log)
 if setup.silence_gdal:
     gdal.PushErrorHandler('CPLQuietErrorHandler')
 
