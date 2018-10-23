@@ -1,9 +1,9 @@
 @echo off
 set OSGEO4W_ROOT=C:\OSGeo4W
 IF EXIST C:\OsGeo4W64\nul set OSGEO4W_ROOT=C:\OSGeo4W64
-IF EXIST C:\OsGeo4W32\nul set OSGEO4W_ROOT="C:\OSGeo4W32
+IF EXIST C:\OsGeo4W32\nul set OSGEO4W_ROOT=C:\OSGeo4W32
 call "%OSGEO4W_ROOT%\bin\o4w_env.bat" >NUL
-call qt5_env.bat
+IF EXIST "%OSGEO4W_ROOT%\bin\qt5_env.bat" call "%OSGEO4W_ROOT%\bin\qt5_env.bat"
 @echo off
 path %~dp0;%OSGEO4W_ROOT%\apps\qgis-ltr\bin;%PATH%
 set QGIS_PREFIX_PATH=%OSGEO4W_ROOT:\=/%/apps/qgis-ltr
