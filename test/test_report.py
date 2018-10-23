@@ -150,7 +150,7 @@ class TestReport(unittest.TestCase):
 
     def test_to_file(self):
         r = report.Report()
-        r.mun_name = str(u"áéíóúñ")
+        r.mun_name = "áéíóúñ"
         output = r.to_string()
         fn = 'test_report.txt'
         r.to_file(fn)

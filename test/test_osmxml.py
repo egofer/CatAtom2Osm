@@ -22,7 +22,7 @@ class OsmxmlTest(unittest.TestCase):
         data = osm.Osm()
         n = data.Node(4,0)
         n.tags['entrance'] = 'yes'
-        n.tags['addr:street'] = str(u'Calle la Ñ')
+        n.tags['addr:street'] = "Calle la Ñ"
         n.tags['addr:housenumber'] = '7'
         w = data.Way([(12,0), (14,0), (14,2), (12,2), (12,0)])
         w.tags['leisure'] = 'swiming_pool'
@@ -77,7 +77,7 @@ class OsmxmlTest(unittest.TestCase):
         root = etree.Element('osm', attrs)
         nodexml = etree.Element('node', dict(id='-1', lon='4', lat='0'))
         nodexml.append(etree.Element('tag', dict(k='entrance', v='yes')))
-        nodexml.append(etree.Element('tag', dict(k='addr:street', v=str(u'Calle la Ñ'))))
+        nodexml.append(etree.Element('tag', dict(k='addr:street', v="Calle la Ñ")))
         nodexml.append(etree.Element('tag', dict(k='addr:housenumber', v='7')))
         root.append(nodexml)
         wayxml = etree.Element('way', dict(id='-100'))
@@ -122,7 +122,7 @@ class OsmxmlTest(unittest.TestCase):
             self.assertEqual(float(xmlnode.get('lat')), osmnode.y)
         n = result.get('-1')
         self.assertEqual(n.tags['entrance'], 'yes')
-        self.assertEqual(n.tags['addr:street'], str(u'Calle la Ñ'))
+        self.assertEqual(n.tags['addr:street'], "Calle la Ñ")
         self.assertEqual(n.tags['addr:housenumber'], '7')
         self.assertEqual(len(result.ways), 3)
         for osmway in result.ways:

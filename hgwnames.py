@@ -44,8 +44,8 @@ def parse(name):
                 new_word = word.title()
         else:
             new_word = word.title()
-        new_word = new_word.replace(str(u'·L'), str(u'·l')) # Letra ele geminada
-        new_word = new_word.replace(str(u'.L'), str(u'·l')) # Letra ele geminada
+        new_word = new_word.replace("·L", "·l") # Letra ele geminada
+        new_word = new_word.replace(".L", "·l") # Letra ele geminada
         result.append(new_word)
     return ' '.join(result).strip()
 

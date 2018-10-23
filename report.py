@@ -36,7 +36,7 @@ class Report(object):
             ('mun_code', _('Code')),
             ('date', _('Date')),
             ('options', _('Options')),
-            ('mun_area', _(str(u'Area'))),
+            ('mun_area', _("Area")),
             ('mun_population', _('Population')),
             ('mun_wikipedia', _('Wikipedia')),
             ('mun_wikidata', _('Wikidata')),
@@ -126,7 +126,7 @@ class Report(object):
             ('warnings', _("Warnings:")),
         ])
         self.formats = {
-            'mun_area': lambda v: locale.format_string(str(u'%.1f km²'), v, True),
+            'mun_area': lambda v: locale.format_string("%.1f km²", v, True),
             'mun_population': lambda v: '{} hab. ({})'.format(*v),
             'mun_wikipedia': lambda v: 'https://www.wikipedia.org/wiki/' + v,
             'mun_wikidata': lambda v: 'https://www.wikidata.org/wiki/' + v,

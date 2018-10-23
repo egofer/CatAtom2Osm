@@ -1133,9 +1133,9 @@ class TestAddressLayer(unittest.TestCase):
         highway_names = layer.get_highway_names(highway)
         test = {
             'AV PAZ (FASNIA)': 'Avenida la Paz',
-            'CL SAN JOAQUIN (FASNIA)': str(u'Calle San Joaquín'),
+            'CL SAN JOAQUIN (FASNIA)': "Calle San Joaquín",
             'CL HOYO (FASNIA)': 'Calle el Hoyo',
-            'CJ CALLEJON (FASNIA)': str(u'Calleja/Callejón Callejon (Fasnia)')
+            'CJ CALLEJON (FASNIA)': "Calleja/Callejón Callejon (Fasnia)"
         }
         for (k, v) in list(highway_names.items()):
             self.assertEqual(v, test[k])

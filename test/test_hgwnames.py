@@ -21,7 +21,7 @@ class TestHgwnames(unittest.TestCase):
         self.fn = lambda x:x['n']
         self.choices = ['Foobar', 'Foo bar', 'Footaz']
         self.ds2 = [
-            {'id':1, 'n':str(u'Móstoles')}, 
+            {'id':1, 'n':"Móstoles"}, 
             {'id':2, 'n':'Las Rozas de Madrid'},
             {'id':3, 'n':'Rivas-Vaciamadrid'},
             {'id':4, 'n':'Madrid'}]
@@ -32,18 +32,18 @@ class TestHgwnames(unittest.TestCase):
     def test_parse(self):
         names = {
             "   CL  FOO BAR  TAZ  ": "Calle Foo Bar Taz",
-            str(u"AV DE ESPAÑA"): str(u"Avenida de España"),
-            "CJ GATA (DE LA)": str(u"Calleja/Callejón Gata (de la)"),
+            "AV DE ESPAÑA": "Avenida de España",
+            "CJ GATA (DE LA)": "Calleja/Callejón Gata (de la)",
             "CR CUMBRE,DE LA": "Carretera/Carrera Cumbre, de la",
             "CL HILARIO (ERAS LAS)": "Calle Hilario (Eras las)",
             "CL BASTIO D'EN SANOGUERA": "Calle Bastio d'en Sanoguera",
             "CL BANC DE L'OLI": "Calle Banc de l'Oli",
             "DS ARANJASSA,S'": "",
-            str(u"CL AIGUA DOLÇA (L')"): str(u"Calle Aigua Dolça (l')"),
-            str(u"CL RUL·LAN"): str(u"Calle Rul·lan"),
+            "CL AIGUA DOLÇA (L')": "Calle Aigua Dolça (l')",
+            "CL RUL·LAN": "Calle Rul·lan",
             "CL FONTE'L PILO": "Calle Fonte'l Pilo",
             "CL TRENET D'ALCOI": "Calle Trenet d'Alcoi",
-            "CL SANT MARCEL.LI": str(u"Calle Sant Marcel·li"),
+            "CL SANT MARCEL.LI": "Calle Sant Marcel·li",
             "CL O'DONNELL": "Calle O'Donnell",
             "XX FooBar": "Xx Foobar"
         }
