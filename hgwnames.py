@@ -61,10 +61,13 @@ def match(name, choices):
     parsed_name = parse(name)
     if fuzz and parsed_name:
         normalized = [normalize(c) for c in choices]
-        matching = process.extractOne(normalize(parsed_name), 
-            normalized, scorer=fuzz.token_sort_ratio)
-        if matching and matching[1] > MATCH_THR:
-            return choices[normalized.index(matching[0])]
+        try:
+            matching = process.extractOne(normalize(parsed_name), 
+                normalized, scorer=fuzz.token_sort_ratio)
+            if matching and matching[1] > MATCH_THR:
+                return choices[normalized.index(matching[0])]
+        except RuntimeError:
+            pass
     return parsed_name
 
 def dsmatch(name, dataset, fn):
