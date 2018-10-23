@@ -15,7 +15,7 @@ import setup
 TAB = '  '
 SEP = ': '
 MEMORY_UNIT = 1048576.0
-int_format = lambda v: locale.format('%d', v, True)
+int_format = lambda v: locale.format_string('%d', v, True)
 
 class Report(object):
 
