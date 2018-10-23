@@ -1,4 +1,5 @@
 from builtins import str, bytes
+import codecs
 import gettext
 import logging
 import six
@@ -34,6 +35,12 @@ def install_gettext(app_name, localedir):
     gettext.bindtextdomain('argparse', localedir)
     gettext.textdomain('argparse')
 
+
+def get_stderr(encoding):
+    """Return wrapped version of stderr encoded to terminal code page"""
+    if six.PY2:
+        return codecs.getwriter(encoding)(sys.stderr)
+    return sys.stderr
 
 class Terminal(object):
 

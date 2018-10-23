@@ -3,8 +3,10 @@
 from __future__ import unicode_literals
 from builtins import range
 import csv
+import locale
 import logging
-import sys, os, locale
+import os
+import sys
 
 import compat
 
@@ -44,7 +46,7 @@ log_file = 'catatom2osm.log'
 log_format = '%(asctime)s - %(levelname)s - %(message)s'
 log = logging.getLogger(app_name)
 fh = logging.FileHandler(log_file)
-ch = logging.StreamHandler(sys.stderr)
+ch = logging.StreamHandler(compat.get_stderr(encoding))
 fh.setLevel(logging.DEBUG)
 ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter(log_format)
