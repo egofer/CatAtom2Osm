@@ -86,8 +86,8 @@ def get_cat_address(ad, cod_mun_cat):
     attr['TN_text'] = "{} {}".format(str(nom_tip_via), str(ad['nom_via']))
     attr['postCode'] = ad['cod_postal']
     attr['spec'] = 'Entrance'
-    to = ad['num_por_hasta'] + ad['ext_hasta']
-    attr['designator'] = ad['num_por_desde'] + ad['ext_desde']
+    to = '{}{}'.format(ad['num_por_hasta'] or '', ad['ext_hasta'] or '')
+    attr['designator'] = '{}{}'.format(ad['num_por_desde'] or '', ad['ext_desde'] or '')
     if to:
         attr['designator'] += '-' + to
     return attr
