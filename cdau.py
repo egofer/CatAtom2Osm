@@ -5,7 +5,6 @@ from builtins import object, range, str
 
 import logging
 import locale
-locale.setlocale(locale.LC_TIME, ('es', 'UTF-8'))
 import os
 import re
 from collections import defaultdict
@@ -18,6 +17,7 @@ import layer
 import setup
 from report import instance as report
 log = setup.log
+locale.setlocale(locale.LC_TIME, ('es', setup.encoding))
 
 
 andalucia = {'04': 'Almeria', '11': 'Cadiz', '14': 'Cordova', '18': 'Granada',

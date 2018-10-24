@@ -458,7 +458,7 @@ class CatAtom2Osm(object):
         for source in list(setup.aux_address.keys()):
             if self.cat.zip_code[:2] in setup.aux_address[source]:
                 aux_source = globals()[source]
-                aux_path = os.path.join(os.path.dirname(self.path), 'aux')
+                aux_path = os.path.join(os.path.dirname(self.path), setup.aux_path)
                 reader = aux_source.Reader(aux_path)
                 aux = reader.read(self.cat.zip_code[:2])
                 aux_source.conflate(aux, self.address, self.cat.zip_code)

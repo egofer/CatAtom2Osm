@@ -30,7 +30,7 @@ def winenv():
         if os.getenv('LANG') is None:
             os.environ['LANG'] = language
 
-locale.setlocale(locale.LC_ALL, '')
+#locale.setlocale(locale.LC_ALL, '')
 language, encoding = locale.getdefaultlocale()
 terminal = compat.Terminal(encoding)
 app_path = terminal.decode(os.path.dirname(__file__))
@@ -354,4 +354,5 @@ mun_fails = {
 }
 
 aux_address = {'cdau': ['04', '11', '14', '18', '21', '23', '29', '41']}
+aux_path = 'auxsrcs'
 
