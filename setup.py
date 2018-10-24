@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """Application preferences"""
 from __future__ import unicode_literals
 from builtins import range
@@ -46,7 +46,7 @@ log_file = 'catatom2osm.log'
 log_format = '%(asctime)s - %(levelname)s - %(message)s'
 log = logging.getLogger(app_name)
 fh = logging.FileHandler(log_file)
-ch = logging.StreamHandler(compat.get_stderr(encoding))
+ch = logging.StreamHandler(compat.get_stderr())
 fh.setLevel(logging.DEBUG)
 ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter(log_format)

@@ -43,10 +43,10 @@ def set_es_time():
     except locale.Error:
         locale.setlocale(locale.LC_TIME, 'esp')
 
-def get_stderr(encoding):
+def get_stderr():
     """Return wrapped version of stderr encoded to terminal code page"""
     if six.PY2:
-        return codecs.getwriter(encoding)(sys.stderr)
+        return codecs.getwriter(sys.stdout.encoding)(sys.stderr)
     return sys.stderr
 
 
