@@ -4,9 +4,28 @@ Instalación
 Linux
 -----
 
-En una consola de comandos ejecutar::
+Instalar QGIS siguiendo las instrucciones de https://qgis.org
 
-    sudo apt install qgis git python-pip python-dev
+Este es un resumen de la secuencia de comandos para instalar QGIS 2.18.24 en Debian Jessie::
+
+    su
+    echo 'deb     https://qgis.org/debian-ltr jessie main' > /etc/apt/sources.list.d/qgis.list
+    echo 'deb-src https://qgis.org/debian-ltr jessie main' >> /etc/apt/sources.list.d/qgis.list
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-key CAEB3DC3BDF7FB45
+    apt update
+    apt install qgis
+
+Este para QGIS 3.2.3 en Ubuntu bionic::
+
+    sudo echo 'deb     https://qgis.org/ubuntu bionic main' > /etc/apt/sources.list.d/qgis.list
+    sudo echo 'deb-src https://qgis.org/ubuntu bionic main' >> /etc/apt/sources.list.d/qgis.list
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key CAEB3DC3BDF7FB45
+    sudo apt update
+    sudo apt install qgis
+
+Clonar el repositorio del programa ejecutando::
+
+    sudo apt install git python-pip python-dev
     cd ~
     mkdir catastro
     cd catastro
@@ -18,25 +37,6 @@ En una consola de comandos ejecutar::
 Después de la instalación, el programa está disponible para ejecutar desde la terminal.
 
     catatom2osm
-
-Se sugiere ejecutar el programa en una carpeta dedicada, por ejemplo
-
-    cd
-    mkdir catastro
-    cd catastro
-
-Notas:
-
-En Debian Jessie al ejecutar "catatom2osm" se muestra el siguiente error:
->2017-12-08 15:08:12,559 - ERROR - Se requiere QGIS versión 2.10.1 o superior
-
-Es necesario instalar una versión de QGIS más reciente, para ello se debe ejecutar::
-
-    su
-    echo 'deb     http://qgis.org/debian jessie main' > /etc/apt/sources.list.d/qgis.list
-    echo 'deb-src http://qgis.org/debian jessie main' >> /etc/apt/sources.list.d/qgis.list
-    apt update
-    apt install qgis
 
 
 Mac OS X
