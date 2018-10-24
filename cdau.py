@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """Reader of CDAU CSV files"""
 from __future__ import unicode_literals
 from builtins import object, range, str
@@ -12,12 +12,13 @@ from datetime import datetime
 
 from qgis.core import *
 
+import compat
 import download
 import layer
 import setup
 from report import instance as report
 log = setup.log
-locale.setlocale(locale.LC_TIME, ('es', setup.encoding))
+compat.set_es_time()
 
 
 andalucia = {'04': 'Almeria', '11': 'Cadiz', '14': 'Cordova', '18': 'Granada',

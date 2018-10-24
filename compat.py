@@ -1,6 +1,7 @@
 from builtins import str, bytes
 import codecs
 import gettext
+import locale
 import logging
 import six
 import sys
@@ -35,12 +36,19 @@ def install_gettext(app_name, localedir):
     gettext.bindtextdomain('argparse', localedir)
     gettext.textdomain('argparse')
 
+def set_es_time():
+    try:
+        language, encoding = locale.getdefaultlocale()
+        locale.setlocale(locale.LC_TIME, ('es', encoding))
+    except locale.Error:
+        locale.setlocale(locale.LC_TIME, 'esp')
 
 def get_stderr(encoding):
     """Return wrapped version of stderr encoded to terminal code page"""
     if six.PY2:
         return codecs.getwriter(encoding)(sys.stderr)
     return sys.stderr
+
 
 class Terminal(object):
 
