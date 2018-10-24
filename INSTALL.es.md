@@ -94,37 +94,52 @@ página de descarga de http://qgis.org
 
 * Ejecutar el instalador y seleccionar la opción Instalación Avanzada
 * Instalar desde Internet
-* Como directorio de instalación usar C:\OSGeo4W
 * Seleccionar las opciones por defecto
 * En la pantalla de selección de paquetes seleccionar:
 
   * Desktop -> qgis: QGIS Desktop
   * Libs -> msvcrt 2008
-  * Libs -> python-devel
-  * Libs -> python-pip
-  * Libs -> setuptools
+  * Libs -> python3-devel
+  * Libs -> python3-pip
+  * Libs -> python3-setuptools
 
 * Aceptar la lista de dependencias sugerida
 
-Instalar Microsoft Visual C++ Compiler for Python 2.7 desde 
-http://aka.ms/vcpython27
-
-Descargar el paquete python-levenshtein en las librerías no oficiales de 
-Christoph Gohlke desde http://www.lfd.uci.edu/~gohlke/Pythonlibs/
+Instalar Microsoft Visual C++ 14.0 Build Tools siguiendo las instrucciones de 
+https://www.scivision.co/python-windows-visual-c++-14-required/
 
 Instalar el programa de escritorio de GitHub desde desktop.github.com
 
 Ejecutarlo y descargar el repositorio https://github.com/OSM-es/CatAtom2Osm.git
 
-En la carpeta CatAtom2Osm descargada lanzar el archivo pyqgis.bat. 
+En la carpeta CatAtom2Osm descargada lanzar el archivo pyqgis3.bat. 
 En la consola resultante ejecutar::
 
     python -m pip install -r requisites.txt
-    python -m pip install ruta al archivo descargado/python_Levenshtein‑0.12.0‑cp27‑cp27m‑win_amd64.whl
 
-Será necesario ejecutar pyqgis.bat cuando queramos usar el programa para abrir una consola de comandos con el entorno de Python QGIS adecuado. Se sugiere editar el archivo pyqgis.bat, descomentar la penúltima línea con la orden CD e introducir la ruta de la carpeta donde se van a descargar los archivos de Catastro. Por ejemplo::
+Será necesario ejecutar pyqgis3.bat cuando queramos usar el programa para abrir una consola de comandos con el entorno de Python QGIS adecuado. Se sugiere editar el archivo pyqgis3.bat, descomentar la penúltima línea con la orden CD e introducir la ruta de la carpeta donde se van a descargar los archivos de Catastro. Por ejemplo::
 
-    cd c:\Users\Javier\Documents\catastro
+    cd c:\Users\TuNombre\Documents\catastro
+
+Notas:
+
+* Si la instalación de QGIS se aborta con el error "La ejecución de código no puede continuar porque no se encontró zip.dll", la única solución encontrada es usar el instalador OSGeo4W de 32 bits en lugar del de 64 bits.
+
+
+QGIS 2
+++++++
+
+Si se desea instalar QGIS 2 en lugar de 3, seleccionar estos paquetes::
+
+  * Desktop -> qgis-ltr: QGIS Desktop
+  * Libs -> msvcrt 2008
+  * Libs -> python-devel
+  * Libs -> python-pip
+  * Libs -> setuptools
+
+En lugar de Instalar Microsoft Visual C++ 14.0 Build Tools, instalar Microsoft Visual C++ Compiler for Python 2.7 desde http://aka.ms/vcpython27
+
+Abrir la consola con el entorno de Python QGIS usando el archivo pyqgis.bat.
 
 
 Entorno de pruebas

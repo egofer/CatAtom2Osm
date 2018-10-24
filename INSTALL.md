@@ -84,42 +84,57 @@ Windows
 Install QGIS using the OSGeo4W Network Installer (64 bits/ 32 bits) from
 http://qgis.org download page.
 
-* Run the installe and choose the Advanced Install option.
+* Run the installer and choose the Advanced Install option.
 * Install from Internet
-* Enter the directory for the install C:\OSGeo4W
 * Accept the default options
 * From the Select packages screen select:
 
   * Desktop -> qgis: QGIS Desktop
   * Libs -> msvcrt 2008
-  * Libs -> python-devel
-  * Libs -> python-pip
-  * Libs -> setuptools
+  * Libs -> python3-devel
+  * Libs -> python3-pip
+  * Libs -> python3-setuptools
 
 * Accept the list of unmet dependencies
 
-Install Microsoft Visual C++ Compiler for Python 2.7 from 
-http://aka.ms/vcpython27
-
-Download the package python-levenshtein in the unofficial library of 
-Christoph Gohlke from http://www.lfd.uci.edu/~gohlke/Pythonlibs/
+Install Microsoft Visual C++ 14.0 Build Tools following the instructions in 
+https://www.scivision.co/python-windows-visual-c++-14-required/
 
 Install the GitHub desktop utility from desktop.github.com
 
 Run it and download the repository https://github.com/OSM-es/CatAtom2Osm.git
 
-In the previously downloaded CatAtom2Osm folder launch the file pyqgis.bat. 
+In the previously downloaded CatAtom2Osm folder launch the file pyqgis3.bat. 
 Write this in the resulting shell::
 
     python -m pip install -r requisites.txt
-    python -m pip install path to downloaded/python_Levenshtein‑0.12.0‑cp27‑cp27m‑win_amd64.whl
 
-To use the program it will be necessary to run pyqgis.bat to open a convenient 
-Python QGIS shell. It's suggested to edit pyqgis.bat, uncomment the penultimate
+To use the program it will be necessary to run pyqgis3.bat to open a convenient 
+Python QGIS shell. It's suggested to edit pyqgis3.bat, uncomment the penultimate
 line with the CD command and enter the path of the folder where you want to 
 download the Cadastre files. For example::
 
     cd c:\Users\YourName\Documents\cadastre
+
+Notes:
+
+* If the QGIS install aborts with this error "the code execution cannot proceed because zip.dll was not found", the only solution found is to use the 32 bits OSGeo4W installer instead of 64 bits.
+
+
+QGIS 2
+++++++
+
+If you want to install QGIS 2 instead of 3, select these packages::
+
+  * Desktop -> qgis-ltr: QGIS Desktop
+  * Libs -> msvcrt 2008
+  * Libs -> python-devel
+  * Libs -> python-pip
+  * Libs -> setuptools
+
+Instead of Microsoft Visual C++ 14.0 Build Tools, install Microsoft Visual C++ Compiler for Python 2.7 from http://aka.ms/vcpython27
+
+Open the the terminal with Python QGIS environment using the file pyqgis.bat.
 
 
 Development requeriments
