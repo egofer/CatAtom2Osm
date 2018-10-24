@@ -154,9 +154,9 @@ class TestReport(unittest.TestCase):
         output = r.to_string()
         fn = 'test_report.txt'
         r.to_file(fn)
-        with io.open(fn, 'r', encoding='utf-8') as fo:
+        with io.open(fn, 'r', encoding=setup.encoding) as fo:
             text = str(fo.read())
-            text = text.replace('\n', setup.eol)
+            text = text.replace('\n\n', setup.eol)
         self.assertEqual(output, text)
         if os.path.exists(fn):
             os.remove(fn)
