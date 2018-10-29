@@ -530,7 +530,7 @@ class BaseLayer(QgsVectorLayer):
                 msg = _("Detected a %s geometry in the '%s' layer") % \
                     (geom.wkbType(), self.name())
                 log.warning(msg)
-                report.warnings.add(msg)
+                report.warnings.append(msg)
             if e: e.tags.update(tags_translation(feature))
         changeset_tags = dict(setup.changeset_tags, **tags)
         for (key, value) in changeset_tags.items():
