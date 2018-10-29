@@ -14,9 +14,9 @@ log = setup.log
 
 def write_elem(outfile, e):
     try:
-        outfile.write(str(etree.tostring(e, pretty_print=True)))
+        outfile.write(etree.tostring(e, pretty_print=True).decode())
     except TypeError: # pragma: no cover
-        outfile.write(str(etree.tostring(e)))
+        outfile.write(etree.tostring(e).decode())
 
 def serialize(outfile, data):
     """Output XML for an OSM data set"""
