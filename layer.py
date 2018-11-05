@@ -933,17 +933,21 @@ class PolygonLayer(BaseLayer):
         """Calculate the difference of each geometry with those in layer"""
         geometries = {f.id(): QgsGeometry(f.geometry()) for f in layer.getFeatures()}
         index = layer.get_index()
-        to_change = {}
         for feat in self.getFeatures():
             g1 = feat.geometry()
+            print('r', feat.id(), feat['label'])
             fids = index.intersects(g1.boundingBox())
+            gc = None
             for fid in fids:
                 g2 = geometries[fid]
                 if g2.intersects(g1):
-                    g1 = g1.difference(g2)
-                    to_change[feat.id()] = g1
-        if to_change:
-            self.writer.changeGeometryValues(to_change)
+                    if gc is None:
+                        gc = QgsGeometry(g2)
+                    else:
+                        gc = gc.combine(g2)
+            if gc is not None:
+                g1 = g1.difference(gc)
+                self.writer.changeGeometryValues({feat.id(): g1})
 
     def clean(self):
         """Delete invalid geometries and close vertices, add topological points
