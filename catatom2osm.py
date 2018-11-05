@@ -90,21 +90,23 @@ class CatAtom2Osm(object):
     def run(self):
         """Launches the app"""
         log.info(_("Start processing '%s'"), report.mun_code)
-        self.get_zoning()
+        if self.options.address:
+            self.read_address()
+        if self.is_new:
+            self.options.tasks = False
+            self.options.building = False
+            self.options.zoning = False
+        else:
+            self.get_zoning()
         if self.options.zoning:
             self.process_zoning()
             if not self.options.tasks:
                 self.delete_shp('rustic_zoning.shp')
         self.address_osm = osm.Osm()
         self.building_osm = osm.Osm()
-        if self.options.address:
-            self.read_address()
-            if self.is_new:
-                self.options.tasks = False
-                self.options.building = False
-            elif not self.options.manual:
-                current_address = self.get_current_ad_osm()
-                self.address.conflate(current_address)
+        if self.options.address and not self.is_new and not self.options.manual:
+            current_address = self.get_current_ad_osm()
+            self.address.conflate(current_address)
         if self.options.building or self.options.tasks:
             self.get_building()
             self.process_building()
@@ -138,7 +140,8 @@ class CatAtom2Osm(object):
             self.export_layer(self.rustic_zoning, 'zoning.geojson', 'GeoJSON')
             del self.urban_zoning
             self.delete_shp('urban_zoning.shp')
-        del self.rustic_zoning
+        if hasattr(self, 'rustic_zoning'):
+            del self.rustic_zoning
         self.delete_shp('rustic_zoning.shp')
         if self.options.building:
             self.building_osm = self.building.to_osm()
