@@ -670,28 +670,6 @@ class TestConsLayer(unittest.TestCase):
         feat = next(layer.getFeatures(request))
         self.assertNotEqual(feat, None)
 
-    def test_append_zone(self):
-        layer = ConsLayer()
-        self.assertTrue(layer.isValid(), "Init QGIS")
-        fixture = QgsVectorLayer('test/cons.shp', 'building', 'ogr')
-        self.assertTrue(fixture.isValid())
-        index = QgsSpatialIndex(fixture.getFeatures())
-        poly = [(358627.4, 3124199.8), (358641.8, 3124190.4), (358652.2,
-            3124207.7), (358635.2, 3124217.1), (358627.4, 3124199.8)]
-        geom = Geometry.fromPolygonXY([[Point(p[0], p[1]) for p in poly]])
-        zone = QgsFeature(self.layer.fields())
-        zone.setGeometry(geom)
-        layer.append_zone(fixture, zone, [], index)
-        self.assertEqual(layer.featureCount(), 13)
-        processed = ['8641601CS5284S', '8641602CS5284S', '8641603CS5284S',
-            '8641655CS5284S', '8641656CS5284S', '8641657CS5284S', 
-            '8641658CS5284S', '8742701CS5284S']
-        for f in layer.getFeatures():
-            self.assertIn(f['localId'].split('_')[0], processed)
-        layer = ConsLayer()
-        layer.append_zone(fixture, zone, processed, index)
-        self.assertEqual(layer.featureCount(), 0)
-
     def test_remove_parts_below_ground(self):
         to_clean = [f.id() for f in self.layer.search('lev_above=0 and lev_below>0')]
         self.assertGreater(len(to_clean), 0, 'There are parts below ground')

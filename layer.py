@@ -1201,40 +1201,6 @@ class ConsLayer(PolygonLayer):
             request.setFilterFids(fids)
         super(ConsLayer, self).explode_multi_parts(request)
 
-    def append_zone(self, layer, zone, processed, index):
-        """Append features of layer inside zone excluding processed localId's'"""
-        self.setCrs(layer.crs())
-        fids = index.intersects(zone.geometry().boundingBox())
-        request = QgsFeatureRequest().setFilterFids(fids)
-        to_add = []
-        features = []
-        refs = set()
-        total = 0
-        for feat in layer.getFeatures(request):
-            if not feat['localId'] in processed:
-                if not '_' in feat['localId'] and is_inside(feat, zone):
-                    to_add.append(self.copy_feature(feat))
-                    refs.add(feat['localId'])
-                    total += 1
-                else:
-                    features.append(feat)
-            if len(to_add) > BUFFER_SIZE:
-                self.writer.addFeatures(to_add)
-                to_add = []
-        for feat in features:
-            if '_' in feat['localId'] and feat['localId'].split('_')[0] in refs:
-                to_add.append(self.copy_feature(feat))
-                total += 1
-            if len(to_add) > BUFFER_SIZE:
-                self.writer.addFeatures(to_add)
-                to_add = []
-        if len(to_add) > 0:
-            self.writer.addFeatures(to_add)
-        if total > 0:
-            log.debug (_("Loaded %d features in '%s' from '%s'"), total,
-                self.name(), layer.name())
-        return refs
-
     def set_tasks(self, uzoning, rzoning):
         """Assings to each building and pool the task label of the zone in witch
         it is containd. Parts receives the label of the building it belongs. 
