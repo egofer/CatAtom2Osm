@@ -81,7 +81,8 @@ class CatAtom2Osm(object):
         if qgis_utils.QGIS_VERSION_INT < setup.MIN_QGIS_VERSION_INT:
             msg = _("Required QGIS version %s or greater") % setup.MIN_QGIS_VERSION
             raise ValueError(msg)
-        gdal_version_int = int('{:02d}{:02d}{:02d}'.format(*list(map(int, gdal.__version__.split('.')))))
+        gdal_version_int = int('{:02d}{:02d}{:02d}'.format(
+            *list(map(int, gdal.__version__.split('.')))))
         if gdal_version_int < setup.MIN_GDAL_VERSION_INT:
             msg = _("Required GDAL version %s or greater") % setup.MIN_GDAL_VERSION
             raise ValueError(msg)
@@ -90,15 +91,14 @@ class CatAtom2Osm(object):
     def run(self):
         """Launches the app"""
         log.info(_("Start processing '%s'"), report.mun_code)
+        self.get_zoning()
         if self.options.address:
             self.read_address()
         if self.is_new:
             self.options.tasks = False
             self.options.building = False
             self.options.zoning = False
-        else:
-            self.get_zoning()
-        if self.options.zoning:
+        if self.options.zoning or self.options.tasks:
             self.process_zoning()
             if not self.options.tasks:
                 self.delete_shp('rustic_zoning.shp')
@@ -134,10 +134,10 @@ class CatAtom2Osm(object):
         if self.options.zoning:
             self.export_layer(self.urban_zoning, 'urban_zoning.geojson', 'GeoJSON')
             self.export_layer(self.rustic_zoning, 'rustic_zoning.geojson', 'GeoJSON')
-        if hasattr(self, 'urban_zoning'):
             self.rustic_zoning.difference(self.urban_zoning)
             self.rustic_zoning.append(self.urban_zoning)
             self.export_layer(self.rustic_zoning, 'zoning.geojson', 'GeoJSON')
+        if hasattr(self, 'urban_zoning'):
             del self.urban_zoning
             self.delete_shp('urban_zoning.shp')
         if hasattr(self, 'rustic_zoning'):
@@ -256,6 +256,12 @@ class CatAtom2Osm(object):
         report.tasks_u = tasks_u
 
     def process_zoning(self):
+        self.urban_zoning.topology()
+        self.urban_zoning.merge_adjacents()
+        self.rustic_zoning.set_tasks(self.cat.zip_code)
+        self.urban_zoning.set_tasks(self.cat.zip_code)
+        if self.options.tasks:
+            return
         self.urban_zoning.delete_invalid_geometries()
         self.urban_zoning.simplify()
         self.rustic_zoning.clean()
@@ -417,10 +423,6 @@ class CatAtom2Osm(object):
             layer.ZoningLayer.create_shp(fn, zoning_gml.crs())
             self.urban_zoning = layer.ZoningLayer('u{:05}', fn, 'urbanzoning', 'ogr')
             self.urban_zoning.append(zoning_gml, level='M')
-            self.urban_zoning.topology()
-            self.urban_zoning.merge_adjacents()
-            self.rustic_zoning.set_tasks(self.cat.zip_code)
-            self.urban_zoning.set_tasks(self.cat.zip_code)
         del zoning_gml
 
     def read_address(self):

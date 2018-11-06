@@ -935,7 +935,6 @@ class PolygonLayer(BaseLayer):
         index = layer.get_index()
         for feat in self.getFeatures():
             g1 = feat.geometry()
-            print('r', feat.id(), feat['label'])
             fids = index.intersects(g1.boundingBox())
             gc = None
             for fid in fids:
