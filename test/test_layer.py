@@ -467,6 +467,8 @@ class TestPolygonLayer(unittest.TestCase):
         h4 = Geometry.fromPolygonXY([[Point(30,30),
             Point(40,30), Point(40,40), Point(40,30), Point(30,30)
         ]])
+        r1 = g1.difference(h1)
+        r2 = g2.difference(h3)
         layer1.writer.addFeatures([QgsFeature() for i in range(2)])
         layer1.writer.changeGeometryValues({1: g1, 2: g2})
         layer2.writer.addFeatures([QgsFeature() for i in range(4)])
@@ -477,14 +479,8 @@ class TestPolygonLayer(unittest.TestCase):
         f1 = next(layer1.getFeatures(request))
         request = QgsFeatureRequest().setFilterFid(2)
         f2 = next(layer1.getFeatures(request))
-        self.assertEqual(Geometry.get_multipolygon(f1)[0], [[Point(10,10), 
-            Point(10,20), Point(20,20), Point(20,10), Point(10,10)],
-            [Point(14,14), Point(16,14), Point(16,16), Point(14,16),
-            Point(14,14)]]
-        )
-        self.assertEqual(Geometry.get_multipolygon(f2)[0], [[Point(30,20), 
-            Point(38,20), Point(38,10), Point(30,10), Point(30,20)]]
-        )
+        self.assertTrue(f1.geometry().equals(r1))
+        self.assertTrue(f2.geometry().equals(r2))
 
 
 class TestParcelLayer(unittest.TestCase):
