@@ -438,7 +438,7 @@ class TestPolygonLayer(unittest.TestCase):
                     duplicates[point].add(dup)
         del vertices
         return duplicates
-    
+
     def test_difference(self):
         layer1 = PolygonLayer('Polygon', 'test1', 'memory')
         layer2 = PolygonLayer('Polygon', 'test2', 'memory')
@@ -460,6 +460,8 @@ class TestPolygonLayer(unittest.TestCase):
         h4 = QgsGeometry().fromPolygon([[QgsPoint(30,30),
             QgsPoint(40,30), QgsPoint(40,40), QgsPoint(40,30), QgsPoint(30,30)
         ]])
+        r1 = g1.difference(h1)
+        r2 = g2.difference(h3)
         layer1.writer.addFeatures([QgsFeature() for i in range(2)])
         layer1.writer.changeGeometryValues({1: g1, 2: g2})
         layer2.writer.addFeatures([QgsFeature() for i in range(4)])
@@ -469,15 +471,9 @@ class TestPolygonLayer(unittest.TestCase):
         request = QgsFeatureRequest().setFilterFid(1)
         f1 = layer1.getFeatures(request).next()
         request = QgsFeatureRequest().setFilterFid(2)
-        f2 = layer1.getFeatures(request).next()
-        self.assertEquals(f1.geometry().asPolygon(), [[QgsPoint(10,10), 
-            QgsPoint(10,20), QgsPoint(20,20), QgsPoint(20,10), QgsPoint(10,10)],
-            [QgsPoint(14,14), QgsPoint(16,14), QgsPoint(16,16), QgsPoint(14,16),
-            QgsPoint(14,14)]]
-        )
-        self.assertEquals(f2.geometry().asPolygon(), [[QgsPoint(30,20), 
-            QgsPoint(38,20), QgsPoint(38,10), QgsPoint(30,10), QgsPoint(30,20)]]
-        )
+        f2 = next(layer1.getFeatures(request))
+        self.assertTrue(f1.geometry().equals(r1))
+        self.assertTrue(f2.geometry().equals(r2))
 
 
 class TestParcelLayer(unittest.TestCase):
@@ -537,7 +533,7 @@ class TestZoningLayer(unittest.TestCase):
         self.layer1.merge_adjacents()
         (groups, geometries) = self.layer1.get_adjacents_and_geometries()
         self.assertEquals(len(groups), 0)
-        
+
     def test_set_tasks(self):
         self.layer1.set_tasks('12345')
         labels = {int(f['label'][1:]) for f in self.layer1.getFeatures()}
@@ -549,7 +545,7 @@ class TestZoningLayer(unittest.TestCase):
         self.assertEquals(max(labels), len(labels))
         self.assertEquals(min(labels), 1)
         self.assertEquals(self.layer2.getFeatures().next()['zipcode'], '12345')
-        
+
     def test_set_cons_tasks(self):
         test = Counter({u'86416': 198, u'84428': 89, u'88423': 86, u'86417': 70,
             u'89423': 61, u'86423': 57, u'87427': 53, u'86439': 45, u'86464': 38,
@@ -957,7 +953,7 @@ class TestConsLayer(unittest.TestCase):
             request = QgsFeatureRequest(exp)
             feat = self.layer.getFeatures(request).next()
             self.assertNotEquals(feat['fixme'], '')
-    
+
     def test_to_osm(self):
         data = self.layer.to_osm(upload='always')
         self.assertEquals(data.upload, 'always')
