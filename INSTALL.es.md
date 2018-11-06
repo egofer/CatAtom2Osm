@@ -124,6 +124,7 @@ Será necesario ejecutar pyqgis3.bat cuando queramos usar el programa para abrir
 Notas:
 
 * Si la instalación de QGIS se aborta con el error "La ejecución de código no puede continuar porque no se encontró zip.dll", la única solución encontrada es usar el instalador OSGeo4W de 32 bits en lugar del de 64 bits.
+* Si durante la ejecución del programa aparecen mensajes de error similares a "Failed to create file building_packed.shp: Permission denied", ejecutar en un directorio con nombre sencillo (sin caracteres espaciales) colgando del directorio raíz, por ejemplo: C:\Catastro
 
 
 QGIS 2

@@ -119,6 +119,7 @@ download the Cadastre files. For example::
 Notes:
 
 * If the QGIS install aborts with this error "the code execution cannot proceed because zip.dll was not found", the only solution found is to use the 32 bits OSGeo4W installer instead of 64 bits.
+* If during excecution you get error messages similar to "Failed to create file building_packed.shp: Permission denied", run from a simple folder (without special characters) hanging from the root, like: C:\Catastro
 
 
 QGIS 2
