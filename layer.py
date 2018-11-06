@@ -7,6 +7,7 @@ import math
 import re
 from collections import defaultdict
 import logging
+from tqdm import tqdm
 
 from qgis.core import *
 from qgiscompat import *
@@ -25,7 +26,6 @@ is_inside = lambda f1, f2: \
 
 get_attributes = lambda feat: \
     dict([(i, feat[i]) for i in range(len(feat.fields().toList()))])
-
 
 class Point(Qgs2DPoint):
     """Extends QgsPoint with some utility methods"""
@@ -323,6 +323,7 @@ class BaseLayer(QgsVectorLayer):
         self.setCrs(layer.crs())
         total = 0
         to_add = []
+        pbar = self.get_progressbar(_("Append"), layer.featureCount())
         for feature in layer.getFeatures():
             if not query or query(feature, kwargs):
                 to_add.append(self.copy_feature(feature, rename, resolve))
@@ -330,6 +331,8 @@ class BaseLayer(QgsVectorLayer):
             if len(to_add) > BUFFER_SIZE:
                 self.writer.addFeatures(to_add)
                 to_add = []
+            pbar.update()
+        pbar.close()
         if len(to_add) > 0:
             self.writer.addFeatures(to_add)
         if total:
@@ -346,6 +349,7 @@ class BaseLayer(QgsVectorLayer):
             target_crs = QgsCoordinateReferenceSystem(4326)
         crs_transform = ggs2coordinate_transform(self.crs(), target_crs)
         to_change = {}
+        pbar = self.get_progressbar(_("Reproject"), self.featureCount())
         for feature in self.getFeatures():
             geom = QgsGeometry(feature.geometry())
             geom.transform(crs_transform)
@@ -353,6 +357,8 @@ class BaseLayer(QgsVectorLayer):
             if len(to_change) > BUFFER_SIZE:
                 self.writer.changeGeometryValues(to_change)
                 to_change = {}
+            pbar.update()
+        pbar.close()
         if len(to_change) > 0:
             self.writer.changeGeometryValues(to_change)
         self.setCrs(target_crs)
@@ -392,9 +398,12 @@ class BaseLayer(QgsVectorLayer):
         self.writer.addAttributes(fields)
         self.updateFields()
         source_values = {}
+        pbar = self.get_progressbar(_("Join field"), self.featureCount() + \
+            source_layer.featureCount())
         for feature in source_layer.getFeatures():
             source_values[feature[join_field_name]] = \
                     {attr: feature[attr] for attr in field_names_subset}
+            pbar.update()
         total = 0
         to_change = {}
         for feature in self.getFeatures():
@@ -410,6 +419,8 @@ class BaseLayer(QgsVectorLayer):
             if len(to_change) > BUFFER_SIZE:
                 self.writer.changeAttributeValues(to_change)
                 to_change = {}
+            pbar.update()
+        pbar.close()
         if len(to_change) > 0:
             self.writer.changeAttributeValues(to_change)
         if total:
@@ -557,6 +568,13 @@ class BaseLayer(QgsVectorLayer):
             count += 1
         return count
 
+    def get_progressbar(self, description, total=None):
+        """Return progress bar with 'description' for 'total' iterations"""
+        pbar = tqdm(total=total, leave=True)
+        pbar.set_description(description)
+        pbar.set_postfix(file=os.path.basename(self.source()), refresh=False)
+        return pbar
+
 
 class PolygonLayer(BaseLayer):
     """Base class for polygon layers"""
@@ -581,6 +599,7 @@ class PolygonLayer(BaseLayer):
         """
         to_clean = []
         to_add = []
+        pbar = self.get_progressbar(_("Explode multi pars"), self.featureCount())
         for feature in self.getFeatures(request):
             mp = Geometry.get_multipolygon(feature)
             if len(mp) > 1:
@@ -589,6 +608,8 @@ class PolygonLayer(BaseLayer):
                     feat.setGeometry(Geometry.fromPolygonXY(part))
                     to_add.append(feat)
                 to_clean.append(feature.id())
+            pbar.update()
+        pbar.close()
         if to_clean:
             self.writer.deleteFeatures(to_clean)
             self.writer.addFeatures(to_add)
@@ -656,6 +677,7 @@ class PolygonLayer(BaseLayer):
         index = self.get_index()
         to_change = {}
         nodes = set()
+        pbar = self.get_progressbar(_("Topology"), len(geometries))
         for (gid, geom) in geometries.items():
             for point in frozenset(Geometry.get_outer_vertices(geom)):
                 if point not in nodes:
@@ -718,6 +740,8 @@ class PolygonLayer(BaseLayer):
             if len(to_change) > BUFFER_SIZE:
                 self.writer.changeGeometryValues(to_change)
                 to_change = {}
+            pbar.update()
+        pbar.close()
         if len(to_change) > 0:
             self.writer.changeGeometryValues(to_change)
         if td:
@@ -748,6 +772,7 @@ class PolygonLayer(BaseLayer):
         zz = 0
         spikes = 0
         geometries = {f.id(): QgsGeometry(f.geometry()) for f in self.getFeatures()}
+        pbar = self.get_progressbar(_("Delete invalid geometries"), len(geometries))
         for fid, geom in geometries.items():
             badgeom = False
             for polygon in Geometry.get_multipolygon(geom):
@@ -815,6 +840,8 @@ class PolygonLayer(BaseLayer):
                                     debshp2.add_point(vx, 'vx %d %d' % (fid, ndx))
                                     debshp2.add_point(va, 'va %d %d %d %f' % (fid, ndx, ndxa, angle_a))
                                     debshp2.add_point(v, 'v %d %d %d %s' % (fid, ndx, len(ring), valid))
+            pbar.update()
+        pbar.close()
         if to_move:
             for fid, geom in geometries.items():
                 if fid in to_clean: continue
@@ -869,6 +896,7 @@ class PolygonLayer(BaseLayer):
         to_change = {}
         # Clean non corners
         (parents_per_vertex, geometries) = self.get_parents_per_vertex_and_geometries()
+        pbar = self.get_progressbar(_("Simplify"), len(parents_per_vertex))
         for pnt, parents in parents_per_vertex.items():
             point = Point(pnt)
             # Test if this vertex is a 'corner' in any of its parent polygons
@@ -898,6 +926,8 @@ class PolygonLayer(BaseLayer):
                         msg = "Deleted"
             if log.getEffectiveLevel() <= logging.DEBUG:
                 debshp.add_point(point, msg + ' ' + debmsg)
+            pbar.update()
+        pbar.close()
         if to_change:
             self.writer.changeGeometryValues(to_change)
             log.debug(_("Simplified %d vertices in the '%s' layer"), killed,
@@ -933,6 +963,7 @@ class PolygonLayer(BaseLayer):
         """Calculate the difference of each geometry with those in layer"""
         geometries = {f.id(): QgsGeometry(f.geometry()) for f in layer.getFeatures()}
         index = layer.get_index()
+        pbar = self.get_progressbar(_("Difference"), len(geometries))
         for feat in self.getFeatures():
             g1 = feat.geometry()
             fids = index.intersects(g1.boundingBox())
@@ -944,9 +975,11 @@ class PolygonLayer(BaseLayer):
                         gc = QgsGeometry(g2)
                     else:
                         gc = gc.combine(g2)
+                    pbar.update()
             if gc is not None:
                 g1 = g1.difference(gc)
                 self.writer.changeGeometryValues({feat.id(): g1})
+        pbar.close()
 
     def clean(self):
         """Delete invalid geometries and close vertices, add topological points
@@ -1008,6 +1041,7 @@ class ZoningLayer(PolygonLayer):
         to_add = []
         multi = 0
         final = 0
+        pbar = self.get_progressbar(_("Append"), layer.featureCount())
         for feature in layer.getFeatures():
             if layer.dataProvider().fieldNameIndex('levelName') > 0:
                 zone = feature['levelName'][3]
@@ -1030,6 +1064,8 @@ class ZoningLayer(PolygonLayer):
             if len(to_add) > BUFFER_SIZE:
                 self.writer.addFeatures(to_add)
                 to_add = []
+            pbar.update()
+        pbar.close()
         if len(to_add) > 0:
             self.writer.addFeatures(to_add)
         if total:
@@ -1290,6 +1326,7 @@ class ConsLayer(PolygonLayer):
         to_add = []
         parts_for_ref = defaultdict(list)
         buildings = {f['localId']: f for f in self.getFeatures() if self.is_building(f)}
+        pbar = self.get_progressbar(_("Remove outside parts"), self.featureCount())
         for feat in self.getFeatures():
             if self.is_part(feat):
                 ref = feat['localId'].split('_')[0]
@@ -1301,6 +1338,8 @@ class ConsLayer(PolygonLayer):
                     bu = buildings[ref]
                     if not is_inside(feat, bu):
                         to_clean_o.append(feat.id())
+            pbar.update()
+        pbar.close()
         for ref, parts in parts_for_ref.items():
             feat = QgsFeature(QgsFields(self.fields()))
             feat['localId'] = ref
@@ -1426,6 +1465,8 @@ class ConsLayer(PolygonLayer):
         adjacent_parts_deleted = 0
         pools_on_roofs = 0
         visited_parcels = set()
+        t_buildings = self.count("not regexp_match(localId, '_')")
+        pbar = self.get_progressbar(_("Merge building parts"), t_buildings)
         for building in self.search("not regexp_match(localId, '_')"):
             ref = building['localId']
             it_pools = pools[ref]
@@ -1461,6 +1502,8 @@ class ConsLayer(PolygonLayer):
             levels_to_footprint += len(ch)
             parts_merged_to_building += len(cn)
             adjacent_parts_deleted += len(cng)
+            pbar.update()
+        pbar.close()
         if to_change:
             self.writer.changeAttributeValues(to_change)
         if to_change_g:
@@ -1607,6 +1650,7 @@ class ConsLayer(PolygonLayer):
         num_buildings = 0
         conflicts = 0
         to_clean = set()
+        pbar = self.get_progressbar(_("Conflate"), len(current_bu_osm.elements))
         for el in current_bu_osm.elements:
             poly = None
             is_pool = 'leisure' in el.tags and el.tags['leisure'] == 'swimming_pool'
@@ -1635,6 +1679,8 @@ class ConsLayer(PolygonLayer):
                         to_clean.add(el)
                     if not delete and conflict:
                         el.tags['conflict'] = 'yes'
+            pbar.update()
+        pbar.close()
         for el in to_clean:
             current_bu_osm.remove(el)
         log.debug(_("Detected %d conflicts in %d buildings/pools from OSM"), 

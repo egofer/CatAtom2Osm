@@ -218,7 +218,8 @@ class TestBaseLayer(unittest.TestCase):
         self.assertEqual(feature['localId'], new_fet['localId'])
         self.assertTrue(feature.geometry().equals(new_fet.geometry()))
 
-    def test_append_with_rename(self):
+    @mock.patch('layer.tqdm')
+    def test_append_with_rename(self, m_tqdm):
         rename = {"A": "gml_id", "B": "value"}
         self.layer.append(self.fixture, rename)
         self.assertEqual(self.layer.featureCount(), self.fixture.featureCount())
@@ -226,7 +227,8 @@ class TestBaseLayer(unittest.TestCase):
         new_fet = next(self.layer.getFeatures())
         self.assertEqual(feature['gml_id'], new_fet['A'])
 
-    def test_append_all_fields(self):
+    @mock.patch('layer.tqdm')
+    def test_append_all_fields(self, m_tqdm):
         layer = BaseLayer("Polygon", "test", "memory")
         self.assertTrue(layer.isValid())
         layer.append(self.fixture)
@@ -235,14 +237,16 @@ class TestBaseLayer(unittest.TestCase):
         self.assertEqual(feature['gml_id'], new_fet['gml_id'])
         self.assertEqual(feature['localId'], new_fet['localId'])
 
-    def test_append_with_query(self):
+    @mock.patch('layer.tqdm')
+    def test_append_with_query(self, m_tqdm):
         layer = BaseLayer("Polygon", "test", "memory")
         self.assertTrue(layer.isValid())
         declined_filter = lambda feat, kwargs: feat['conditionOfConstruction'] == 'declined'
         layer.append(self.fixture, query=declined_filter)
         self.assertEqual(layer.featureCount(), 2)
 
-    def test_append_void(self):
+    @mock.patch('layer.tqdm')
+    def test_append_void(self, m_tqdm):
         layer = BaseLayer("Polygon", "test", "memory")
         self.assertTrue(layer.isValid())
         declined_filter = lambda feat, kwargs: feat['conditionOfConstruction'] == 'foobar'
@@ -259,7 +263,8 @@ class TestBaseLayer(unittest.TestCase):
         self.layer.writer.deleteFeatures([feat.id()])
         self.assertEqual(self.layer.featureCount(), 0)
 
-    def test_translate_field(self):
+    @mock.patch('layer.tqdm')
+    def test_translate_field(self, m_tqdm):
         ascii_uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         feat = next(self.fixture.getFeatures())
         geom = QgsGeometry(feat.geometry())
@@ -285,7 +290,8 @@ class TestBaseLayer(unittest.TestCase):
         self.layer.translate_field('A', translations, clean=False)
         self.assertGreater(self.layer.featureCount(), 0)
 
-    def test_boundig_box(self):
+    @mock.patch('layer.tqdm')
+    def test_boundig_box(self, m_tqdm):
         layer = BaseLayer("Polygon", "test", "memory")
         self.assertTrue(layer.isValid())
         self.assertEqual(layer.bounding_box(), None)
@@ -365,7 +371,8 @@ class TestBaseLayer2(unittest.TestCase):
 
 class TestPolygonLayer(unittest.TestCase):
 
-    def setUp(self):
+    @mock.patch('layer.tqdm')
+    def setUp(self, m_tqdm):
         self.fixture = QgsVectorLayer('test/cons.shp', 'building', 'ogr')
         self.assertTrue(self.fixture.isValid(), "Loading fixture")
         fn = 'test_layer.shp'
@@ -383,7 +390,8 @@ class TestPolygonLayer(unittest.TestCase):
         area = self.layer.get_area()
         self.assertEqual(round(area, 1), 1140234.8)
 
-    def test_explode_multi_parts(self):
+    @mock.patch('layer.tqdm')
+    def test_explode_multi_parts(self, m_tqdm):
         multiparts = [f for f in self.layer.getFeatures()
             if len(Geometry.get_multipolygon(f)) > 1]
         self.assertGreater(len(multiparts), 0, "There are multipart features")
@@ -446,7 +454,8 @@ class TestPolygonLayer(unittest.TestCase):
         del vertices
         return duplicates
     
-    def test_difference(self):
+    @mock.patch('layer.tqdm')
+    def test_difference(self, m_tqdm):
         layer1 = PolygonLayer('Polygon', 'test1', 'memory')
         layer2 = PolygonLayer('Polygon', 'test2', 'memory')
         g1 = Geometry.fromPolygonXY([[Point(10,10),
@@ -498,7 +507,8 @@ class TestParcelLayer(unittest.TestCase):
 
 class TestZoningLayer(unittest.TestCase):
 
-    def setUp(self):
+    @mock.patch('layer.tqdm')
+    def setUp(self, m_tqdm):
         self.fixture = QgsVectorLayer('test/zoning.gml', 'zoning', 'ogr')
         self.assertTrue(self.fixture.isValid(), "Loading fixture")
         fn = 'urban_zoning.shp'
@@ -551,7 +561,8 @@ class TestZoningLayer(unittest.TestCase):
         self.assertEqual(min(labels), 1)
         self.assertEqual(next(self.layer2.getFeatures())['zipcode'], '12345')
         
-    def test_set_cons_tasks(self):
+    @mock.patch('layer.tqdm')
+    def test_set_cons_tasks(self, m_tqdm):
         test = Counter({'86416': 198, '84428': 89, '88423': 86, '86417': 70,
             '89423': 61, '86423': 57, '87427': 53, '86439': 45, '86464': 38,
             '85426': 34, '89403': 33, '86435': 32, '86434': 28, '88429': 27,
@@ -576,7 +587,8 @@ class TestZoningLayer(unittest.TestCase):
 
 class TestConsLayer(unittest.TestCase):
 
-    def setUp(self):
+    @mock.patch('layer.tqdm')
+    def setUp(self, m_tqdm):
         self.fixture = QgsVectorLayer('test/cons.shp', 'building', 'ogr')
         self.assertTrue(self.fixture.isValid(), "Loading fixture")
         fn = 'test_layer.shp'
@@ -610,7 +622,8 @@ class TestConsLayer(unittest.TestCase):
         self.assertGreater(len(Geometry.get_multipolygon(geom)), 0)
         self.assertLess(len(Geometry.get_multipolygon(geom)), len(parts))
 
-    def test_explode_multi_parts(self):
+    @mock.patch('layer.tqdm')
+    def test_explode_multi_parts(self, m_tqdm):
         mp0 = [f for f in self.layer.getFeatures()
             if len(Geometry.get_multipolygon(f)) > 1]
         self.assertGreater(len(mp0), 0)
@@ -697,7 +710,8 @@ class TestConsLayer(unittest.TestCase):
         self.assertTrue(all([localid==pa['localid'][0:14]
             for (localid, group) in list(parts.items()) for pa in group]))
 
-    def test_remove_outside_parts(self):
+    @mock.patch('layer.tqdm')
+    def test_remove_outside_parts(self, m_tqdm):
         refs = [
             '8742721CS5284S_part10',
             '8742721CS5284S_part5',
@@ -759,7 +773,8 @@ class TestConsLayer(unittest.TestCase):
             if self.layer.is_building(ref):
                 self.test_merge_adjacent_parts(ref)
 
-    def test_add_topological_points(self):
+    @mock.patch('layer.tqdm')
+    def test_add_topological_points(self, m_tqdm):
         refs = [
             ('8842708CS5284S', Point(358821.08, 3124205.68), 0),
             ('8842708CS5284S_part1', Point(358821.08, 3124205.68), 0),
@@ -776,7 +791,8 @@ class TestConsLayer(unittest.TestCase):
             poly = Geometry.get_multipolygon(building)
             self.assertIn(ref[1], poly[ref[2]][0])
 
-    def test_delete_invalid_geometries(self):
+    @mock.patch('layer.tqdm')
+    def test_delete_invalid_geometries(self, m_tqdm):
         f1 = QgsFeature(self.layer.fields())
         g1 = Geometry.fromPolygonXY([[
             Point(358794.000, 3124330.000),
@@ -874,7 +890,8 @@ class TestConsLayer(unittest.TestCase):
             building = next(self.layer.search("localId = '%s'" % ref[0]))
             self.assertEqual(ref[1] in Geometry.get_multipolygon(building)[0][0], ref[2])
 
-    def test_simplify2(self):
+    @mock.patch('layer.tqdm')
+    def test_simplify2(self, m_tqdm):
         layer = ConsLayer()
         writer = layer.dataProvider()
         fixture1 = QgsVectorLayer('test/38023.buildingpart.gml', 'building', 'ogr')
