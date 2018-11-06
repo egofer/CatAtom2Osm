@@ -13,7 +13,8 @@ import setup
 TAB = '  '
 SEP = ': '
 MEMORY_UNIT = 1048576.0
-int_format = lambda v: locale.format('%d', v, True)
+MEMORY_LABEL = 'MB'
+int_format = lambda v: locale.format_string('%d', v, True)
 
 class Report(object):
 
@@ -130,9 +131,9 @@ class Report(object):
             'mun_wikidata': lambda v: 'https://www.wikidata.org/wiki/' + v,
             'cpu_freq': lambda v: locale.format_string('%.1f Mhz', v, True),
             'ex_time': lambda v: locale.format_string('%.1f '+_('seconds'), v, True),
-            'memory': lambda v: locale.format_string('%.2f GB', v, True),
-            'rss': lambda v: locale.format_string('%.2f GB', v, True),
-            'vms': lambda v: locale.format_string('%.2f GB', v, True),
+            'memory': lambda v: locale.format_string('%.2f ', v, True) + MEMORY_LABEL,
+            'rss': lambda v: locale.format_string('%.2f ', v, True) + MEMORY_LABEL,
+            'vms': lambda v: locale.format_string('%.2f ', v, True) + MEMORY_LABEL,
         }
         self.tasks_with_fixmes = set()
 
