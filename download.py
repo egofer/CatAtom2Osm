@@ -25,9 +25,9 @@ def wget(url, filename):
     total = 0
     if 'Content-Length' in response.headers:
         total = int(response.headers['Content-Length'])
-    #progress = ProgressBar(total)
     pbar = tqdm(total=total, unit='B', unit_scale=True, 
         unit_divisor=chunk_size, leave=False)
+    pbar.set_description(_("Downloading"))
     pbar.set_postfix(file=os.path.basename(filename), refresh=False)
     with open(filename, "wb") as f:
         for chunk in response.iter_content(chunk_size):
