@@ -83,14 +83,15 @@ msg:
 
 .PHONY: install
 install:
-	@echo "#!/bin/bash" > catatom2osm
 ifeq (${OS},$(filter $(OS),Sierra Darwin))
-	@echo "source "'"'"$(shell pwd)/pyqgismac.sh"'"' >> catatom2osm
 	@chmod +x pyqgismac.sh
-endif
-	@echo "python "'"'"$(shell pwd)/main.py"'"'" $$"'*' >> catatom2osm
+	@chmod +x pyqgis3mac.sh
+	@chmod +x catatom2osmmac
+	@ln -sf $(shell pwd)/catatom2osmmac $(INSTALL_DIR)/catatom2osm
+else
 	@chmod +x catatom2osm
 	@ln -sf $(shell pwd)/catatom2osm $(INSTALL_DIR)/catatom2osm
+endif
 	@echo "Created symbolic link $(INSTALL_DIR)-->$(shell pwd)/catatom2osm"
 
 .PHONY: uninstall
