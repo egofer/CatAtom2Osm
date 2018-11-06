@@ -6,45 +6,7 @@ import random
 
 os.environ['LANGUAGE'] = 'C'
 import setup
-from download import ProgressBar, get_response, wget, chunk_size
-
-
-class TestProgressBar(unittest.TestCase):
-
-    def test_init(self):
-        p = ProgressBar(1000)
-        self.assertEqual(p.total, 1000)
-        self.assertEqual(p.progress, 0)
-
-    @mock.patch('download.sys')
-    def test_update(self, mock_sys):
-        pb = ProgressBar(1000)
-        progress = random.randint(0, 9)
-        pb.update(100 * progress)
-        self.assertEqual(pb.progress, 100 * progress)
-        self.assertTrue(mock_sys.stdout.write.called)
-        output = mock_sys.stdout.write.call_args_list[0][0][0]
-        self.assertEqual(output.count('#'), int(pb.bar_len * progress / 10.0))
-        self.assertEqual(output.count('-'), int(pb.bar_len * (10-progress) / 10.0))
-
-    @mock.patch('download.sys')
-    def test_update100(self, mock_sys):
-        pb = ProgressBar(1000)
-        pb.update(1100)
-        self.assertEqual(pb.progress, 1000)
-        self.assertTrue(mock_sys.stdout.write.called)
-        output = mock_sys.stdout.write.call_args_list[0][0][0]
-        self.assertEqual(output.count('#'), pb.bar_len)
-        self.assertEqual(output.count('-'), 0)
-    
-    @mock.patch('download.sys')
-    def test_update0(self, mock_sys):
-        pb = ProgressBar(0)
-        progress = random.randint(0, 99999)
-        pb.update(progress)
-        self.assertTrue(mock_sys.stdout.write.called)
-        output = mock_sys.stdout.write.call_args_list[0][0][0]
-        self.assertEqual(output.split(': ')[1], '%.1fK\r' % (progress / 1024.0))
+from download import get_response, wget, chunk_size
 
 
 class TestGetResponse(unittest.TestCase):
@@ -73,7 +35,7 @@ class TestGetResponse(unittest.TestCase):
 class TestWget(unittest.TestCase):
 
     @mock.patch('download.get_response')
-    @mock.patch('download.ProgressBar')
+    @mock.patch('download.tqdm')
     @mock.patch('download.open')
     def test_wget(self, mock_open, mock_pb, mock_gr):
         mock_gr.return_value = mock.MagicMock()
@@ -84,10 +46,11 @@ class TestWget(unittest.TestCase):
         mock_open.return_value.__enter__.return_value = file_mock
         wget('foo', 'bar')
         self.assertEqual(file_mock.write.call_count, chunk_size)
-        mock_pb.assert_called_once_with(99999)
+        mock_pb.assert_called_once_with(total=99999, unit='B', 
+            unit_scale=True, unit_divisor=chunk_size, leave=False)
     
     @mock.patch('download.get_response')
-    @mock.patch('download.ProgressBar')
+    @mock.patch('download.tqdm')
     @mock.patch('download.open')
     def test_wget0(self, mock_open, mock_pb, mock_gr):
         mock_gr.return_value = mock.MagicMock()
@@ -98,5 +61,6 @@ class TestWget(unittest.TestCase):
         mock_open.return_value.__enter__.return_value = file_mock
         wget('foo', 'bar')
         self.assertEqual(file_mock.write.call_count, chunk_size)
-        mock_pb.assert_called_with(0)
+        mock_pb.assert_called_once_with(total=0, unit='B', 
+            unit_scale=True, unit_divisor=chunk_size, leave=False)
 

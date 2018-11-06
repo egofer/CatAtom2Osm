@@ -2,6 +2,7 @@ future
 lxml
 requests
 psutil
+tqdm
 fuzzywuzzy[speedup]
 
 # sudo pip install -r requisites.txt
