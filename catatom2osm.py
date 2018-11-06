@@ -98,6 +98,7 @@ class CatAtom2Osm(object):
             self.options.tasks = False
             self.options.building = False
             self.options.zoning = False
+            self.options.parcel = False
         if self.options.zoning or self.options.tasks:
             self.process_zoning()
             if not self.options.tasks:
@@ -260,8 +261,6 @@ class CatAtom2Osm(object):
         self.urban_zoning.merge_adjacents()
         self.rustic_zoning.set_tasks(self.cat.zip_code)
         self.urban_zoning.set_tasks(self.cat.zip_code)
-        if self.options.tasks:
-            return
         self.urban_zoning.delete_invalid_geometries()
         self.urban_zoning.simplify()
         self.rustic_zoning.clean()
