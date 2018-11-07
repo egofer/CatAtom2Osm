@@ -1,12 +1,15 @@
 #!/bin/bash
-VERSION=$(qgis --help 2>&1 | head -n 1 | cut -d'.' -f1)
-SCRIPT="$(readlink -f $0)"
+VERSION="QGIS - 2"
+if [ -d "/Applications/QGIS3.app" ]; then
+    VERSION="QGIS - 3"
+fi
+SCRIPT="$(readlink $0)"
 DIR="$(dirname $SCRIPT)"
 if [ "$VERSION" == "QGIS - 2" ]; then
-    source "$DIR/pyqgismac.py"
-    python2 "$DIR/main.py" $*
+    source "$DIR/pyqgismac.sh"
+    python "$DIR/main.py" $*
 else
-    source "$DIR/pyqgis3mac.py"
+    source "$DIR/pyqgis3mac.sh"
     python3 "$DIR/main.py" $*
 fi
 
