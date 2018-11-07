@@ -299,7 +299,8 @@ class TestBaseLayer(unittest.TestCase):
         layer.append(self.fixture)
         self.assertEqual(layer.bounding_box(), bbox)
 
-    def test_reproject(self):
+    @mock.patch('layer.tqdm')
+    def test_reproject(self, m_tqdm):
         layer = BaseLayer("Polygon", "test", "memory")
         self.assertTrue(layer.isValid())
         layer.append(self.fixture)
@@ -639,7 +640,8 @@ class TestConsLayer(unittest.TestCase):
             if len(Geometry.get_multipolygon(f)) > 1]
         self.assertEqual(len(mp1), len(mp2))
 
-    def test_append_building(self):
+    @mock.patch('layer.tqdm')
+    def test_append_building(self, m_tqdm):
         layer = ConsLayer()
         self.assertTrue(layer.isValid(), "Init QGIS")
         fixture = QgsVectorLayer('test/building.gml', 'building', 'ogr')
@@ -650,7 +652,8 @@ class TestConsLayer(unittest.TestCase):
         self.assertEqual(feature['conditionOfConstruction'], new_fet['condition'])
         self.assertEqual(feature['localId'], new_fet['localId'])
 
-    def test_append_buildingpart(self):
+    @mock.patch('layer.tqdm')
+    def test_append_buildingpart(self, m_tqdm):
         layer = ConsLayer()
         self.assertTrue(layer.isValid(), "Init QGIS")
         fixture = QgsVectorLayer('test/buildingpart.gml', 'building', 'ogr')
@@ -661,7 +664,8 @@ class TestConsLayer(unittest.TestCase):
         self.assertEqual(feature['numberOfFloorsAboveGround'], new_fet['lev_above'])
         self.assertEqual(feature['localId'], new_fet['localId'])
 
-    def test_append_othercons(self):
+    @mock.patch('layer.tqdm')
+    def test_append_othercons(self, m_tqdm):
         layer = ConsLayer()
         self.assertTrue(layer.isValid(), "Init QGIS")
         fixture = QgsVectorLayer('test/othercons.gml', 'building', 'ogr')
@@ -672,7 +676,8 @@ class TestConsLayer(unittest.TestCase):
         self.assertEqual(feature['constructionNature'], new_fet['nature'])
         self.assertEqual(feature['localId'], new_fet['localId'])
 
-    def test_append_cons(self):
+    @mock.patch('layer.tqdm')
+    def test_append_cons(self, m_tqdm):
         exp = QgsExpression("nature = 'openAirPool'")
         request = QgsFeatureRequest(exp)
         feat = next(self.layer.getFeatures(request))
@@ -683,7 +688,8 @@ class TestConsLayer(unittest.TestCase):
         feat = next(layer.getFeatures(request))
         self.assertNotEqual(feat, None)
 
-    def test_remove_parts_below_ground(self):
+    @mock.patch('layer.tqdm')
+    def test_remove_parts_below_ground(self, m_tqdm):
         to_clean = [f.id() for f in self.layer.search('lev_above=0 and lev_below>0')]
         self.assertGreater(len(to_clean), 0, 'There are parts below ground')
         self.layer.remove_outside_parts()
@@ -729,7 +735,8 @@ class TestConsLayer(unittest.TestCase):
         for feat in self.layer.getFeatures():
             self.assertNotIn(feat['localId'], refs)
 
-    def test_get_parts(self):
+    @mock.patch('layer.tqdm')
+    def test_get_parts(self, m_tqdm):
         self.layer.explode_multi_parts()
         parts = [p for p in self.layer.search("localId like '8840501CS5284S_part%%'")]
         for footprint in self.layer.search("localId = '8840501CS5284S'"):
@@ -743,7 +750,8 @@ class TestConsLayer(unittest.TestCase):
             self.assertEqual(max_level, max_levelc)
             self.assertEqual(min_level, min_levelc)
 
-    def test_merge_adjacent_parts(self, ref=None):
+    @mock.patch('layer.tqdm')
+    def test_merge_adjacent_parts(self, m_tqdm, ref=None):
         if ref == None:
             self.layer.explode_multi_parts()
             ref = '8842323CS5284S'
@@ -766,7 +774,8 @@ class TestConsLayer(unittest.TestCase):
             self.assertEqual(ch[footprint.id()][7], min_level)
             self.assertEqual(set(cn), set([p.id() for p in parts_for_level[max_level, min_level]]))
 
-    def test_merge_building_parts(self):
+    @mock.patch('layer.tqdm')
+    def test_merge_building_parts(self, m_tqdm):
         self.layer.remove_outside_parts()
         self.layer.merge_building_parts()
         for ref in self.layer.getFeatures():
@@ -878,7 +887,8 @@ class TestConsLayer(unittest.TestCase):
             (357400.00, 3124305.00)]
         self.assertEqual(r, [(round(p.x(), 2), round(p.y(), 2)) for p in mp[0][0]])
 
-    def test_simplify1(self):
+    @mock.patch('layer.tqdm')
+    def test_simplify1(self, m_tqdm):
         refs = [
             ('8643326CS5284S', Point(358684.62, 3124377.54), True),
             ('8643326CS5284S', Point(358686.29, 3124376.11), True),
@@ -911,7 +921,8 @@ class TestConsLayer(unittest.TestCase):
             self.assertTrue(geom.isGeosValid(), feat['localId'])
         layer.merge_building_parts()
 
-    def test_move_address(self):
+    @mock.patch('layer.tqdm')
+    def test_move_address(self, m_tqdm):
         refs = {
             '38.012.10.10.8643403CS5284S': 'Entrance',
             '38.012.10.11.8842304CS5284S': 'Entrance',
@@ -938,7 +949,8 @@ class TestConsLayer(unittest.TestCase):
         self.layer.move_address(address)
         self.assertEqual(address.featureCount(), 6)
 
-    def test_validate(self):
+    @mock.patch('layer.tqdm')
+    def test_validate(self, m_tqdm):
         self.layer.merge_building_parts()
         max_level = {}
         min_level = {}
@@ -967,7 +979,8 @@ class TestConsLayer(unittest.TestCase):
         self.assertEqual(ways, len(data.ways))
         self.assertEqual(rels, len(data.relations))
 
-    def test_conflate(self):
+    @mock.patch('layer.tqdm')
+    def test_conflate(self, m_tqdm):
         self.layer.reproject()
         d = osm.Osm()
         d.Way(((-16.44211325828, 28.23715394977), (-16.44208978895, 28.23714124855),
@@ -1056,7 +1069,8 @@ class TestAddressLayer(unittest.TestCase):
         del self.layer
         AddressLayer.delete_shp('test_layer.shp')
 
-    def test_append(self):
+    @mock.patch('layer.tqdm')
+    def test_append(self, m_tqdm):
         self.layer.append(self.address_gml)
         feat = next(self.layer.getFeatures())
         attrs = ['localId', 'PD_id', 'TN_id', 'AU_id']
@@ -1065,7 +1079,8 @@ class TestAddressLayer(unittest.TestCase):
         for (attr, value) in zip(attrs, values):
             self.assertEqual(feat[attr], value)
 
-    def test_join_field(self):
+    @mock.patch('layer.tqdm')
+    def test_join_field(self, m_tqdm):
         self.layer.append(self.address_gml)
         self.layer.join_field(self.tn_gml, 'TN_id', 'gml_id', ['text'], 'TN_')
         self.layer.join_field(self.au_gml, 'AU_id', 'gml_id', ['text'], 'AU_')
@@ -1076,7 +1091,8 @@ class TestAddressLayer(unittest.TestCase):
         for (attr, value) in zip(attrs, values):
             self.assertEqual(feat[attr], value)
 
-    def test_join_field_size(self):
+    @mock.patch('layer.tqdm')
+    def test_join_field_size(self, m_tqdm):
         layer = PolygonLayer('Point', 'test', 'memory')
         layer.dataProvider().addAttributes([QgsField('A', QVariant.String, len=255)])
         layer.updateFields()
@@ -1084,11 +1100,13 @@ class TestAddressLayer(unittest.TestCase):
         self.layer.join_field(layer, 'TN_id', 'gml_id', ['A'], 'TN_')
         self.assertEqual(self.layer.fields().field('TN_A').length(), 254)
 
-    def test_join_void(self):
+    @mock.patch('layer.tqdm')
+    def test_join_void(self, m_tqdm):
         self.layer.join_field(self.tn_gml, 'TN_id', 'gml_id', ['text'], 'TN_')
         self.assertEqual(self.layer.featureCount(), 0)
 
-    def test_to_osm(self):
+    @mock.patch('layer.tqdm')
+    def test_to_osm(self, m_tqdm):
         self.layer.append(self.address_gml)
         self.layer.join_field(self.tn_gml, 'TN_id', 'gml_id', ['text'], 'TN_')
         self.layer.join_field(self.au_gml, 'AU_id', 'gml_id', ['text'], 'AU_')
@@ -1106,7 +1124,8 @@ class TestAddressLayer(unittest.TestCase):
             t = address[feat['localId'].split('.')[-1]]
             self.assertEqual(feat['TN_text']+feat['designator'], t)
 
-    def test_conflate(self):
+    @mock.patch('layer.tqdm')
+    def test_conflate(self, m_tqdm):
         self.layer.append(self.address_gml)
         self.layer.join_field(self.tn_gml, 'TN_id', 'gml_id', ['text'], 'TN_')
         self.layer.join_field(self.au_gml, 'AU_id', 'gml_id', ['text'], 'AU_')
