@@ -926,10 +926,14 @@ class PolygonLayer(BaseLayer):
                         msg = "Deleted"
             if log.getEffectiveLevel() <= logging.DEBUG:
                 debshp.add_point(point, msg + ' ' + debmsg)
+            if len(to_change) > BUFFER_SIZE:
+                self.writer.changeGeometryValues(to_change)
+                to_change = {}
             pbar.update()
         pbar.close()
-        if to_change:
+        if len(to_change) > 0:
             self.writer.changeGeometryValues(to_change)
+        if killed > 0:
             log.debug(_("Simplified %d vertices in the '%s' layer"), killed,
                 self.name())
             report.values['vertex_simplify_' + self.name()] = killed
