@@ -1669,6 +1669,7 @@ class ConsLayer(PolygonLayer):
                 geom = Geometry().fromMultiPolygonXY(poly)
                 if geom is None or not geom.isGeosValid():
                     msg = _("OSM building with id %s is not valid") % el.fid
+                    pbar.clean()
                     log.warning(msg)
                     report.warnings.append(msg)
                 else:
