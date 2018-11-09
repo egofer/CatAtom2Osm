@@ -43,8 +43,11 @@ class Reader(object):
         if os.path.exists(md_path):
             text = open(md_path, 'r').read()
         else:
-            zf = zipfile.ZipFile(zip_path)
-            text = zf.read(os.path.basename(md_path))
+            try:
+                zf = zipfile.ZipFile(zip_path)
+                text = zf.read(self.get_path_from_zip(zf, md_path))
+            except IOError:
+                raise IOError(_("Could not read metadata from '%s'") % md_path)
         root = etree.fromstring(text)
         is_empty = len(root) == 0 or len(root[0]) == 0
         namespace = {
@@ -101,16 +104,16 @@ class Reader(object):
         md_path = os.path.join(self.path, md_fn)
         gml_path = os.path.join(self.path, gml_fn)
         zip_path = os.path.join(self.path, zip_fn)
-        vsizip_path = "/".join(('/vsizip', self.path, zip_fn, gml_fn))
-        return (md_path, gml_path, zip_path, vsizip_path, group)
+        return (md_path, gml_path, zip_path, group)
 
     def is_empty(self, gml_path, zip_path):
         """Detects if the file is empty. Cadastre empty files (usually 
         otherconstruction) comes with a null feature and results in a non valid
         layer in QGIS"""
         if os.path.exists(zip_path):
-            zf = zipfile.ZipFile(zip_path, 'r')
-            f = zf.open(os.path.basename(gml_path).split('|')[0], 'r')
+            zf = zipfile.ZipFile(zip_path)
+            gml_fp = self.get_path_from_zip(zf, gml_path)
+            f = zf.open(gml_fp, 'r')
         else:
             f = open(gml_path, 'r')
         context = etree.iterparse(f, events=('end',))
@@ -122,6 +125,29 @@ class Reader(object):
         except StopIteration:
             return True
 
+    def get_path_from_zip(self, zf, a_path):
+        """Return full path in zip of this file name"""
+        fn = os.path.basename(a_path).split('|')[0]
+        for name in zf.namelist():
+            if name.endswith(fn):
+                return name
+        raise(KeyError("There is no item named '{}' in the archive".format(fn)))
+
+    def get_gml_from_zip(self, gml_path, zip_path, group, layername):
+        """Return gml layer from zip if exists and is valid or none"""
+        try:
+            zf = zipfile.ZipFile(zip_path)
+            gml_fp = self.get_path_from_zip(zf, gml_path)
+            vsizip_path = "/".join(('/vsizip', zip_path, gml_fp)).replace('\\', '/')
+            if group == 'AD':
+                vsizip_path += "|layername=" + layername
+            gml = layer.BaseLayer(vsizip_path, layername+'.gml', 'ogr')
+            if not gml.isValid():
+                gml = None
+        except IOError:
+            gml = None
+        return gml
+
     def download(self, layername):
         """
         Downloads the file for a a Cadastre layername.
@@ -130,7 +156,7 @@ class Reader(object):
             layername (str): Short name of the Cadastre layer. Any of 
                 'building', 'cadastralzoning', 'address'
         """
-        (md_path, gml_path, zip_path, vsizip_path, group) = self.get_layer_paths(layername)
+        (md_path, gml_path, zip_path, group) = self.get_layer_paths(layername)
         url = setup.prov_url[group].format(code=self.prov_code)
         self.get_atom_file(url)
 
@@ -148,11 +174,11 @@ class Reader(object):
             allow_empty (bool): If False (default), raise a exception for empty
                 layer, else returns None
             force_zip (bool): Force to use ZIP file.
-                
+
         Returns:
             QgsVectorLayer: Vector layer.
         """
-        (md_path, gml_path, zip_path, vsizip_path, group) = self.get_layer_paths(layername)
+        (md_path, gml_path, zip_path, group) = self.get_layer_paths(layername)
         url = setup.prov_url[group].format(code=self.prov_code)
         if not os.path.exists(zip_path) and (not os.path.exists(gml_path) or force_zip):
             self.get_atom_file(url)
@@ -163,8 +189,8 @@ class Reader(object):
             else:
                 log.info(_("The layer '%s' is empty"), gml_path)
                 return None
-        gml = layer.BaseLayer(vsizip_path, layername+'.gml', 'ogr')
-        if not gml.isValid():
+        gml = self.get_gml_from_zip(gml_path, zip_path, group, layername)
+        if gml is None:
             gml = layer.BaseLayer(gml_path, layername+'.gml', 'ogr')
             if not gml.isValid():
                 raise IOError(_("Failed to load layer '%s'") % gml_path)
