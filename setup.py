@@ -5,7 +5,7 @@ import csv
 import gettext
 
 app_name = 'CatAtom2Osm'
-app_version = '1.1.7'
+app_version = '1.1.8'
 app_author = u'Javier Sánchez Portero'
 app_copyright = u'2017, Javier Sánchez Portero'
 app_desc = 'Tool to convert INSPIRE data sets from the Spanish Cadastre ATOM Services to OSM files'
@@ -30,7 +30,6 @@ app_path = os.path.dirname(__file__)
 localedir = os.path.join(app_path, 'locale', 'po')
 platform = sys.platform
 winenv()
-
 
 gettext.install(app_name.lower(), localedir=localedir, unicode=1)
 

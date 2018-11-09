@@ -1,6 +1,12 @@
 Change log
 ==========
 
+**2018-11-09 (1.1.8)**
+
+* Resolves error opening the most current Cadastre files (issue #29)
+* Reduces the processing time to generate the zoning.geojson file for certain provinces (issue #26)
+* Fix errors in the English translation and memory units in the report (by @javirg)
+
 **2018-05-29 (1.1.7)**
 
 * Add translation of street names in Galician and Catalan.

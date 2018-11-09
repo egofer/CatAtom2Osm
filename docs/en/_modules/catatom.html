@@ -15,7 +15,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>catatom &#8212; CatAtom2Osm 1.1.7 documentation</title>
+    <title>catatom &#8212; CatAtom2Osm 1.1.8 documentation</title>
     
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.7',
+        VERSION:     '1.1.8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -49,7 +49,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">CatAtom2Osm 1.1.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CatAtom2Osm 1.1.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -157,8 +157,11 @@
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">md_path</span><span class="p">):</span>
             <span class="n">text</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">md_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">zf</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">zf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">md_path</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">zf</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">zf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_path_from_zip</span><span class="p">(</span><span class="n">zf</span><span class="p">,</span> <span class="n">md_path</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Could not read metadata from &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">md_path</span><span class="p">)</span>
         <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
         <span class="n">is_empty</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">root</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span>
         <span class="n">namespace</span> <span class="o">=</span> <span class="p">{</span>
@@ -215,16 +218,16 @@
         <span class="n">md_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">md_fn</span><span class="p">)</span>
         <span class="n">gml_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">gml_fn</span><span class="p">)</span>
         <span class="n">zip_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">zip_fn</span><span class="p">)</span>
-        <span class="n">vsizip_path</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s1">&#39;/vsizip&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">zip_fn</span><span class="p">,</span> <span class="n">gml_fn</span><span class="p">))</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">md_path</span><span class="p">,</span> <span class="n">gml_path</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">vsizip_path</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="n">md_path</span><span class="p">,</span> <span class="n">gml_path</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Reader.is_empty"><a class="viewcode-back" href="../api/catatom.html#catatom.Reader.is_empty">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gml_path</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Detects if the file is empty. Cadastre empty files (usually </span>
 <span class="sd">        otherconstruction) comes with a null feature and results in a non valid</span>
 <span class="sd">        layer in QGIS&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">zip_path</span><span class="p">):</span>
-            <span class="n">zf</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">zf</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">gml_path</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+            <span class="n">zf</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span>
+            <span class="n">gml_fp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_path_from_zip</span><span class="p">(</span><span class="n">zf</span><span class="p">,</span> <span class="n">gml_path</span><span class="p">)</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">zf</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">gml_fp</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">gml_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
         <span class="n">context</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">events</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">,))</span>
@@ -236,6 +239,29 @@
         <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span></div>
 
+<div class="viewcode-block" id="Reader.get_path_from_zip"><a class="viewcode-back" href="../api/catatom.html#catatom.Reader.get_path_from_zip">[docs]</a>    <span class="k">def</span> <span class="nf">get_path_from_zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zf</span><span class="p">,</span> <span class="n">a_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return full path in zip of this file name&quot;&quot;&quot;</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">a_path</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">zf</span><span class="o">.</span><span class="n">namelist</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">name</span>
+        <span class="k">raise</span><span class="p">(</span><span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;There is no item named &#39;</span><span class="si">{}</span><span class="s2">&#39; in the archive&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fn</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="Reader.get_gml_from_zip"><a class="viewcode-back" href="../api/catatom.html#catatom.Reader.get_gml_from_zip">[docs]</a>    <span class="k">def</span> <span class="nf">get_gml_from_zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gml_path</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">layername</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return gml layer from zip if exists and is valid or none&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">zf</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span>
+            <span class="n">gml_fp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_path_from_zip</span><span class="p">(</span><span class="n">zf</span><span class="p">,</span> <span class="n">gml_path</span><span class="p">)</span>
+            <span class="n">vsizip_path</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="s1">&#39;/vsizip&#39;</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">gml_fp</span><span class="p">))</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">group</span> <span class="o">==</span> <span class="s1">&#39;AD&#39;</span><span class="p">:</span>
+                <span class="n">vsizip_path</span> <span class="o">+=</span> <span class="s2">&quot;|layername=&quot;</span> <span class="o">+</span> <span class="n">layername</span>
+            <span class="n">gml</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">BaseLayer</span><span class="p">(</span><span class="n">vsizip_path</span><span class="p">,</span> <span class="n">layername</span><span class="o">+</span><span class="s1">&#39;.gml&#39;</span><span class="p">,</span> <span class="s1">&#39;ogr&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">gml</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+                <span class="n">gml</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="n">gml</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">gml</span></div>
+
 <div class="viewcode-block" id="Reader.download"><a class="viewcode-back" href="../api/catatom.html#catatom.Reader.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layername</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Downloads the file for a a Cadastre layername.</span>
@@ -244,7 +270,7 @@
 <span class="sd">            layername (str): Short name of the Cadastre layer. Any of </span>
 <span class="sd">                &#39;building&#39;, &#39;cadastralzoning&#39;, &#39;address&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="p">(</span><span class="n">md_path</span><span class="p">,</span> <span class="n">gml_path</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">vsizip_path</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_layer_paths</span><span class="p">(</span><span class="n">layername</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">md_path</span><span class="p">,</span> <span class="n">gml_path</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_layer_paths</span><span class="p">(</span><span class="n">layername</span><span class="p">)</span>
         <span class="n">url</span> <span class="o">=</span> <span class="n">setup</span><span class="o">.</span><span class="n">prov_url</span><span class="p">[</span><span class="n">group</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prov_code</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_atom_file</span><span class="p">(</span><span class="n">url</span><span class="p">)</span></div>
 
@@ -262,11 +288,11 @@
 <span class="sd">            allow_empty (bool): If False (default), raise a exception for empty</span>
 <span class="sd">                layer, else returns None</span>
 <span class="sd">            force_zip (bool): Force to use ZIP file.</span>
-<span class="sd">                </span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            QgsVectorLayer: Vector layer.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="p">(</span><span class="n">md_path</span><span class="p">,</span> <span class="n">gml_path</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">vsizip_path</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_layer_paths</span><span class="p">(</span><span class="n">layername</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">md_path</span><span class="p">,</span> <span class="n">gml_path</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_layer_paths</span><span class="p">(</span><span class="n">layername</span><span class="p">)</span>
         <span class="n">url</span> <span class="o">=</span> <span class="n">setup</span><span class="o">.</span><span class="n">prov_url</span><span class="p">[</span><span class="n">group</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prov_code</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">zip_path</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">gml_path</span><span class="p">)</span> <span class="ow">or</span> <span class="n">force_zip</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_atom_file</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -277,8 +303,8 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;The layer &#39;</span><span class="si">%s</span><span class="s2">&#39; is empty&quot;</span><span class="p">),</span> <span class="n">gml_path</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">None</span>
-        <span class="n">gml</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">BaseLayer</span><span class="p">(</span><span class="n">vsizip_path</span><span class="p">,</span> <span class="n">layername</span><span class="o">+</span><span class="s1">&#39;.gml&#39;</span><span class="p">,</span> <span class="s1">&#39;ogr&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">gml</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+        <span class="n">gml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_gml_from_zip</span><span class="p">(</span><span class="n">gml_path</span><span class="p">,</span> <span class="n">zip_path</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">layername</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">gml</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">gml</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">BaseLayer</span><span class="p">(</span><span class="n">gml_path</span><span class="p">,</span> <span class="n">layername</span><span class="o">+</span><span class="s1">&#39;.gml&#39;</span><span class="p">,</span> <span class="s1">&#39;ogr&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">gml</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
                 <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Failed to load layer &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">gml_path</span><span class="p">)</span>
@@ -354,7 +380,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">CatAtom2Osm 1.1.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CatAtom2Osm 1.1.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

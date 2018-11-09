@@ -15,7 +15,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>report &#8212; CatAtom2Osm 1.1.7 documentation</title>
+    <title>report &#8212; CatAtom2Osm 1.1.8 documentation</title>
     
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.7',
+        VERSION:     '1.1.8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -49,7 +49,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">CatAtom2Osm 1.1.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CatAtom2Osm 1.1.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
       </ul>
     </div>
@@ -127,7 +127,8 @@
 <span class="n">TAB</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span>
 <span class="n">SEP</span> <span class="o">=</span> <span class="s1">&#39;: &#39;</span>
 <span class="n">MEMORY_UNIT</span> <span class="o">=</span> <span class="mf">1048576.0</span>
-<span class="n">int_format</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">locale</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">MEMORY_LABEL</span> <span class="o">=</span> <span class="s1">&#39;MB&#39;</span>
+<span class="n">int_format</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">locale</span><span class="o">.</span><span class="n">format_string</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Report"><a class="viewcode-back" href="../api/report.html#report.Report">[docs]</a><span class="k">class</span> <span class="nc">Report</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
@@ -180,7 +181,7 @@
             <span class="p">(</span><span class="s1">&#39;addresses_without_number&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Addresses without house number deleted&#39;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;orphand_addresses&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Addresses without associated building deleted&#39;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;multiple_addresses&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Addresses belonging to multiple buildings deleted&#39;</span><span class="p">)),</span>
-            <span class="p">(</span><span class="s1">&#39;not_unique_addresses&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;&#39;Parcel&#39; addresses not unique for it building deleted&quot;</span><span class="p">)),</span>
+            <span class="p">(</span><span class="s1">&#39;not_unique_addresses&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;&#39;Parcel&#39; addresses not unique for its building deleted&quot;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;subgroup_ad_conflation&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Conflation&quot;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;osm_addresses&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;OSM addresses &quot;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;osm_addresses_whithout_number&#39;</span><span class="p">,</span> <span class="n">TAB</span> <span class="o">+</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Without house number&quot;</span><span class="p">)),</span>
@@ -196,7 +197,7 @@
             <span class="p">(</span><span class="s1">&#39;building_date&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Source date&#39;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;inp_features&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Feature count&#39;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;inp_buildings&#39;</span><span class="p">,</span> <span class="n">TAB</span> <span class="o">+</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Buildings&#39;</span><span class="p">)),</span>
-            <span class="p">(</span><span class="s1">&#39;inp_parts&#39;</span><span class="p">,</span> <span class="n">TAB</span> <span class="o">+</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Buildings parts&#39;</span><span class="p">)),</span>
+            <span class="p">(</span><span class="s1">&#39;inp_parts&#39;</span><span class="p">,</span> <span class="n">TAB</span> <span class="o">+</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Building parts&#39;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;inp_pools&#39;</span><span class="p">,</span> <span class="n">TAB</span> <span class="o">+</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Swimming pools&#39;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;subgroup_bu_process&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Process&#39;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;orphand_parts&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Parts outside footprint deleted&quot;</span><span class="p">)),</span>
@@ -216,7 +217,7 @@
             <span class="p">(</span><span class="s1">&#39;vertex_simplify_building&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Simplified vertices&quot;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;subgroup_bu_conflation&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Conflation&quot;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;osm_buildings&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Buildings/pools in OSM&quot;</span><span class="p">)),</span>
-            <span class="p">(</span><span class="s1">&#39;osm_building_conflicts&#39;</span><span class="p">,</span> <span class="n">TAB</span> <span class="o">+</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;With conflic&quot;</span><span class="p">)),</span>
+            <span class="p">(</span><span class="s1">&#39;osm_building_conflicts&#39;</span><span class="p">,</span> <span class="n">TAB</span> <span class="o">+</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;With conflict&quot;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;subgroup_bu_output&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s1">&#39;Output data&#39;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;nodes&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Nodes&quot;</span><span class="p">)),</span>
             <span class="p">(</span><span class="s1">&#39;ways&#39;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Ways&quot;</span><span class="p">)),</span>
@@ -244,9 +245,9 @@
             <span class="s1">&#39;mun_wikidata&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="s1">&#39;https://www.wikidata.org/wiki/&#39;</span> <span class="o">+</span> <span class="n">v</span><span class="p">,</span>
             <span class="s1">&#39;cpu_freq&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">locale</span><span class="o">.</span><span class="n">format_string</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> Mhz&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
             <span class="s1">&#39;ex_time&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">locale</span><span class="o">.</span><span class="n">format_string</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> &#39;</span><span class="o">+</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;seconds&#39;</span><span class="p">),</span> <span class="n">v</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
-            <span class="s1">&#39;memory&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">locale</span><span class="o">.</span><span class="n">format_string</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1"> GB&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
-            <span class="s1">&#39;rss&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">locale</span><span class="o">.</span><span class="n">format_string</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1"> GB&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
-            <span class="s1">&#39;vms&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">locale</span><span class="o">.</span><span class="n">format_string</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1"> GB&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
+            <span class="s1">&#39;memory&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">locale</span><span class="o">.</span><span class="n">format_string</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1"> &#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">MEMORY_LABEL</span><span class="p">,</span>
+            <span class="s1">&#39;rss&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">locale</span><span class="o">.</span><span class="n">format_string</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1"> &#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">MEMORY_LABEL</span><span class="p">,</span>
+            <span class="s1">&#39;vms&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">locale</span><span class="o">.</span><span class="n">format_string</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1"> &#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">MEMORY_LABEL</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tasks_with_fixmes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
@@ -442,7 +443,7 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">CatAtom2Osm 1.1.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CatAtom2Osm 1.1.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
       </ul>
     </div>

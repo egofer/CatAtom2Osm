@@ -15,7 +15,7 @@
   <link rel="stylesheet" type="text/css" href="../_static/css/bootstrap-theme.min.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-    <title>catatom module &#8212; CatAtom2Osm 1.1.7 documentation</title>
+    <title>catatom module &#8212; CatAtom2Osm 1.1.8 documentation</title>
     
     <link rel="stylesheet" href="../_static/guzzle.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -23,7 +23,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '1.1.7',
+        VERSION:     '1.1.8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -57,7 +57,7 @@
         <li class="right" >
           <a href="modules.html" title="CatAtom2Osm"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">CatAtom2Osm 1.1.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CatAtom2Osm 1.1.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../api.html" >API reference</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="modules.html" accesskey="U">CatAtom2Osm</a> &#187;</li> 
       </ul>
@@ -165,6 +165,12 @@ Precondition: called after read any gml (metadata adquired)</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="catatom.Reader.get_gml_from_zip">
+<code class="descname">get_gml_from_zip</code><span class="sig-paren">(</span><em>gml_path</em>, <em>zip_path</em>, <em>group</em>, <em>layername</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/catatom.html#Reader.get_gml_from_zip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#catatom.Reader.get_gml_from_zip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return gml layer from zip if exists and is valid or none</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="catatom.Reader.get_layer_paths">
 <code class="descname">get_layer_paths</code><span class="sig-paren">(</span><em>layername</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/catatom.html#Reader.get_layer_paths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#catatom.Reader.get_layer_paths" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -173,6 +179,12 @@ Precondition: called after read any gml (metadata adquired)</p>
 <dt id="catatom.Reader.get_metadata">
 <code class="descname">get_metadata</code><span class="sig-paren">(</span><em>md_path</em>, <em>zip_path=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/catatom.html#Reader.get_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#catatom.Reader.get_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the metadata of the source file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="catatom.Reader.get_path_from_zip">
+<code class="descname">get_path_from_zip</code><span class="sig-paren">(</span><em>zf</em>, <em>a_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/catatom.html#Reader.get_path_from_zip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#catatom.Reader.get_path_from_zip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return full path in zip of this file name</p>
 </dd></dl>
 
 <dl class="method">
@@ -257,7 +269,7 @@ layer, else returns None</li>
         <li class="right" >
           <a href="modules.html" title="CatAtom2Osm"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">CatAtom2Osm 1.1.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">CatAtom2Osm 1.1.8 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../api.html" >API reference</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="modules.html" >CatAtom2Osm</a> &#187;</li> 
       </ul>

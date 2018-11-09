@@ -1,6 +1,12 @@
 Registro de cambios
 ===================
 
+**09-11-2018 (1.1.8)**
+
+* Resuelve error abriendo los archivos de Catastro más actuales (cuestión #29)
+* Disminuye el tiempo de proceso para generar el archivo zoning.geojson de determinadas provincias (cuestión #26)
+* Corrige errores en la traducción inglesa y unidades de memoria en el informe (por @javirg)
+
 **29-05-2018 (1.1.7)**
 
 * Añade traducción de nombres de calles en Gallego y Catalán.
