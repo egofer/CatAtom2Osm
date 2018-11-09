@@ -42,11 +42,11 @@ Después de la instalación, el programa está disponible para ejecutar desde la
 Mac OS X
 --------
 
-Instalar QGIS desde la página de descarga de KyngChaos 
-http://www.kyngchaos.com/software/qgis
+Instalar QGIS3 desde la página de descarga de QGIS
+http://qgis.org 
 
-Información adicional
-https://www.gislounge.com/installing-qgis-on-the-mac/
+Pero antes instalar la versión indicada allí de Python
+http://python.org
 
 Instalar el programa de escritorio de GitHub desde
 http://desktop.github.com
@@ -59,11 +59,10 @@ https://www.soydemac.com/abrir-terminal-mac/
 
 Ejecutar los comandos::
 
-    cd
-    git clone https://github.com/OSM-es/CatAtom2Osm.git
-    cd CatAtom2Osm
+    cd Documents/GitHub/CatAtom2Osm
     sudo easy_install pip
-    sudo pip install -r requisites.txt
+    sudo pip3 install --update pip
+    sudo pip3 install -r requisites.txt
     sudo make install
 
 Durante la instalación de los requisitos pedirá la instalación de las 
@@ -84,6 +83,19 @@ Se sugiere ejecutar el programa en una carpeta dedicada, por ejemplo
 Notas:
 
 * Ignorar el mensaje "ERROR: Opening of authentication db FAILED"
+* Si al instalar pip con easy_install sale un error relacionado con la versión del protocolo SSL, usar este comando
+
+    curl https://bootstrap.pypa.io/get-pip.py | python
+
+QGIS 2
+++++++
+
+Si se desea instalar QGIS 2 en lugar de 3, los comandos a ejecutar son estos::
+
+    cd Documents/GitHub/CatAtom2Osm
+    sudo easy_install pip
+    sudo pip install -r requisites.txt
+    sudo make install
 
 
 Windows

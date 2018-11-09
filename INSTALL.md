@@ -42,8 +42,11 @@ After this, the program is available to run in the terminal.
 Mac OS X
 --------
 
-Install QGIS from KyngChaos download page 
-http://www.kyngchaos.com/software/qgis
+Install QGIS3 from the QGIS download page
+http://qgis.org
+
+But before install the version of Python stated there:
+http://python.org
 
 Install GitHub desktop utility from
 http://desktop.github.com
@@ -54,8 +57,10 @@ https://github.com/OSM-es/CatAtom2Osm.git
 Open a command line shell and change the directory to the previously
 downloaded CatAtom2Osm folder. Run this commands::
 
+    cd Documents/GitHub/CatAtom2Osm
     sudo easy_install pip
-    sudo pip install -r requisites.txt
+    sudo pip3 install --update pip
+    sudo pip3 install -r requisites.txt
     sudo make install
 
 While you install the requisites you will be prompted to install the command
@@ -76,6 +81,16 @@ It's suggested to run the code in a dedicate folder, for example.
 Notes:
 
 * Ignore the message "ERROR: Opening of authentication db FAILED"
+
+QGIS 2
+++++++
+
+If you want to install QGIS 2 instead of 3, these are the commands to run::
+
+    cd Documents/GitHub/CatAtom2Osm
+    sudo easy_install pip
+    sudo pip install -r requisites.txt
+    sudo make install
 
 
 Windows
