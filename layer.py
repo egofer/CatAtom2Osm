@@ -228,7 +228,8 @@ class BaseLayer(QgsVectorLayer):
 
     @staticmethod
     def create_shp(name, crs, fields=QgsFields(), geom_type=WKBMultiPolygon):
-        writer = QgsVectorFileWriter(name, 'UTF-8', fields, geom_type, crs, 'ESRI Shapefile')
+        writer = QgsVectorFileWriter(name, 'UTF-8', fields, geom_type, crs, 
+            'ESRI Shapefile', layerOptions=['AUTO_REPACxK=xxx', 'SPATIAL_INDEX=xxx'])
         if writer.hasError() != QgsVectorFileWriter.NoError:
             msg = _("Error when creating shapefile: '%s'") % writer.errorMessage()
             raise IOError(msg)

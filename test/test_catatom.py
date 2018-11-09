@@ -113,6 +113,16 @@ class TestCatAtom(unittest.TestCase):
         self.assertEqual(self.m_cat.cat_mun, 'TAZ')
         self.assertEqual(self.m_cat.crs_ref, 32628)
 
+    @mock.patch('catatom.zipfile')
+    def test_get_path_from_zip(self, m_zip):
+        self.m_cat.get_path_from_zip = get_func(catatom.Reader.get_path_from_zip)
+        a_path = os.path.join('foo', 'bar', 'taz')
+        m_zip.namelist.return_value = ['xyz', '123taz', 'abc']
+        full_path = self.m_cat.get_path_from_zip(self.m_cat, m_zip, a_path)
+        self.assertEqual(full_path, '123taz')
+        with self.assertRaises(KeyError) as ke:
+            self.m_cat.get_path_from_zip(self.m_cat, m_zip, 'xxxxx')
+
     @mock.patch('catatom.os')
     @mock.patch('catatom.open')
     @mock.patch('catatom.zipfile')
@@ -120,10 +130,9 @@ class TestCatAtom(unittest.TestCase):
         self.m_cat.get_metadata = get_func(catatom.Reader.get_metadata)
         m_os.path.exists.return_value = False
         m_zip.ZipFile.return_value.read.return_value = metadata
+        self.m_cat.get_path_from_zip.return_value = 'foo'
         self.m_cat.get_metadata(self.m_cat, 'foo', 'bar')
-        m_zip.ZipFile.assert_called_once_with('bar')
-        m_os.path.basename.assert_called_once_with('foo')
-        m_zip.ZipFile().read.assert_called_once_with(m_os.path.basename())
+        m_zip.ZipFile().read.assert_called_once_with('foo')
         self.assertEqual(self.m_cat.src_date, '2017-02-25')
         self.assertEqual(self.m_cat.cat_mun, 'TAZ')
         self.assertEqual(self.m_cat.crs_ref, 32628)
@@ -167,25 +176,23 @@ class TestCatAtom(unittest.TestCase):
         self.m_cat.path = 'foo'
         self.m_cat.zip_code = 'bar'
         ln = random.choice(['building', 'buildingpart', 'otherconstruction'])
-        (md_path, gml_path, zip_path, vsizip_path, g) = self.m_cat.get_layer_paths(self.m_cat, ln)
+        (md_path, gml_path, zip_path, g) = self.m_cat.get_layer_paths(self.m_cat, ln)
         self.assertEqual(g, 'BU')
         self.assertEqual(md_path, 'foo/A.ES.SDGC.BU.MD.bar.xml')
         self.assertEqual(gml_path, 'foo/A.ES.SDGC.BU.bar.' + ln + '.gml')
         self.assertEqual(zip_path, 'foo/A.ES.SDGC.BU.bar.zip')
-        self.assertEqual(vsizip_path, '/vsizip/' + zip_path + '/' + gml_path.split('/')[-1])
         ln = random.choice(['cadastralparcel', 'cadastralzoning'])
-        (md_path, gml_path, zip_path, vsizip_path, g) = self.m_cat.get_layer_paths(self.m_cat, ln)
+        (md_path, gml_path, zip_path, g) = self.m_cat.get_layer_paths(self.m_cat, ln)
         self.assertEqual(g, 'CP')
         self.assertEqual(md_path, 'foo/A.ES.SDGC.CP.MD..bar.xml')
         self.assertEqual(gml_path, 'foo/A.ES.SDGC.CP.bar.' + ln + '.gml')
         self.assertEqual(zip_path, 'foo/A.ES.SDGC.CP.bar.zip')
         ln = random.choice(['address', 'thoroughfarename', 'postaldescriptor', 'adminunitname'])
-        (md_path, gml_path, zip_path, vsizip_path, g) = self.m_cat.get_layer_paths(self.m_cat, ln)
+        (md_path, gml_path, zip_path, g) = self.m_cat.get_layer_paths(self.m_cat, ln)
         self.assertEqual(g, 'AD')
         self.assertEqual(md_path, 'foo/A.ES.SDGC.AD.MD.bar.xml')
         self.assertEqual(gml_path, 'foo/A.ES.SDGC.AD.bar.gml')
         self.assertEqual(zip_path, 'foo/A.ES.SDGC.AD.bar.zip')
-        self.assertEqual(vsizip_path.split('|')[-1], 'layername=' + ln)
 
     @mock.patch('catatom.os')
     @mock.patch('catatom.log')
@@ -193,7 +200,7 @@ class TestCatAtom(unittest.TestCase):
         self.m_cat.download = get_func(catatom.Reader.download)
         g = random.choice(['BU', 'CP', 'AD'])
         url = setup.prov_url[g].format(code='99')
-        self.m_cat.get_layer_paths.return_value = ('1', '2', '3', '4', g)
+        self.m_cat.get_layer_paths.return_value = ('1', '2', '3', g)
         self.m_cat.prov_code = '99'
         self.m_cat.download(self.m_cat, 'foobar')
         self.m_cat.get_layer_paths.assert_called_once_with('foobar')
@@ -206,10 +213,8 @@ class TestCatAtom(unittest.TestCase):
     def test_read(self, m_qgscrs, m_layer, m_log, m_os):
         self.m_cat.read = get_func(catatom.Reader.read)
         g = random.choice(['BU', 'CP', 'AD'])
-        self.m_cat.get_layer_paths.return_value = ('1', '2', '3', '4', g)
+        self.m_cat.get_layer_paths.return_value = ('1', '2', '3', g)
         m_os.path.exists.return_value = True
-        m_layer.BaseLayer.return_value.isValid.return_value = True
-        m_layer.BaseLayer.return_value.crs.return_value.isValid.return_value = False
         m_qgscrs.return_value.isValid.return_value = True
         self.m_cat.is_empty.return_value = False
         self.m_cat.crs_ref = '32628'
@@ -219,7 +224,7 @@ class TestCatAtom(unittest.TestCase):
         self.m_cat.get_layer_paths.assert_called_once_with('foobar')
         self.m_cat.get_atom_file.assert_not_called()
         self.m_cat.get_metadata.assert_called_once_with('1', '3')
-        m_layer.BaseLayer.assert_called_once_with('4', 'foobar.gml', 'ogr')
+        self.m_cat.get_gml_from_zip.assert_called_once_with('2', '3', g, 'foobar')
         m_crs = m_qgscrs.return_value
         gml.setCrs.assert_called_once_with(m_crs)
         self.assertEqual(gml.source_date, 'bar')
@@ -232,7 +237,7 @@ class TestCatAtom(unittest.TestCase):
         output = m_log.info.call_args_list[-1][0][0]
         self.assertIn('empty', output)
         self.assertEqual(gml, None)
-        m_layer.BaseLayer.assert_called_with('4', 'foobar.gml', 'ogr')
+        self.m_cat.get_gml_from_zip.assert_called_once_with('2', '3', g, 'foobar')
 
         m_os.path.exists.side_effect = [False, True]
         with self.assertRaises(IOError) as cm:
@@ -248,24 +253,67 @@ class TestCatAtom(unittest.TestCase):
             self.m_cat.read(self.m_cat, 'foobar')
         self.assertIn('Could not determine the CRS', str(cm.exception))
 
-        m_layer.BaseLayer.return_value.crs.return_value.isValid.return_value = True
         m_layer.BaseLayer.return_value.isValid.return_value = False
+        self.m_cat.get_gml_from_zip.return_value = None
         with self.assertRaises(IOError) as cm:
             self.m_cat.read(self.m_cat, 'foobar')
         self.assertIn('Failed to load', str(cm.exception))
 
-        m_layer.BaseLayer.return_value.isValid.side_effect = [False, True]
+        self.m_cat.get_gml_from_zip.return_value = None
+        m_layer.BaseLayer.return_value.isValid.return_value = True
         m_qgscrs.return_value.isValid.return_value = True
         gml = self.m_cat.read(self.m_cat, 'foobar')
         self.assertEqual(gml, m_layer.BaseLayer.return_value)
 
     def test_is_empty(self):
-        test = get_func(catatom.Reader.is_empty)(None, 'test/empty.gml|foo', 'test/empty.zip')
+        self.m_cat.is_empty = get_func(catatom.Reader.is_empty)
+        self.m_cat.get_path_from_zip.return_value = 'empty.gml'
+        test = self.m_cat.is_empty(self.m_cat, 'test/empty.gml|foo', 'test/empty.zip')
         self.assertTrue(test)
-        test = get_func(catatom.Reader.is_empty)(None, 'test/empty.gml', '')
+        test = self.m_cat.is_empty(self.m_cat, 'test/empty.gml', '')
         self.assertTrue(test)
-        test = get_func(catatom.Reader.is_empty)(None, 'test/building.gml', '')
+        test = self.m_cat.is_empty(self.m_cat, 'test/building.gml', '')
         self.assertFalse(test)
+
+    def test_get_path_from_zip(self):
+        self.m_cat.get_path_from_zip = get_func(catatom.Reader.get_path_from_zip)
+        zf = mock.MagicMock()
+        zf.namelist.return_value = ['xxxfoo', 'yyybar']
+        n = self.m_cat.get_path_from_zip(self.m_cat, zf, 'foo')
+        self.assertEqual(n, 'xxxfoo')
+        n = self.m_cat.get_path_from_zip(self.m_cat, zf, 'bar|xxx')
+        self.assertEqual(n, 'yyybar')
+        with self.assertRaises(KeyError) as cm:
+            n = self.m_cat.get_path_from_zip(self.m_cat, zf, 'taz')
+        self.assertIn('There is no item', str(cm.exception))
+
+    @mock.patch('catatom.zipfile')
+    @mock.patch('catatom.layer')
+    def test_get_gml_from_zip(self, m_layer, m_zip):
+        m_layer.BaseLayer.return_value.isValid.return_value = True
+        zf = mock.MagicMock()
+        m_zip.ZipFile.return_value = zf
+        self.m_cat.get_path_from_zip.return_value = 'bar/gml_path'
+        self.m_cat.get_gml_from_zip = get_func(catatom.Reader.get_gml_from_zip)
+        gml = self.m_cat.get_gml_from_zip(self.m_cat, 'gml_path', 'foo\zip_path', 
+            'group', 'ln')
+        m_zip.ZipFile.assert_called_once_with('foo\zip_path')
+        self.m_cat.get_path_from_zip.assert_called_once_with(zf, 'gml_path')
+        self.assertEqual(gml, m_layer.BaseLayer.return_value)
+        vsizip_path = '/vsizip/foo/zip_path/bar/gml_path'
+        m_layer.BaseLayer.assert_called_once_with(vsizip_path, 'ln.gml', 'ogr')
+        
+    @mock.patch('catatom.zipfile')
+    @mock.patch('catatom.layer')
+    def test_get_gml_from_zip_ifs(self, m_layer, m_zip):
+        m_layer.BaseLayer.return_value.isValid.return_value = False
+        self.m_cat.get_path_from_zip.return_value = 'bar/gml_path'
+        self.m_cat.get_gml_from_zip = get_func(catatom.Reader.get_gml_from_zip)
+        gml = self.m_cat.get_gml_from_zip(self.m_cat, 'gml_path', 'foo\zip_path',
+            'AD', 'ln')
+        self.assertEqual(gml, None)
+        vsizip_path = '/vsizip/foo/zip_path/bar/gml_path|layername=ln'
+        m_layer.BaseLayer.assert_called_once_with(vsizip_path, 'ln.gml', 'ogr')
 
     @mock.patch('catatom.log.warning')
     @mock.patch('catatom.overpass')
