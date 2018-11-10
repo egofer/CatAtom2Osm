@@ -1064,9 +1064,10 @@ class ZoningLayer(PolygonLayer):
                         to_add.append(f)
                         final += 1
                     multi += 1
-                else:
+                    total += 1
+                elif len(mp) == 1:
                     to_add.append(feat)
-                total += 1
+                    total += 1
             if len(to_add) > BUFFER_SIZE:
                 self.writer.addFeatures(to_add)
                 to_add = []
