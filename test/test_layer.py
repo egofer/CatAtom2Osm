@@ -253,6 +253,18 @@ class TestBaseLayer(unittest.TestCase):
         layer.append(self.fixture, query=declined_filter)
         self.assertEqual(layer.featureCount(), 0)
 
+    @mock.patch('layer.tqdm')
+    @mock.patch('layer.Geometry')
+    def test_append_void_geometry(self, m_geom, m_tqdm):
+        m_geom.get_multipolygon.return_value = []
+        m_layer = mock.MagicMock()
+        m_layer.getFeatures.return_value = [mock.MagicMock()]
+        tl = mock.MagicMock()
+        f = BaseLayer.append
+        tl.append = getattr(f, '__func__', f)
+        tl.append(tl, m_layer)
+        self.assertFalse(tl.writer.addFeatures.called)
+
     def test_add_delete(self):
         feat = QgsFeature(self.layer.fields())
         feat['A'] = 'foobar'
