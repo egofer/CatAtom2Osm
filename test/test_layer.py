@@ -522,6 +522,8 @@ class TestZoningLayer(unittest.TestCase):
         self.assertTrue(self.layer2.isValid(), "Init QGIS")
         self.layer1.append(self.fixture, 'M')
         self.layer2.append(self.fixture, 'P')
+        
+    def test_append(self):
         self.assertGreater(self.layer1.featureCount() + self.layer2.featureCount(),
             self.fixture.featureCount())
         for f in self.layer1.getFeatures():
@@ -530,6 +532,18 @@ class TestZoningLayer(unittest.TestCase):
         for f in self.layer2.getFeatures():
             self.assertEqual(f['levelName'][3], 'P')
             self.assertFalse(len(Geometry.get_multipolygon(f)) > 1)
+
+    @mock.patch('layer.tqdm')
+    @mock.patch('layer.Geometry')
+    def test_append_void_geometry(self, m_geom, m_tqdm):
+        m_geom.get_multipolygon.return_value = []
+        m_layer = mock.MagicMock()
+        m_layer.getFeatures.return_value = [mock.MagicMock()]
+        zoning = mock.MagicMock()
+        f = ZoningLayer.append
+        zoning.append = getattr(f, '__func__', f)
+        zoning.append(zoning, m_layer, level=None)
+        self.assertFalse(zoning.writer.addFeatures.called)
 
     def tearDown(self):
         del self.layer1
