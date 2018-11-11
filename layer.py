@@ -327,15 +327,15 @@ class BaseLayer(QgsVectorLayer):
         pbar = self.get_progressbar(_("Append"), layer.featureCount())
         for feature in layer.getFeatures():
             geom = feature.geometry()
-            mp = Geometry.get_multipolygon(geom)
-            if len(mp) >= 1:
-                if not query or query(feature, kwargs):
+            if not query or query(feature, kwargs):
+                if geom.wkbType() == WKBPoint or \
+                        len(Geometry.get_multipolygon(geom)) >= 1:
                     to_add.append(self.copy_feature(feature, rename, resolve))
                     total += 1
-                if len(to_add) > BUFFER_SIZE:
-                    self.writer.addFeatures(to_add)
-                    to_add = []
-                pbar.update()
+            if len(to_add) > BUFFER_SIZE:
+                self.writer.addFeatures(to_add)
+                to_add = []
+            pbar.update()
         pbar.close()
         if len(to_add) > 0:
             self.writer.addFeatures(to_add)

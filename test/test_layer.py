@@ -258,12 +258,17 @@ class TestBaseLayer(unittest.TestCase):
     def test_append_void_geometry(self, m_geom, m_tqdm):
         m_geom.get_multipolygon.return_value = []
         m_layer = mock.MagicMock()
-        m_layer.getFeatures.return_value = [mock.MagicMock()]
+        feat = mock.MagicMock()
+        m_layer.getFeatures.return_value = [feat]
         tl = mock.MagicMock()
         f = BaseLayer.append
         tl.append = getattr(f, '__func__', f)
         tl.append(tl, m_layer)
         self.assertFalse(tl.writer.addFeatures.called)
+        feat.geometry.return_value.wkbType.assert_called_once_with()
+        feat.geometry.return_value.wkbType.return_value = WKBPoint
+        tl.append(tl, m_layer)
+        self.assertTrue(tl.writer.addFeatures.called)
 
     def test_add_delete(self):
         feat = QgsFeature(self.layer.fields())
