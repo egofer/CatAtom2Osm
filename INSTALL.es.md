@@ -1,8 +1,6 @@
-Instalación
-===========
+# Instalación
 
-Linux
------
+## Linux
 
 Instalar QGIS siguiendo las instrucciones de https://qgis.org
 
@@ -39,8 +37,7 @@ Después de la instalación, el programa está disponible para ejecutar desde la
     catatom2osm
 
 
-Mac OS X
---------
+## Mac OS X
 
 Instalar QGIS3 desde la página de descarga de QGIS
 http://qgis.org 
@@ -87,8 +84,7 @@ Notas:
 
     curl https://bootstrap.pypa.io/get-pip.py | python
 
-QGIS 2
-++++++
+### QGIS 2
 
 Si se desea instalar QGIS 2 en lugar de 3, los comandos a ejecutar son estos::
 
@@ -98,8 +94,7 @@ Si se desea instalar QGIS 2 en lugar de 3, los comandos a ejecutar son estos::
     sudo make install
 
 
-Windows
--------
+## Windows
 
 Instalar QGIS usando el instalador OSGeo4W en red (64 bits/ 32 bits) desde la
 página de descarga de http://qgis.org
@@ -139,8 +134,7 @@ Notas:
 * Si durante la ejecución del programa aparecen mensajes de error similares a "Failed to create file building_packed.shp: Permission denied", ejecutar en un directorio con nombre sencillo (sin caracteres espaciales) colgando del directorio raíz, por ejemplo: C:\Catastro
 
 
-QGIS 2
-++++++
+### QGIS 2
 
 Si se desea instalar QGIS 2 en lugar de 3, seleccionar estos paquetes::
 
@@ -155,8 +149,7 @@ En lugar de Instalar Microsoft Visual C++ 14.0 Build Tools, instalar Microsoft V
 Abrir la consola con el entorno de Python QGIS usando el archivo pyqgis.bat.
 
 
-Entorno de pruebas
-------------------
+## Entorno de pruebas
 
 Opcionalmente, se puede instalar el entorno de pruebas para contribuir en el desarrollo del programa.
 En Linux y Macos::
