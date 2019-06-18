@@ -44,7 +44,8 @@ class Reader(object):
     def get_metadata(self, md_path, zip_path=""):
         """Get the metadata of the source file"""
         if os.path.exists(md_path):
-            text = open(md_path, 'rb').read()
+            with open(md_path, 'rb') as f:
+                text = f.read()
         else:
             try:
                 zf = zipfile.ZipFile(zip_path)
