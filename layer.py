@@ -214,6 +214,10 @@ class Geometry(object):
             geom = geom.combine(p.geometry())
         return geom
 
+    @staticmethod
+    def is_valid(geom):
+        return geom.isGeosValid() and len(geom.asMultiPolygon()) > 0
+
 
 class BaseLayer(QgsVectorLayer):
     """Base class for application layers"""
@@ -701,7 +705,7 @@ class PolygonLayer(BaseLayer):
                             if dist_a < dup_thr**2:
                                 g.deleteVertex(ndxa)
                                 note = "dupe refused by isGeosValid"
-                                if g.isGeosValid():
+                                if Geometry.is_valid(g):
                                     note = "Merge dup. %.10f %.5f,%.5f->%.5f,%.5f" % \
                                         (dist_a, va.x(), va.y(), point.x(), point.y())
                                     nodes.add(p)
@@ -710,7 +714,7 @@ class PolygonLayer(BaseLayer):
                             if dist_b < dup_thr**2:
                                 g.deleteVertex(ndxb)
                                 note = "dupe refused by isGeosValid"
-                                if g.isGeosValid():
+                                if Geometry.is_valid(g):
                                     note = "Merge dup. %.10f %.5f,%.5f->%.5f,%.5f" % \
                                         (dist_b, vb.x(), vb.y(), point.x(), point.y())
                                     nodes.add(p)
@@ -719,7 +723,7 @@ class PolygonLayer(BaseLayer):
                         elif dist_v < dup_thr**2:
                             g.moveVertex(point.x(), point.y(), ndx)
                             note = "dupe refused by isGeosValid"
-                            if g.isGeosValid():
+                            if Geometry.is_valid(g):
                                 note = "Merge dup. %.10f %.5f,%.5f->%.5f,%.5f" % \
                                     (dist_v, p.x(), p.y(), point.x(), point.y())
                                 nodes.add(p)
@@ -733,7 +737,7 @@ class PolygonLayer(BaseLayer):
                                 note = "Topo refused by insertVertex"
                                 if g.insertVertex(point.x(), point.y(), vertex):
                                     note = "Topo refused by isGeosValid"
-                                    if g.isGeosValid():
+                                    if Geometry.is_valid(g):
                                         note = "Add topo %.6f %.5f,%.5f" % \
                                             (dist_s, point.x(), point.y())
                                         tp += 1
@@ -924,7 +928,7 @@ class PolygonLayer(BaseLayer):
                     invalid_ring = (v == va or v == vb or va == vb)
                     g.deleteVertex(ndx)
                     msg = "Refused"
-                    if g.isGeosValid() and not invalid_ring:
+                    if Geometry.is_valid(g) and not invalid_ring:
                         parents.remove(fid)
                         geometries[fid] = g
                         to_change[fid] = g
@@ -1499,7 +1503,7 @@ class ConsLayer(PolygonLayer):
                         if del_part:
                             to_clean.append(part.id())
                             it_parts.remove(part)
-                            if part in part in parts[ref]:
+                            if part in parts[ref]:
                                 parts[ref].remove(part)
                             adjacent_parts_deleted += 1
                         elif new_geom:
@@ -1756,4 +1760,3 @@ class DebugWriter(QgsVectorFileWriter):
         if note:
             feat.setAttribute("note", note[:254])
         return self.addFeature(feat)
-
