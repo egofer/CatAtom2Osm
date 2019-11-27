@@ -299,7 +299,7 @@ class BaseLayer(QgsVectorLayer):
                     dst_ft[dst_attr] = match.group(0)
             else:
                 src_attr = dst_attr
-                if dst_attr in rename:
+                if dst_attr in rename and rename[dst_attr] in src_attrs:
                     src_attr = rename[dst_attr]
                 if src_attr in src_attrs:
                     dst_ft[dst_attr] = feature[src_attr]
@@ -1032,7 +1032,10 @@ class ZoningLayer(PolygonLayer):
                 QgsField('zipcode', QVariant.String, len=5),
             ])
             self.updateFields()
-        self.rename = {'localId': 'inspireId_localId'}
+        self.rename = {
+            'localId': 'inspireId_localId',
+            'levelName': 'LocalisedCharacterString',
+        }
         self.source_date = source_date
         self.task_number = 0
         self.task_pattern = pattern
