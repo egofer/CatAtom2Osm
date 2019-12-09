@@ -1,6 +1,10 @@
 Change log
 ==========
 
+**2019-12-09 (1.1.9)**
+
+* Fix error tras actualización de archivos GML de Catastro #47
+
 **2018-11-09 (1.1.8)**
 
 * Resolves error opening the most current Cadastre files (issue #29)

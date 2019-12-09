@@ -1,6 +1,10 @@
 Registro de cambios
 ===================
 
+**09-12-2019 (1.1.9)**
+
+* Resuelve error tras actualización de archivos GML de Catastro #47
+
 **09-11-2018 (1.1.8)**
 
 * Resuelve error abriendo los archivos de Catastro más actuales (cuestión #29)
