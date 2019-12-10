@@ -556,6 +556,7 @@ class TestZoningLayer(unittest.TestCase):
         m_geom.get_multipolygon.return_value = []
         m_layer = mock.MagicMock()
         m_layer.getFeatures.return_value = [mock.MagicMock()]
+        m_layer.dataProvider.return_value.fieldNameIndex.return_value = 1
         zoning = mock.MagicMock()
         f = ZoningLayer.append
         zoning.append = getattr(f, '__func__', f)
