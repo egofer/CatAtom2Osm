@@ -506,8 +506,8 @@ class TestPolygonLayer(unittest.TestCase):
         f1 = next(layer1.getFeatures(request))
         request = QgsFeatureRequest().setFilterFid(2)
         f2 = next(layer1.getFeatures(request))
-        self.assertTrue(f1.geometry().equals(r1))
-        self.assertTrue(f2.geometry().equals(r2))
+        self.assertEqual(f1.geometry().difference(r1).area(), 0)
+        self.assertEqual(f2.geometry().difference(r2).area(), 0)
 
 
 class TestParcelLayer(unittest.TestCase):
