@@ -216,7 +216,7 @@ class Geometry(object):
 
     @staticmethod
     def is_valid(geom):
-        return geom.isGeosValid() and len(geom.asMultiPolygon()) > 0
+        return geom.isGeosValid() and len(Geometry.get_multipolygon(geom)) > 0
 
 
 class BaseLayer(QgsVectorLayer):
