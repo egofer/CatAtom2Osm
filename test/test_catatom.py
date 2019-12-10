@@ -106,7 +106,7 @@ class TestCatAtom(unittest.TestCase):
     def test_get_metadata_from_xml(self, m_open, m_os):
         self.m_cat.get_metadata = get_func(catatom.Reader.get_metadata)
         m_os.path.exists.return_value = True
-        m_open.return_value.read.return_value = metadata
+        m_open.return_value.__enter__.return_value.read.return_value = metadata
         self.m_cat.get_metadata(self.m_cat, 'foo')
         m_open.assert_called_once_with('foo', 'rb')
         self.assertEqual(self.m_cat.src_date, '2017-02-25')
