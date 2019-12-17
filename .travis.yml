@@ -9,9 +9,9 @@ addons:
       - pass
 
 script:
-  - docker build -t $DOCKER_USERNAME/CatAtom2Osm:test --build-arg REQUISITES=requisites-dev.txt .
-  - docker run --rm -u root $DOCKER_USERNAME/CatAtom2Osm:test /bin/bash -c "cd /opt/CatAtom2Osm && python -m unittest discover"
-  - docker build -t $DOCKER_USERNAME/CatAtom2Osm:latest .
+  - docker build -t $DOCKER_USERNAME/catatom2osm:test --build-arg REQUISITES=requisites-dev.txt .
+  - docker run --rm -u root $DOCKER_USERNAME/catatom2osm:test /bin/bash -c "cd /opt/CatAtom2Osm && python -m unittest discover"
+  - docker build -t $DOCKER_USERNAME/catatom2osm:latest .
 
 deploy:
   provider: script
