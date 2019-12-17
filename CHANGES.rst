@@ -1,7 +1,11 @@
 Change log
 ==========
 
-**2019-12-16 (1.1.10)**
+**2019-12-17 (1.1.11)**
+* Deploy only to tagged releases
+* Fix docker repository name
+
+**2019-12-17 (1.1.10)**
 
 * Add docker container and Travis CI
 

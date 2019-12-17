@@ -1,7 +1,11 @@
 Registro de cambios
 ===================
 
-**16-12-2019 (1.1.10)**
+**17-12-2019 (1.1.11)**
+* Despliega sólo a versiones etiquetadas
+* Corrige el nombre del repositorio Docker
+
+**17-12-2019 (1.1.10)**
 
 * Añade contenedor docker e integración contínua con travis
 
