@@ -1,6 +1,9 @@
 Change log
 ==========
 
+**2019-12-17 (1.1.12)**
+* Fix docker push script name
+
 **2019-12-17 (1.1.11)**
 * Deploy only to tagged releases
 * Fix docker repository name
