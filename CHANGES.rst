@@ -1,6 +1,10 @@
 Change log
 ==========
 
+**2019-12-16 (1.1.10)**
+
+* Add docker container and Travis CI
+
 **2019-12-09 (1.1.9)**
 
 * Fix error tras actualización de archivos GML de Catastro #47

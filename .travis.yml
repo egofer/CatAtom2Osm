@@ -1,0 +1,20 @@
+os: linux
+language: minimal
+service: docker
+install: skip
+
+addons:
+  apt:
+    packages:
+      - pass
+
+script:
+  - docker build -t $DOCKER_USERNAME/CatAtom2Osm:test --build-arg REQUISITES=requisites-dev.txt .
+  - docker run --rm -u root $DOCKER_USERNAME/CatAtom2Osm:test /bin/bash -c "cd /opt/CatAtom2Osm && python -m unittest discover"
+  - docker build -t $DOCKER_USERNAME/CatAtom2Osm:latest .
+
+deploy:
+  provider: script
+  script: bash docker_push
+  on:
+    branch: master

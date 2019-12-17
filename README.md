@@ -5,11 +5,6 @@ Tool to convert INSPIRE data sets from the Spanish Cadastre ATOM Services (http:
 
 https://wiki.openstreetmap.org/wiki/Spanish_Cadastre/Buildings_Import
 
-Warning
--------
-
-Only for testing purposses. Don't upload any result to OSM.
-
 Requeriments
 ------------
 
@@ -28,7 +23,9 @@ QGIS >= 2.10.1, GDAL >= 2 are required.
 Install
 -------
 
-See INSTALL.md (https://OSM-es.github.io/CatAtom2Osm/en/install.html)
+See INSTALL.md (https://OSM-es.github.io/CatAtom2Osm/en/install.html).
+Alternatively, you could use this Docker image 
+(https://hub.docker.com/r/egofer/catatom2osm).
 
 Usage
 -----

@@ -7,11 +7,6 @@ a archivos OSM. Esto es parte de una propuesta de importación en construcción:
 
 https://wiki.openstreetmap.org/wiki/ES:Catastro_espa%C3%B1ol/Importaci%C3%B3n_de_edificios
 
-Advertencia
------------
-
-Sólo para fines de prueba. No subas ningún resultado en OSM.
-
 Requisitos
 ----------
 
@@ -31,6 +26,8 @@ Instalación
 -----------
 
 Ver INSTALL.es.md (https://OSM-es.github.io/CatAtom2Osm/es/install.html)
+Alternativamente, se puede usar esta imagen de Docker 
+(https://hub.docker.com/r/egofer/catatom2osm).
 
 Uso
 ---
