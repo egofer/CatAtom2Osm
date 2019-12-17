@@ -27,5 +27,5 @@ VERSION=$(grep app_version setup.py | cut -d"=" -f2 | tr -d " \"'")
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 docker push "$DOCKER_USERNAME"/catatom2osm:latest
-docker tag "$DOCKER_USERNAME"/catatom2osm:latest "$DOCKER_USERNAME"/prueba:"$VERSION"
+docker tag "$DOCKER_USERNAME"/catatom2osm:latest "$DOCKER_USERNAME"/catatom2osm:"$VERSION"
 docker push "$DOCKER_USERNAME"/catatom2osm:"$VERSION"

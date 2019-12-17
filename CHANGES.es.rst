@@ -1,7 +1,10 @@
 Registro de cambios
 ===================
 
-**17-12-2019 (1.1.11)**
+**17-12-2019 (1.1.13)**
+* Corrige el nombre del repositorio Docker
+
+**17-12-2019 (1.1.12)**
 * Corrige el nombre del script de depliegue en docker
 
 **17-12-2019 (1.1.11)**
