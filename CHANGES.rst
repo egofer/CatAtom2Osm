@@ -1,6 +1,9 @@
 Change log
 ==========
 
+**2019-12-18 (1.1.14)**
+* Set docker app path owner
+
 **2019-12-17 (1.1.13)**
 * Fix docker repository name
 

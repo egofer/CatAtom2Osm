@@ -1,6 +1,9 @@
 Registro de cambios
 ===================
 
+**18-12-2019 (1.1.14)**
+* Asigna el dueño de la carpeta de la aplicación en docker
+
 **17-12-2019 (1.1.13)**
 * Corrige el nombre del repositorio Docker
 
@@ -12,7 +15,6 @@ Registro de cambios
 * Corrige el nombre del repositorio Docker
 
 **17-12-2019 (1.1.10)**
-
 * Añade contenedor docker e integración contínua con travis
 
 **09-12-2019 (1.1.9)**

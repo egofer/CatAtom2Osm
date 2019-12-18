@@ -10,6 +10,7 @@ ARG gid=1000
 ARG home=/catastro
 
 # System deps
+ENV APP_PATH=/opt/CatAtom2Osm
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y \
   && apt-get upgrade -y \
@@ -27,13 +28,14 @@ RUN mkdir -p "/tmp/runtime-$user" && chown $uid:$gid "/tmp/runtime-$user"
 ENV XDG_RUNTIME_DIR="/tmp/runtime-$user"
 
 # Copy only requirements to cache them in docker layer
-WORKDIR /opt/CatAtom2Osm
+WORKDIR $APP_PATH
 COPY $REQUISITES ./
 RUN pip install -r $REQUISITES
 
 # Install app
 COPY . .
 RUN make install
+RUN chown -R $user:$group $APP_PATH
 
 USER $user
 WORKDIR $home
