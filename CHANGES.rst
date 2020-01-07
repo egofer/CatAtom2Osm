@@ -1,6 +1,9 @@
 Change log
 ==========
 
+**2020-01-07 (1.2)**
+* Qgis 3.x compatible version
+
 **2019-12-18 (1.1.14)**
 * Set docker app path owner
 

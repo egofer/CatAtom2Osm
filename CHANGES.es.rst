@@ -1,6 +1,9 @@
 Registro de cambios
 ===================
 
+**07-01-2020 (1.2)**
+* Versión compatible con Qgis 3.x
+
 **18-12-2019 (1.1.14)**
 * Asigna el dueño de la carpeta de la aplicación en docker
 
