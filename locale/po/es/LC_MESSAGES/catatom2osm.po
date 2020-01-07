@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: CatAtom2Osm\n"
-"POT-Creation-Date: 2020-01-07 10:26+WET\n"
+"POT-Creation-Date: 2020-01-07 12:11+WET\n"
 "PO-Revision-Date: 2017-05-28 19:23+WEST\n"
 "Last-Translator: Javier Sánchez <javiersanp@gmail.com>\n"
 "Language: es\n"
@@ -164,22 +164,6 @@ msgstr "Reemplazadas %d direcciones de '%s'"
 #: cdau.py:198
 msgid "Added %d addresses from '%s'"
 msgstr "Añadidas %d direcciones de '%s'"
-
-#: compat.py:14
-msgid "Running with lxml.etree"
-msgstr "Usando lxml.etree"
-
-#: compat.py:18 compat.py:26
-msgid "Running with ElementTree"
-msgstr "Usando ElementTree"
-
-#: compat.py:22
-msgid "Running with cElementTree"
-msgstr "Usando cElementTree"
-
-#: compat.py:28
-msgid "Failed to import ElementTree from any known place"
-msgstr "No se pudo importar ElementTree desde ningún lugar conocido"
 
 #: csvtools.py:33
 msgid "Failed to load CSV file '%s'"
