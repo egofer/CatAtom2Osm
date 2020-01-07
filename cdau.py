@@ -1,9 +1,10 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """Reader of CDAU CSV files"""
+from __future__ import unicode_literals
+from builtins import object, range, str
 
 import logging
 import locale
-locale.setlocale(locale.LC_TIME, ('es', 'UTF-8'))
 import os
 import re
 from collections import defaultdict
@@ -11,12 +12,13 @@ from datetime import datetime
 
 from qgis.core import *
 
+import compat
 import download
 import layer
 import setup
 from report import instance as report
-
-log = logging.getLogger(setup.app_name + "." + __name__)
+log = setup.log
+compat.set_es_time()
 
 
 andalucia = {'04': 'Almeria', '11': 'Cadiz', '14': 'Cordova', '18': 'Granada',
@@ -57,7 +59,7 @@ def cod_mun_cat2ine(cod_mun_cat):
     cod_prov = cod_mun_cat[0:2]
     cod_mun = int(cod_mun_cat[2:])
     if cod_prov == '18':
-        if cod_mun in cod_mun_trans[cod_prov].keys():
+        if cod_mun in list(cod_mun_trans[cod_prov].keys()):
             cod_mun = cod_mun_trans[cod_prov][cod_mun]
         else:
             if cod_mun in range(64, 120) or cod_mun in range(137, 143):
@@ -81,11 +83,11 @@ def get_cat_address(ad, cod_mun_cat):
     attr['localId'] = '{}.{}.{}.{}'.format(cod_mun_cat[:2], cod_mun_cat[2:], 
         ad['dgc_via'], ad['refcatparc'])
     nom_tip_via = highway_types_equiv.get(ad['nom_tip_via'], ad['nom_tip_via'])
-    attr['TN_text'] = u'{} {}'.format(nom_tip_via, ad['nom_via'])
+    attr['TN_text'] = "{} {}".format(str(nom_tip_via), str(ad['nom_via']))
     attr['postCode'] = ad['cod_postal']
     attr['spec'] = 'Entrance'
-    to = ad['num_por_hasta'] + ad['ext_hasta']
-    attr['designator'] = ad['num_por_desde'] + ad['ext_desde']
+    to = '{}{}'.format(ad['num_por_hasta'] or '', ad['ext_hasta'] or '')
+    attr['designator'] = '{}{}'.format(ad['num_por_desde'] or '', ad['ext_desde'] or '')
     if to:
         attr['designator'] += '-' + to
     return attr
@@ -109,10 +111,11 @@ class Reader(object):
 
     def get_metadata(self, md_path):
         if os.path.exists(md_path):
-            self.src_date = open(md_path, 'r').read()
+            with open(md_path, 'r') as fo:
+                self.src_date = fo.read()
         else:
             response = download.get_response(meta_url)
-            s = re.search('fecha de referencia.*([0-9]{1,2} de .+ de [0-9]{4})', response.text)
+            s = re.search(r'fecha de referencia.*([0-9]{1,2} de .+ de [0-9]{4})', response.text)
             try:
                 self.src_date = datetime.strptime(s.group(1), '%d de %B de %Y').strftime('%Y-%m-%d')
             except:
@@ -121,7 +124,7 @@ class Reader(object):
                 fo.write(self.src_date)
 
     def read(self, prov_code):
-        if prov_code not in andalucia.keys():
+        if prov_code not in list(andalucia.keys()):
             raise ValueError(_("Province code '%s' not valid") % prov_code)
         csv_fn = csv_name.format(andalucia[prov_code])
         csv_path = os.path.join(self.path, csv_fn)
@@ -158,17 +161,15 @@ def conflate(cdau_address, cat_address, cod_mun_cat):
         c += 1
         attr = get_cat_address(ad, cod_mun_cat)
         ref = attr['localId']
-        pt = QgsPoint()
-        pt.setX(float(ad['x']))
-        pt.setY(float(ad['y']))
+        pt = layer.Point(float(ad['x']), float(ad['y']))
         if len(addresses[ref]) == 0: # can't resolve cadastral reference
             area_of_candidates = layer.Point(pt).boundingBox(cdau_thr)
             fids = index.intersects(area_of_candidates)
             if len(fids) == 0: # no close cadastre address
                 feat = QgsFeature(cat_address.fields())
-                for key, value in attr.items():
+                for key, value in list(attr.items()):
                     feat[key] = value
-                feat.setGeometry(QgsGeometry.fromPoint(pt))
+                feat.setGeometry(layer.Geometry.fromPointXY(pt))
                 to_add.append(feat) # add new
         else: # get nearest
             min_dist = 100
@@ -179,8 +180,8 @@ def conflate(cdau_address, cat_address, cod_mun_cat):
                    min_dist = dist
                    candidate = feat
             if candidate is not None: # update existing
-                to_change_g[candidate.id()] = QgsGeometry.fromPoint(pt)
-                for key, value in attr.items():
+                to_change_g[candidate.id()] = layer.Geometry.fromPointXY(pt)
+                for key, value in list(attr.items()):
                     candidate[key] = value
                 to_change[candidate.id()] = layer.get_attributes(candidate)
     log.info(_("Parsed %d addresses from '%s'"), c, 'CDAU')

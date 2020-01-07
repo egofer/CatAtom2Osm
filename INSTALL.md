@@ -1,12 +1,29 @@
-Install
-=======
+# Install
 
-Linux
------
+## Linux
 
-In a command line shell write:: 
+Install QGIS with the instructions in https://qgis.org
 
-    sudo apt install qgis git python-pip python-dev
+This is a summary of the commands to install QGIS 2.18.24 in Debian Jessie::
+
+    su
+    echo 'deb     https://qgis.org/debian-ltr jessie main' > /etc/apt/sources.list.d/qgis.list
+    echo 'deb-src https://qgis.org/debian-ltr jessie main' >> /etc/apt/sources.list.d/qgis.list
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-key CAEB3DC3BDF7FB45
+    apt update
+    apt install qgis
+
+This to install QGIS 3.2.3 in Ubuntu bionic::
+
+    sudo echo 'deb     https://qgis.org/ubuntu bionic main' > /etc/apt/sources.list.d/qgis.list
+    sudo echo 'deb-src https://qgis.org/ubuntu bionic main' >> /etc/apt/sources.list.d/qgis.list
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key CAEB3DC3BDF7FB45
+    sudo apt update
+    sudo apt install qgis
+
+Clone the repository running::
+
+    sudo apt install git python-pip python-dev
     cd ~
     mkdir cadastre
     cd cadastre
@@ -19,31 +36,14 @@ After this, the program is available to run in the terminal.
 
     catatom2osm
 
-It's suggested to run the code in a dedicate folder, for example.
 
-    cd
-    mkdir catastro
-    cd catastro
+## Mac OS X
 
-Notes:
+Install QGIS3 from the QGIS download page
+http://qgis.org
 
-In Debian Jessie when you run "catatom2osm" you will get this error:
->2017-12-08 15:08:12,559 - ERROR - Required QGIS version 2.10.1 or greater
-
-An updated version of QGIS is required, you should run::
-
-    su
-    echo 'deb     http://qgis.org/debian jessie main' > /etc/apt/sources.list.d/qgis.list
-    echo 'deb-src http://qgis.org/debian jessie main' >> /etc/apt/sources.list.d/qgis.list
-    apt update
-    apt install qgis
-
-
-Mac OS X
---------
-
-Install QGIS from KyngChaos download page 
-http://www.kyngchaos.com/software/qgis
+But before install the version of Python stated there:
+http://python.org
 
 Install GitHub desktop utility from
 http://desktop.github.com
@@ -54,8 +54,10 @@ https://github.com/OSM-es/CatAtom2Osm.git
 Open a command line shell and change the directory to the previously
 downloaded CatAtom2Osm folder. Run this commands::
 
+    cd Documents/GitHub/CatAtom2Osm
     sudo easy_install pip
-    sudo pip install -r requisites.txt
+    sudo pip3 install --update pip
+    sudo pip3 install -r requisites.txt
     sudo make install
 
 While you install the requisites you will be prompted to install the command
@@ -77,53 +79,75 @@ Notes:
 
 * Ignore the message "ERROR: Opening of authentication db FAILED"
 
+### QGIS 2
 
-Windows
--------
+If you want to install QGIS 2 instead of 3, these are the commands to run::
+
+    cd Documents/GitHub/CatAtom2Osm
+    sudo easy_install pip
+    sudo pip install -r requisites.txt
+    sudo make install
+
+
+## Windows
 
 Install QGIS using the OSGeo4W Network Installer (64 bits/ 32 bits) from
 http://qgis.org download page.
 
-* Run the installe and choose the Advanced Install option.
+* Run the installer and choose the Advanced Install option.
 * Install from Internet
-* Enter the directory for the install C:\OSGeo4W
 * Accept the default options
 * From the Select packages screen select:
 
   * Desktop -> qgis: QGIS Desktop
   * Libs -> msvcrt 2008
-  * Libs -> python-devel
-  * Libs -> python-pip
-  * Libs -> setuptools
+  * Libs -> python3-devel
+  * Libs -> python3-pip
+  * Libs -> python3-setuptools
 
 * Accept the list of unmet dependencies
 
-Install Microsoft Visual C++ Compiler for Python 2.7 from 
-http://aka.ms/vcpython27
-
-Download the package python-levenshtein in the unofficial library of 
-Christoph Gohlke from http://www.lfd.uci.edu/~gohlke/Pythonlibs/
+Install Microsoft Visual C++ 14.0 Build Tools following the instructions in 
+https://www.scivision.co/python-windows-visual-c++-14-required/
 
 Install the GitHub desktop utility from desktop.github.com
 
 Run it and download the repository https://github.com/OSM-es/CatAtom2Osm.git
 
-In the previously downloaded CatAtom2Osm folder launch the file pyqgis.bat. 
+In the previously downloaded CatAtom2Osm folder launch the file pyqgis3.bat. 
 Write this in the resulting shell::
 
     python -m pip install -r requisites.txt
-    python -m pip install path to downloaded/python_Levenshtein‑0.12.0‑cp27‑cp27m‑win_amd64.whl
 
-To use the program it will be necessary to run pyqgis.bat to open a convenient 
-Python QGIS shell. It's suggested to edit pyqgis.bat, uncomment the penultimate
+To use the program it will be necessary to run pyqgis3.bat to open a convenient 
+Python QGIS shell. It's suggested to edit pyqgis3.bat, uncomment the penultimate
 line with the CD command and enter the path of the folder where you want to 
 download the Cadastre files. For example::
 
     cd c:\Users\YourName\Documents\cadastre
 
+Notes:
 
-Development requeriments
-------------------------
+* If the QGIS install aborts with this error "the code execution cannot proceed because zip.dll was not found", the only solution found is to use the 32 bits OSGeo4W installer instead of 64 bits.
+* If during excecution you get error messages similar to "Failed to create file building_packed.shp: Permission denied", run from a simple folder (without special characters) hanging from the root, like: C:\Catastro
+
+
+### QGIS 2
+
+If you want to install QGIS 2 instead of 3, select these packages::
+
+  * Desktop -> qgis-ltr: QGIS Desktop
+  * Libs -> msvcrt 2008
+  * Libs -> python-devel
+  * Libs -> python-pip
+  * Libs -> setuptools
+
+Instead of Microsoft Visual C++ 14.0 Build Tools, install Microsoft Visual C++ Compiler for Python 2.7 from http://aka.ms/vcpython27
+
+Open the the terminal with Python QGIS environment using the file pyqgis.bat.
+
+
+## Development requeriments
 
 Optionally, if you want to contribute to the program, install the development requeriments. In Linux and Macos:
 

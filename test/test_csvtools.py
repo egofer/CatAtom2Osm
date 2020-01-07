@@ -1,9 +1,11 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+from builtins import str
 import unittest
 from tempfile import mkstemp
 
 import csv
-import codecs
+import io
 import os
 os.environ['LANGUAGE'] = 'C'
 
@@ -15,31 +17,35 @@ class TestCsvTools(unittest.TestCase):
 
     def test_csv2dict(self):
         _, tmp_path = mkstemp()
-        with codecs.open(tmp_path, 'w', encoding) as csv_file:
-            csv_file.write(u'á%sx%sé%sy%s' % (delimiter, eol, delimiter, eol))
+        with io.open(tmp_path, 'w', encoding=encoding) as csv_file:
+            csv_file.write("á%sx\né%sy\n" % (delimiter, delimiter))
         a_dict = csv2dict(tmp_path, {})
-        self.assertEquals(a_dict, {u'á':u'x', u'é':u'y'})
+        self.assertEqual(a_dict, {"á":"x", "é":"y"})
 
     def test_csv2dict_bad_delimiter(self):
         _, tmp_path = mkstemp()
-        with codecs.open(tmp_path, 'w', encoding) as csv_file:
-            csv_file.write('a;1%sb;2' % eol)
+        with io.open(tmp_path, 'w', encoding=encoding) as csv_file:
+            csv_file.write('a;1\nb;2')
         with self.assertRaises(IOError):
             a_dict = csv2dict(tmp_path, {})
 
     def test_dict2csv(self):
         _, tmp_path = mkstemp()
-        dict2csv(tmp_path, {u'á':'x', u'é':'y'})
-        with codecs.open(tmp_path, 'r', encoding) as csv_file:
+        d = {"á":'x', "é":'y'}
+        l = list(d.items())
+        t = "%s%s%s\n%s%s%s\n" % (l[0][0], delimiter, l[0][1],
+            l[1][0], delimiter, l[1][1])
+        dict2csv(tmp_path, d)
+        with io.open(tmp_path, 'r', encoding=encoding) as csv_file:
             text = csv_file.read()
-        self.assertEquals(text, u'á%sx%sé%sy%s' % (delimiter, eol, delimiter, eol))
+        self.assertEqual(text, t)
 
     def test_dict2csv_sort(self):
         _, tmp_path = mkstemp()
         dict2csv(tmp_path, {'b':'1', 'a':'3', 'c': '2'}, sort=1)
-        with codecs.open(tmp_path, 'r', encoding) as csv_file:
+        with io.open(tmp_path, 'r', encoding=encoding) as csv_file:
             text = csv_file.read()
-        self.assertEquals(text, u'b%s1%sc%s2%sa%s3%s' % (delimiter, eol, 
-            delimiter, eol, delimiter, eol))
+        self.assertEqual(text, "b%s1\nc%s2\na%s3\n" % (delimiter, 
+            delimiter, delimiter))
 
 

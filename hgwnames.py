@@ -2,6 +2,8 @@
 """
 Parsing of highway names
 """
+from __future__ import unicode_literals
+from builtins import str
 
 import os
 import re
@@ -15,15 +17,15 @@ MATCH_THR = 60
 
 
 def normalize(text):
-    return re.sub(' *\(.*\)', '', text.lower().strip())
+    return re.sub(r' *\(.*\)', '', text.lower().strip())
 
 def parse(name):
     """Transform the name of a street from Cadastre conventions to OSM ones."""
     name = name.split(';')[0] # Remove additional information
-    name = re.sub('[,]+', ', ', name).strip() # Avoids comma without trailing space
+    name = re.sub(r'[,]+', ', ', name).strip() # Avoids comma without trailing space
     result = []
-    for (i, word) in enumerate(re.split('[ ]+', name.strip())):
-        nude_word = re.sub('^\(|\)$', '', word) # Remove enclosing parenthesis
+    for (i, word) in enumerate(re.split(r'[ ]+', name.strip())):
+        nude_word = re.sub(r'^\(|\)$', '', word) # Remove enclosing parenthesis
         if i == 0:
             if word in setup.excluded_types:
                 return ""
@@ -42,8 +44,8 @@ def parse(name):
                 new_word = word.title()
         else:
             new_word = word.title()
-        new_word = new_word.replace(u'·L', u'·l') # Letra ele geminada
-        new_word = new_word.replace(u'.L', u'·l') # Letra ele geminada
+        new_word = new_word.replace("·L", "·l") # Letra ele geminada
+        new_word = new_word.replace(".L", "·l") # Letra ele geminada
         result.append(new_word)
     return ' '.join(result).strip()
 
@@ -59,10 +61,13 @@ def match(name, choices):
     parsed_name = parse(name)
     if fuzz and parsed_name:
         normalized = [normalize(c) for c in choices]
-        matching = process.extractOne(normalize(parsed_name), 
-            normalized, scorer=fuzz.token_sort_ratio)
-        if matching and matching[1] > MATCH_THR:
-            return choices[normalized.index(matching[0])]
+        try:
+            matching = process.extractOne(normalize(parsed_name), 
+                normalized, scorer=fuzz.token_sort_ratio)
+            if matching and matching[1] > MATCH_THR:
+                return choices[normalized.index(matching[0])]
+        except RuntimeError:
+            pass
     return parsed_name
 
 def dsmatch(name, dataset, fn):

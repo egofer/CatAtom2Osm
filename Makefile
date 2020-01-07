@@ -76,21 +76,24 @@ msg:
 	$(GETTEXT) -o $(LOCALE_DIR)/messages.pot *.py
 	$(MSGMERGE) -U $(LOCALE_DIR)/es/LC_MESSAGES/catatom2osm.po $(LOCALE_DIR)/messages.pot
 	$(MSGFMT) $(LOCALE_DIR)/es/LC_MESSAGES/catatom2osm.po -o $(LOCALE_DIR)/es/LC_MESSAGES/catatom2osm.mo
+	$(MSGFMT) $(LOCALE_DIR)/es/LC_MESSAGES/argparse.po -o $(LOCALE_DIR)/es/LC_MESSAGES/argparse.mo
 	@echo
 	@echo "Translation finished. The language files are in $(LOCALE_DIR)."
 
 
 .PHONY: install
 install:
-	@echo "#!/bin/bash" > catatom2osm
 ifeq (${OS},$(filter $(OS),Sierra Darwin))
-	@echo "source "'"'"$(shell pwd)/pyqgismac.sh"'"' >> catatom2osm
 	@chmod +x pyqgismac.sh
-endif
-	@echo "python "'"'"$(shell pwd)/main.py"'"'" $$"'*' >> catatom2osm
+	@chmod +x pyqgis3mac.sh
+	@chmod +x catatom2osmmac
+	@ln -sf $(shell pwd)/catatom2osmmac $(INSTALL_DIR)/catatom2osm
+	@echo "Created symbolic link $(INSTALL_DIR)-->$(shell pwd)/catatom2osmmac"
+else
 	@chmod +x catatom2osm
 	@ln -sf $(shell pwd)/catatom2osm $(INSTALL_DIR)/catatom2osm
 	@echo "Created symbolic link $(INSTALL_DIR)-->$(shell pwd)/catatom2osm"
+endif
 
 .PHONY: uninstall
 uninstall:

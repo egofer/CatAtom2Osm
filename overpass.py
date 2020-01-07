@@ -1,4 +1,6 @@
 """Minimum Overpass API interface"""
+from past.builtins import basestring
+from builtins import object, range
 import re
 
 import download
@@ -32,10 +34,10 @@ class Query(object):
     def set_search_area(self, search_area):
         """Set the area to search in. It could either the osm id of a named area
            or a bounding box (bottom, left, top, right) clause."""
-        if re.match('^\d{1,8}$', search_area):
+        if re.match(r'^\d{1,8}$', search_area):
             self.area_id = search_area
             self.bbox = ''
-        elif re.match('^(-?\d{1,3}(\.\d+)?,\s*){3}-?\d{1,3}(\.\d+)?$', search_area):
+        elif re.match(r'^(-?\d{1,3}(\.\d+)?,\s*){3}-?\d{1,3}(\.\d+)?$', search_area):
             self.bbox = search_area
             self.area_id = ''
         else:
@@ -47,10 +49,10 @@ class Query(object):
            or area clauses. Example: node["name"="Berlin"]"""
         rsc = lambda s: s[:-1] if s[-1] == ';' else s
         for arg in args:
-            if hasattr(arg, '__iter__'):
-                self.statements += [rsc(s) for s in arg]
-            else:
+            if isinstance(arg, basestring):
                 self.statements += rsc(arg).split(';')
+            else:
+                self.statements += [rsc(s) for s in arg]
         return self
     
     def get_url(self, n=0):
@@ -75,7 +77,7 @@ class Query(object):
                 return
             except IOError as e:
                 pass
-        raise e
+        raise IOError("Can't read from any Overpass server'")
     
     def read(self):
         """Returns query result"""
