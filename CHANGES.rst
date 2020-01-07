@@ -1,6 +1,10 @@
 Change log
 ==========
 
+**2020-01-07 (1.2.1)**
+* Fix circular reference translating compat.py
+* Add missing dev requisites
+
 **2020-01-07 (1.2)**
 * Qgis 3.x compatible version
 

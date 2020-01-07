@@ -1,6 +1,10 @@
 Registro de cambios
 ===================
 
+**07-01-2020 (1.2.1)**
+* Resuelve referencia circular traduciendo compat.py
+* Añade requisitos de desarrollo que faltaban
+
 **07-01-2020 (1.2)**
 * Versión compatible con Qgis 3.x
 
