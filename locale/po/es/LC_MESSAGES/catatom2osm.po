@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: CatAtom2Osm\n"
-"POT-Creation-Date: 2018-11-09 10:05+WET\n"
+"POT-Creation-Date: 2020-01-07 10:26+WET\n"
 "PO-Revision-Date: 2017-05-28 19:23+WEST\n"
 "Last-Translator: Javier Sánchez <javiersanp@gmail.com>\n"
 "Language: es\n"
@@ -20,7 +20,7 @@ msgstr ""
 msgid "Last directory name must be a 5 digits ZIP code"
 msgstr "El nombre del último directorio debe ser un Código Postal de 5 dígitos"
 
-#: catatom.py:37 catatom.py:245 cdau.py:128
+#: catatom.py:37 catatom.py:246 cdau.py:128
 msgid "Province code '%s' not valid"
 msgstr "El Código Provincial '%s' no es válido"
 
@@ -28,52 +28,52 @@ msgstr "El Código Provincial '%s' no es válido"
 msgid "Not a directory: '%s'"
 msgstr "No es un directorio: '%s'"
 
-#: catatom.py:53 catatom.py:64 cdau.py:122
+#: catatom.py:54 catatom.py:65 cdau.py:122
 msgid "Could not read metadata from '%s'"
 msgstr "No se pueden leer los metadatos de '%s'"
 
-#: catatom.py:77
+#: catatom.py:78
 msgid "Searching the url for the '%s' layer of '%s'..."
 msgstr "Buscando la url para la capa '%s' de '%s'..."
 
-#: catatom.py:82
+#: catatom.py:83
 msgid "Zip code '%s' don't exists"
 msgstr "El Código Postal '%s' no existe"
 
-#: catatom.py:86 catatom2osm.py:352 cdau.py:133
+#: catatom.py:87 catatom2osm.py:352 cdau.py:133
 msgid "Downloading '%s'"
 msgstr "Descargando '%s'"
 
-#: catatom.py:98
+#: catatom.py:99
 msgid "Unknow layer name '%s'"
 msgstr "El nombre de capa '%s' es desconocido"
 
-#: catatom.py:192 catatom.py:194
+#: catatom.py:193 catatom.py:195
 msgid "The layer '%s' is empty"
 msgstr "La capa '%s' está vacía"
 
-#: catatom.py:200 cdau.py:137
+#: catatom.py:201 cdau.py:137
 msgid "Failed to load layer '%s'"
 msgstr "Error al cargar la capa: '%s'"
 
-#: catatom.py:203
+#: catatom.py:204
 msgid "Could not determine the CRS of '%s'"
 msgstr "No se puede determinar el CRS de '%s'"
 
-#: catatom.py:205 cdau.py:139
+#: catatom.py:206 cdau.py:139
 msgid "Read %d features in '%s'"
 msgstr "Leídos %d características en '%s'"
 
-#: catatom.py:234
+#: catatom.py:235
 msgid "Municipality: '%s'"
 msgstr "Municipio: '%s'"
 
-#: catatom.py:237
+#: catatom.py:238
 msgid "Failed to find administrative boundary, falling back to bounding box"
 msgstr ""
 "No se pudo obtener el límite administrativo, se usará el recuadro delimitador"
 
-#: catatom.py:251
+#: catatom.py:252
 msgid "Territorial office %s"
 msgstr "Oficina territorial %s"
 
@@ -165,6 +165,22 @@ msgstr "Reemplazadas %d direcciones de '%s'"
 msgid "Added %d addresses from '%s'"
 msgstr "Añadidas %d direcciones de '%s'"
 
+#: compat.py:14
+msgid "Running with lxml.etree"
+msgstr "Usando lxml.etree"
+
+#: compat.py:18 compat.py:26
+msgid "Running with ElementTree"
+msgstr "Usando ElementTree"
+
+#: compat.py:22
+msgid "Running with cElementTree"
+msgstr "Usando cElementTree"
+
+#: compat.py:28
+msgid "Failed to import ElementTree from any known place"
+msgstr "No se pudo importar ElementTree desde ningún lugar conocido"
+
 #: csvtools.py:33
 msgid "Failed to load CSV file '%s'"
 msgstr "Error al cargar el archivo CSV '%s'"
@@ -173,187 +189,187 @@ msgstr "Error al cargar el archivo CSV '%s'"
 msgid "Downloading"
 msgstr "Descargando '%s'"
 
-#: layer.py:234
+#: layer.py:238
 msgid "Error when creating shapefile: '%s'"
 msgstr "Error al crear el archivo shapefile: '%s'"
 
-#: layer.py:327 layer.py:1050
+#: layer.py:331 layer.py:1060
 msgid "Append"
 msgstr "Agregar"
 
-#: layer.py:340 layer.py:1078
+#: layer.py:347 layer.py:1089
 msgid "Loaded %d features in '%s' from '%s'"
 msgstr "Cargados %d características en '%s' desde '%s'"
 
-#: layer.py:353
+#: layer.py:360
 msgid "Reproject"
 msgstr "Reproyectar"
 
-#: layer.py:374
+#: layer.py:381
 msgid "Reprojected the '%s' layer to '%s' CRS"
 msgstr "Reproyectada la capa '%s' al CRS '%s'"
 
-#: layer.py:402
+#: layer.py:409
 msgid "Join field"
 msgstr "Unir campo"
 
-#: layer.py:428
+#: layer.py:435
 msgid "Joined '%s' to '%s'"
 msgstr "Combinado '%s' a '%s'"
 
-#: layer.py:542
+#: layer.py:549
 msgid "Detected a %s geometry in the '%s' layer"
 msgstr "Detectada una geometría %s en la capa '%s'"
 
-#: layer.py:552
+#: layer.py:559
 msgid "Loaded %d nodes, %d ways, %d relations from '%s' layer"
 msgstr "Cargados %d nodos, %d vías, %d relaciones de la capa '%s'"
 
-#: layer.py:604
+#: layer.py:611
 msgid "Explode multi pars"
 msgstr "Separar geometrías multiparte"
 
-#: layer.py:618 layer.py:1081
+#: layer.py:625 layer.py:1092
 msgid "%d multi-polygons splitted into %d polygons in the '%s' layer"
 msgstr "%d multipolígonos divididos a %d poligonos en la capa '%s'"
 
-#: layer.py:682
+#: layer.py:689
 msgid "Topology"
 msgstr "Topología"
 
-#: layer.py:750
+#: layer.py:757
 msgid "Merged %d close vertices in the '%s' layer"
 msgstr "Fusionados %d vértices próximos en la capa '%s'"
 
-#: layer.py:754
+#: layer.py:761
 msgid "Created %d topological points in the '%s' layer"
 msgstr "Creados %d puntos topológicos en la capa '%s'"
 
-#: layer.py:777
+#: layer.py:784
 msgid "Delete invalid geometries"
 msgstr "Eliminar geometrías no válidas"
 
-#: layer.py:868
+#: layer.py:875
 msgid "Deleted %d invalid ring geometries in the '%s' layer"
 msgstr "Eliminados %d anillos de geometrías no válidos en la capa '%s'"
 
-#: layer.py:873
+#: layer.py:880
 msgid "Deleted %d invalid geometries in the '%s' layer"
 msgstr "Eliminadas %d geometrías no válidas en la capa '%s'"
 
-#: layer.py:877
+#: layer.py:884
 msgid "Deleted %d zig-zag vertices in the '%s' layer"
 msgstr "Eliminados %d vértices en zig-zag en la capa '%s'"
 
-#: layer.py:881
+#: layer.py:888
 msgid "Deleted %d spike vertices in the '%s' layer"
 msgstr "Fusionados %d vértices en punta en la capa '%s'"
 
-#: layer.py:901
+#: layer.py:908
 msgid "Simplify"
 msgstr "Simplificar"
 
-#: layer.py:939
+#: layer.py:946
 msgid "Simplified %d vertices in the '%s' layer"
 msgstr "Simplificados %d vértices en la capa '%s'"
 
-#: layer.py:965
+#: layer.py:972
 msgid "%d adjacent polygons merged into %d polygons in the '%s' layer"
 msgstr "%d polígonos adyacentes fusionados a %d polígonos en la capa '%s'"
 
-#: layer.py:972
+#: layer.py:979
 msgid "Difference"
 msgstr "Diferencia"
 
-#: layer.py:1147
+#: layer.py:1158
 msgid "Refused %d addresses because they exist in OSM"
 msgstr "Rechazadas %d direcciones por existir en OSM"
 
-#: layer.py:1153
+#: layer.py:1164
 msgid "Deleted %d addresses without house number"
 msgstr "Eliminadas %d direcciones sin número de portal"
 
-#: layer.py:1278
+#: layer.py:1289
 msgid "Missing building footprint for this part"
 msgstr "Falta el contorno del edificio para esta parte"
 
-#: layer.py:1335
+#: layer.py:1346
 msgid "Remove outside parts"
 msgstr "Eliminar partes exteriores"
 
-#: layer.py:1358
+#: layer.py:1369
 msgid "Removed %d building parts outside the footprint"
 msgstr "Eliminadas %d partes de edificio fuera del contorno"
 
-#: layer.py:1362
+#: layer.py:1373
 msgid "Deleted %d building parts with no floors above ground"
 msgstr "Eliminadas %d partes de edificio sin plantas sobre el nivel del suelo"
 
-#: layer.py:1367
+#: layer.py:1378
 msgid "Generated %d building footprints"
 msgstr "Generados %d contornos de edificios"
 
-#: layer.py:1411
+#: layer.py:1422
 msgid "This part is bigger than its building"
 msgstr "Esta parte es mayor que su edificio"
 
-#: layer.py:1475
+#: layer.py:1486
 msgid "Merge building parts"
 msgstr "Combinar partes de edificios"
 
-#: layer.py:1520
+#: layer.py:1531
 msgid "Located %d swimming pools over a building"
 msgstr "Localizadas %d piscinas sobre un edificio"
 
-#: layer.py:1523
+#: layer.py:1534
 msgid "Deleted %d buildings coincidents with a swimming pool"
 msgstr "Eliminados %d edificios conicidentes con una piscina"
 
-#: layer.py:1527
+#: layer.py:1538
 msgid "Translated %d level values to the footprint"
 msgstr "Trasladados %d valores de niveles al contorno"
 
-#: layer.py:1530
+#: layer.py:1541
 msgid "Merged %d building parts to the footprint"
 msgstr "Fusionados %d partes de edificios al contorno"
 
-#: layer.py:1534
+#: layer.py:1545
 msgid "Merged %d adjacent parts"
 msgstr "Fusionadas %d partes adyacentes"
 
-#: layer.py:1610
+#: layer.py:1621
 msgid "Moved %d addresses to entrance, %d changed to parcel"
 msgstr "Desplazadas %d direcciones a entrada, %d cambiadas a parcela"
 
-#: layer.py:1615
+#: layer.py:1626
 msgid "Deleted %d addresses without associated building"
 msgstr "Eliminadas %d direcciones sin edificio asociado"
 
-#: layer.py:1618
+#: layer.py:1629
 msgid "Refused %d addresses belonging to multiple buildings"
 msgstr "Eliminadas %d direcciones pertenecientes a edificios múltiples"
 
-#: layer.py:1629
+#: layer.py:1640
 msgid "GEOS validation"
 msgstr "Validación GEOS"
 
-#: layer.py:1641
+#: layer.py:1652
 msgid "Check, area too small"
 msgstr "Comprobar, área demasiado pequeña"
 
-#: layer.py:1644
+#: layer.py:1655
 msgid "Check, area too big"
 msgstr "Comprobar, área demasiado grande"
 
-#: layer.py:1659
+#: layer.py:1670
 msgid "Conflate"
 msgstr "Combinación"
 
-#: layer.py:1672
+#: layer.py:1683
 msgid "OSM building with id %s is not valid"
 msgstr "El edificio de OSM con id %s no es váido"
 
-#: layer.py:1693
+#: layer.py:1704
 msgid "Detected %d conflicts in %d buildings/pools from OSM"
 msgstr "Detectados %d edificios/piscinas con conflicto de %d en OSM"
 
@@ -806,33 +822,3 @@ msgstr ""
 msgid "Sum of building types should be equal to the number of buildings"
 msgstr ""
 "La suma de los tipos de edificios debe ser igual al número de edificios"
-
-#~ msgid "Running with lxml.etree"
-#~ msgstr "Usando lxml.etree"
-
-#~ msgid "Running with ElementTree on Python 2.5+"
-#~ msgstr "Usando ElementTree en Python 2.5+"
-
-#~ msgid "Running with cElementTree"
-#~ msgstr "Usando cElementTree"
-
-#~ msgid "Running with ElementTree"
-#~ msgstr "Usando ElementTree"
-
-#~ msgid "Failed to import ElementTree from any known place"
-#~ msgstr "No se pudo importar ElementTree desde ningún lugar conocido"
-
-#~ msgid "Progress: %.1fK"
-#~ msgstr "Progreso: %.1fK"
-
-#~ msgid "Print CatAtom2Osm version and exit"
-#~ msgstr "Imprime la versión de CatAtom2Osm y termina"
-
-#~ msgid "Invalid log level: %s"
-#~ msgstr "Nivel de registro no válido: %s"
-
-#~ msgid "%s version %s"
-#~ msgstr "%s versión %s"
-
-#~ msgid "Only for testing purposses. Don't upload any result to OSM"
-#~ msgstr "Sólo para fines de prueba. No cargue ningún resultado en OSM"

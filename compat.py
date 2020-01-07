@@ -11,21 +11,23 @@ import sys
 etreemsg = ""
 try:
     from lxml import etree
-    etreemsg = "Running with lxml.etree"
+    etreemsg = _("Running with lxml.etree")
 except ImportError: # pragma: no cover
     try:
         import xml.etree.ElementTree as etree
-        etreemsg = "Running with ElementTree"
+        etreemsg = _("Running with ElementTree")
     except ImportError:
         try:
             import cElementTree as etree
-            etreemsg = "Running with cElementTree"
+            etreemsg = _("Running with cElementTree")
         except ImportError:
             try:
                 import elementtree.ElementTree as etree
-                etreemsg = "Running with ElementTree"
+                etreemsg = _("Running with ElementTree")
             except ImportError:
-                etreemsg = "Failed to import ElementTree from any known place"
+                etreemsg = _(
+                    "Failed to import ElementTree from any known place"
+                )
                 raise ImportError(etreemsg)
 
 def install_gettext(app_name, localedir):
