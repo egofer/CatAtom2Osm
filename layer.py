@@ -294,7 +294,10 @@ class BaseLayer(QgsVectorLayer):
             dst_attr = field.name()
             if dst_attr in resolve:
                 (src_attr, reference_match) = resolve[dst_attr]
-                match = re.search(reference_match, feature[src_attr])
+                src_val = feature[src_attr]
+                if isinstance(src_val, (list,)):
+                    src_val = ' '.join(src_val)
+                match = re.search(reference_match, src_val)
                 if match:
                     dst_ft[dst_attr] = match.group(0)
             else:

@@ -11,7 +11,7 @@ import sys
 import compat
 
 app_name = 'CatAtom2Osm'
-app_version = '1.2.1dev'
+app_version = '1.2.2dev'
 app_author = 'Javier Sanchez Portero'
 app_copyright = '2017, Javier Sanchez Portero'
 app_desc = 'Tool to convert INSPIRE data sets from the Spanish Cadastre ATOM Services to OSM files'
