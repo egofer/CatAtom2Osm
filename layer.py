@@ -859,7 +859,7 @@ class PolygonLayer(BaseLayer):
                 if fid in to_clean: continue
                 n = 0
                 v = Point(geom.vertexAt(n))
-                while v != Point(0, 0):
+                while v.x() != 0 or v.y() != 0:
                     if v in to_move:
                         g = QgsGeometry(geom)
                         vx = to_move[v]
