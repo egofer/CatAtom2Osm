@@ -1,6 +1,10 @@
 Change log
 ==========
 
+**2020-01-08 (1.2.2)**
+* Fix TypeError: expected string or bytes-like object #49
+* Infinite loop deleting invalid geometries #50
+
 **2020-01-07 (1.2.1)**
 * Fix circular reference translating compat.py
 * Add missing dev requisites
