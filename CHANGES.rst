@@ -1,6 +1,9 @@
 Change log
 ==========
 
+**2021-03-08 (1.3)**
+* Keep all building parts to fulfill the Simple 3D Buildings scheme (issue #56)
+
 **2020-01-08 (1.2.2)**
 * Fix TypeError: expected string or bytes-like object #49
 * Infinite loop deleting invalid geometries #50

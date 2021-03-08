@@ -20,6 +20,7 @@ from report import instance as report
 log = setup.log
 
 BUFFER_SIZE = 512
+SIMPLIFY_BUILDING_PARTS = False
 
 is_inside = lambda f1, f2: \
     f2.geometry().contains(f1.geometry()) or f2.geometry().overlaps(f1.geometry())
@@ -1404,9 +1405,10 @@ class ConsLayer(PolygonLayer):
         footprint:
 
           * Translates the maximum values of number of levels above and below
-            ground to the footprint and deletes all the parts in that level.
+            ground to the footprint and optionally deletes all the parts in
+            that level.
           
-          * Merges the adjacent parts in the rest of the levels.
+          * Merges the adjacent parts in each level.
         """
         to_clean = []
         to_clean_g = []
@@ -1427,7 +1429,7 @@ class ConsLayer(PolygonLayer):
                     check_area = True
             if check_area:
                 continue
-            if level == (max_level, min_level):
+            if level == (max_level, min_level) and SIMPLIFY_BUILDING_PARTS:
                 to_clean = [p.id() for p in parts_for_level[max_level, min_level]]
             else:
                 geom = Geometry.merge_adjacent_features(parts)
