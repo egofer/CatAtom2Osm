@@ -1429,7 +1429,9 @@ class ConsLayer(PolygonLayer):
                     check_area = True
             if check_area:
                 continue
-            if level == (max_level, min_level) and SIMPLIFY_BUILDING_PARTS:
+            if len(parts_for_level) == 1 or (
+                level == (max_level, min_level) and SIMPLIFY_BUILDING_PARTS
+            ):
                 to_clean = [p.id() for p in parts_for_level[max_level, min_level]]
             else:
                 geom = Geometry.merge_adjacent_features(parts)
