@@ -1415,15 +1415,16 @@ class ConsLayer(PolygonLayer):
         to_change = {}
         to_change_g = {}
         parts_for_level, max_level, min_level = self.get_parts(footprint, parts)
+        parts_area = 0
         footprint['lev_above'] = max_level
         footprint['lev_below'] = min_level
-        to_change[footprint.id()] = get_attributes(footprint)
+        building_area = round(footprint.geometry().area(), 0)
         for (level, parts) in parts_for_level.items():
             check_area = False
             for part in parts:
-                part_area = round(part.geometry().area(), 0)
-                building_area = round(footprint.geometry().area(), 0)
-                if part_area > building_area:
+                part_area = part.geometry().area()
+                parts_area += part_area
+                if round(part_area, 0) > building_area:
                     part['fixme'] = _('This part is bigger than its building')
                     to_change[part.id()] = get_attributes(part)
                     check_area = True
@@ -1443,6 +1444,9 @@ class ConsLayer(PolygonLayer):
                             to_change_g[part.id()] = g
                         else:
                             to_clean_g.append(part.id())
+        if len(parts_for_level) > 1 and round(parts_area, 0) <> building_area:
+            footprint['fixme'] = _("Building parts don't fill the building outline")
+        to_change[footprint.id()] = get_attributes(footprint)
         return to_clean, to_clean_g, to_change, to_change_g
 
     def remove_inner_rings(self, feat1, feat2):
