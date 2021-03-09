@@ -1,6 +1,10 @@
 Registro de cambios
 ===================
 
+**09-03-2021 (1.3.2)**
+* Actualiza los paquetes recomendados para python3 (#52)
+* Actualiza URL en cdau.py (#54)
+
 **09-03-2021 (1.3.1)**
 * Añade 'fixme' cuando el área de las partes no coincida con la del edificio (#56).
 
