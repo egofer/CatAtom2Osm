@@ -1290,7 +1290,7 @@ class ConsLayer(PolygonLayer):
             if ref in tasks:
                 feat['task'] = tasks[ref]
             else:
-                feat['fixme'] = _("Missing building footprint for this part")
+                feat['fixme'] = _("Missing building outline for this part")
             to_change[feat.id()] = get_attributes(feat)
             if len(to_change) > BUFFER_SIZE:
                 self.writer.changeAttributeValues(to_change)
@@ -1338,8 +1338,8 @@ class ConsLayer(PolygonLayer):
     def remove_outside_parts(self):
         """
         Remove parts without levels above ground.
-        Create footprint for parts without associated building.
-        Remove parts outside the footprint of it building.
+        Create outline for parts without associated building.
+        Remove parts outside the outline of it building.
         Precondition: Called before merge_greatest_part.
         """
         to_clean_o = []
@@ -1370,7 +1370,7 @@ class ConsLayer(PolygonLayer):
         if len(to_clean_o) + len(to_clean_b) > 0:
             self.writer.deleteFeatures(to_clean_o + to_clean_b)
         if len(to_clean_o) > 0:
-            log.debug(_("Removed %d building parts outside the footprint"), 
+            log.debug(_("Removed %d building parts outside the outline"), 
                 len(to_clean_o))
             report.orphand_parts = len(to_clean_o)
         if len(to_clean_b) > 0:
@@ -1379,33 +1379,33 @@ class ConsLayer(PolygonLayer):
             report.underground_parts = len(to_clean_b)
         if to_add:
             self.writer.addFeatures(to_add)
-            log.debug(_("Generated %d building footprints"), len(to_add))
-            report.new_footprints = len(to_add)
+            log.debug(_("Generated %d building outlines"), len(to_add))
+            report.new_outlines = len(to_add)
 
-    def get_parts(self, footprint, parts):
+    def get_parts(self, outline, parts):
         """
-        Given a building footprint and its parts, for the parts inside the 
-        footprint returns a dictionary of parts for levels, the maximum and
+        Given a building outline and its parts, for the parts inside the 
+        outline returns a dictionary of parts for levels, the maximum and
         minimum levels
         """
         max_level = 0
         min_level = 0
         parts_for_level = defaultdict(list)
         for part in parts:
-            if is_inside(part, footprint):
+            if is_inside(part, outline):
                 level = (part['lev_above'] or 0, part['lev_below'] or 0)
                 if level[0] > max_level: max_level = level[0]
                 if level[1] > min_level: min_level = level[1]
                 parts_for_level[level].append(part)
         return parts_for_level, max_level, min_level
 
-    def merge_adjacent_parts(self, footprint, parts):
+    def merge_adjacent_parts(self, outline, parts):
         """
-        Given a building footprint and its parts, for the parts inside the 
-        footprint:
+        Given a building outline and its parts, for the parts inside the 
+        outline:
 
           * Translates the maximum values of number of levels above and below
-            ground to the footprint and optionally deletes all the parts in
+            ground to the outline and optionally deletes all the parts in
             that level.
           
           * Merges the adjacent parts in each level.
@@ -1414,11 +1414,11 @@ class ConsLayer(PolygonLayer):
         to_clean_g = []
         to_change = {}
         to_change_g = {}
-        parts_for_level, max_level, min_level = self.get_parts(footprint, parts)
+        parts_for_level, max_level, min_level = self.get_parts(outline, parts)
         parts_area = 0
-        footprint['lev_above'] = max_level
-        footprint['lev_below'] = min_level
-        building_area = round(footprint.geometry().area(), 0)
+        outline['lev_above'] = max_level
+        outline['lev_below'] = min_level
+        building_area = round(outline.geometry().area(), 0)
         for (level, parts) in parts_for_level.items():
             check_area = False
             for part in parts:
@@ -1445,8 +1445,8 @@ class ConsLayer(PolygonLayer):
                         else:
                             to_clean_g.append(part.id())
         if len(parts_for_level) > 1 and round(parts_area, 0) <> building_area:
-            footprint['fixme'] = _("Building parts don't fill the building outline")
-        to_change[footprint.id()] = get_attributes(footprint)
+            outline['fixme'] = _("Building parts don't fill the building outline")
+        to_change[outline.id()] = get_attributes(outline)
         return to_clean, to_clean_g, to_change, to_change_g
 
     def remove_inner_rings(self, feat1, feat2):
@@ -1488,7 +1488,7 @@ class ConsLayer(PolygonLayer):
         to_change = {}
         to_change_g = {}
         buildings_in_pools = 0
-        levels_to_footprint = 0
+        levels_to_outline = 0
         parts_merged_to_building = 0
         adjacent_parts_deleted = 0
         pools_on_roofs = 0
@@ -1527,7 +1527,7 @@ class ConsLayer(PolygonLayer):
             to_clean += cn + cng
             to_change.update(ch)
             to_change_g.update(chg)
-            levels_to_footprint += len(ch)
+            levels_to_outline += len(ch)
             parts_merged_to_building += len(cn)
             adjacent_parts_deleted += len(cng)
             pbar.update()
@@ -1545,13 +1545,13 @@ class ConsLayer(PolygonLayer):
             log.debug(_("Deleted %d buildings coincidents with a swimming pool"),
                 buildings_in_pools)
             report.buildings_in_pools = buildings_in_pools
-        if levels_to_footprint:
-            log.debug(_("Translated %d level values to the footprint"), 
-                levels_to_footprint)
+        if levels_to_outline:
+            log.debug(_("Translated %d level values to the outline"), 
+                levels_to_outline)
         if parts_merged_to_building:
-            log.debug(_("Merged %d building parts to the footprint"), 
+            log.debug(_("Merged %d building parts to the outline"), 
                 parts_merged_to_building)
-            report.parts_to_footprint = parts_merged_to_building
+            report.parts_to_outline = parts_merged_to_building
         if adjacent_parts_deleted:
             log.debug(_("Merged %d adjacent parts"), adjacent_parts_deleted)
             report.adjacent_parts = adjacent_parts_deleted
@@ -1568,7 +1568,7 @@ class ConsLayer(PolygonLayer):
 
     def move_address(self, address):
         """
-        Move each address to the nearest point in the footprint of its
+        Move each address to the nearest point in the outline of its
         associated building (same cadastral reference), but only if:
 
         * The address specification is Entrance.
