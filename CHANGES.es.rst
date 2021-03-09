@@ -1,6 +1,9 @@
 Registro de cambios
 ===================
 
+**09-03-2021 (1.3.3)**
+* Corrige pruebas rotas en d851c4b (#56)
+
 **09-03-2021 (1.3.2)**
 * Actualiza los paquetes recomendados para python3 (#52)
 * Actualiza URL en cdau.py (#54)

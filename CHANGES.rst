@@ -1,6 +1,9 @@
 Change log
 ==========
 
+**2021-03-09 (1.3.3)**
+* Fix tests broken in d851c4b (issue #56)
+
 **2021-03-09 (1.3.2)**
 * Update recommend python3 packages for the initial setup (issue #52)
 * Update URL in cdau.py (issue #54)

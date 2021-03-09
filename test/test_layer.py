@@ -771,9 +771,9 @@ class TestConsLayer(unittest.TestCase):
     def test_get_parts(self, m_tqdm):
         self.layer.explode_multi_parts()
         parts = [p for p in self.layer.search("localId like '8840501CS5284S_part%%'")]
-        for footprint in self.layer.search("localId = '8840501CS5284S'"):
-            parts_inside = [p for p in parts if is_inside(p, footprint)]
-            parts_for_level, max_level, min_level = self.layer.get_parts(footprint, parts)
+        for outline in self.layer.search("localId = '8840501CS5284S'"):
+            parts_inside = [p for p in parts if is_inside(p, outline)]
+            parts_for_level, max_level, min_level = self.layer.get_parts(outline, parts)
             max_levelc = max([p['lev_above'] for p in parts_inside])
             min_levelc = max([p['lev_below'] for p in parts_inside])
             self.assertEqual(len(parts_inside), sum([len(p) for p in list(parts_for_level.values())]))
@@ -788,9 +788,9 @@ class TestConsLayer(unittest.TestCase):
             self.layer.explode_multi_parts()
             ref = '8842323CS5284S'
         parts = [p for p in self.layer.search("localId like '%s_part%%'" % ref)]
-        for footprint in self.layer.search("localId = '%s'" % ref):
-            cn, cng, ch, chg= self.layer.merge_adjacent_parts(footprint, parts)
-            parts_for_level, max_level, min_level = self.layer.get_parts(footprint, parts)
+        for outline in self.layer.search("localId = '%s'" % ref):
+            cn, cng, ch, chg= self.layer.merge_adjacent_parts(outline, parts)
+            parts_for_level, max_level, min_level = self.layer.get_parts(outline, parts)
             if len(parts_for_level) > 1:
                 areap = 0
                 for level, group in list(parts_for_level.items()):
@@ -805,8 +805,8 @@ class TestConsLayer(unittest.TestCase):
                 self.assertEqual(set(cn), set([p.id() for p in parts_for_level[max_level, min_level]]))
             self.assertEqual(max([l[0] for l in list(parts_for_level.keys())]), max_level)
             self.assertEqual(max([l[1] for l in list(parts_for_level.keys())]), min_level)
-            self.assertEqual(ch[footprint.id()][6], max_level)
-            self.assertEqual(ch[footprint.id()][7], min_level)
+            self.assertEqual(ch[outline.id()][6], max_level)
+            self.assertEqual(ch[outline.id()][7], min_level)
 
     @mock.patch('layer.tqdm')
     def test_merge_building_parts(self, m_tqdm):

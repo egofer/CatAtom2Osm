@@ -68,7 +68,7 @@ class TestReport(unittest.TestCase):
         r.out_features = 8
         r.orphand_parts = 1
         r.underground_parts = 1
-        r.new_footprints = 2
+        r.new_outlines = 2
         r.multipart_geoms_building = 2
         r.exploded_parts_building = 4
         r.validate()
