@@ -1,6 +1,11 @@
 Change log
 ==========
 
+**2021-03-09 (1.3.2)**
+* Update recommend python3 packages for the initial setup (issue #52)
+* Update URL in cdau.py (issue #54)
+
+
 **2021-03-09 (1.3.1)**
 * Add a 'fixme' when the building parts area is not equal to the building area (issue #56)
 
