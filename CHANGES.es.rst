@@ -1,6 +1,10 @@
 Registro de cambios
 ===================
 
+**07-04-2021 (1.3.4)**
+* Evita fallar por archivos de zonificación rotos con zonas faltantes en Catastro.
+* La opcion '-l' muestra las oficionas territoriales si no se pasa parámetro.
+
 **09-03-2021 (1.3.3)**
 * Corrige pruebas rotas en d851c4b (#56)
 

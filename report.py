@@ -120,6 +120,7 @@ class Report(object):
             ('dlbg', _("Min. levels below ground (level: # of buildings)")),
             ('tasks_r', _("Rustic tasks files")),
             ('tasks_u', _("Urban tasks files")),
+            ('tasks_m', _("Buildings without zone")),
             ('group_problems', _("Problems")),
             ('errors', _("Report validation:")),
             ('fixme_count', _("Fixmes")),

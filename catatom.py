@@ -242,17 +242,23 @@ class Reader(object):
 
 def list_municipalities(prov_code):
     """Get from the ATOM services a list of municipalities for a given province"""
-    if prov_code not in setup.valid_provinces:
+    if prov_code == '99':
+        url = setup.serv_url['BU']
+        title = _("Territorial office")
+    elif prov_code not in setup.valid_provinces:
         raise ValueError(_("Province code '%s' not valid") % prov_code)
-    url = setup.prov_url['BU'].format(code=prov_code)
+    else:
+        url = setup.prov_url['BU'].format(code=prov_code)
     response = download.get_response(url)
     root = etree.fromstring(response.content)
     ns = {'atom': 'http://www.w3.org/2005/Atom'}
-    office = root.find('atom:title', ns).text.split('Office ')[1]
-    title = _("Territorial office %s") % office
+    if prov_code != '99':
+        office = root.find('atom:title', ns).text.split('Office ')[1]
+        title = _("Territorial office %s") % office
     print(title)
     print("=" * len(title))
     for entry in root.findall('atom:entry', namespaces=ns):
         row = entry.find('atom:title', ns).text.replace('buildings', '')
+        row = row.replace('Territorial office ', '')
         print(row)
 

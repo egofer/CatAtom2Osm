@@ -1,6 +1,10 @@
 Change log
 ==========
 
+**2021-04-07 (1.3.4)**
+* Avoids to fail for broken zonification files with missing zones in Cadastre (issue #57)
+* Option '-l' list territorial offices if used without argument value
+
 **2021-03-09 (1.3.3)**
 * Fix tests broken in d851c4b (issue #56)
 

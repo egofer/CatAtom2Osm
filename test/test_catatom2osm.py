@@ -189,9 +189,10 @@ class TestCatAtom2Osm(unittest.TestCase):
     @mock.patch('catatom2osm.report')
     def test_process_tasks(self, m_report, m_layer, m_os):
         m_os.path.join = lambda *args: '/'.join(args)
-        m_os.path.exists.side_effect = [True, True, False, True, True]
+        m_os.path.exists.side_effect = [True, True, True, False, True, True]
         m_report.mun_code = 'AAA'
         m_report.mun_name = 'BBB'
+        m_report.tasks_m = 10
         task = mock.MagicMock()
         task.featureCount.return_value = 999
         m_layer.ConsLayer.side_effect = [task, task, task, task, task]
@@ -201,22 +202,25 @@ class TestCatAtom2Osm(unittest.TestCase):
         for i in range(5):
             zones.append(mock.MagicMock())
             zones[i].id.return_value = i
-            zones[i].__getitem__.return_value = 'x00{}'.format(i)
-        self.m_app.urban_zoning.getFeatures.return_value = [zones[0], zones[1]]
+            zones[i].__getitem__.return_value = '{}00{}'.format(
+                ('r', 'u')[i % 2], i
+            )
+        self.m_app.urban_zoning.getFeatures.return_value = [zones[1], zones[3]]
         self.m_app.rustic_zoning.getFeatures.return_value = [
-            zones[2], zones[3], zones[4]
+            zones[0], zones[2], zones[4]
         ]
         self.m_app.process_tasks = get_func(cat.CatAtom2Osm.process_tasks)
         self.m_app.process_tasks(self.m_app, building)
         m_layer.ConsLayer.assert_has_calls([
-            mock.call('foo/tasks/x002.shp', 'x002', 'ogr', source_date=1234),
-            mock.call('foo/tasks/x003.shp', 'x003', 'ogr', source_date=1234),
-            mock.call('foo/tasks/x000.shp', 'x000', 'ogr', source_date=1234),
-            mock.call('foo/tasks/x001.shp', 'x001', 'ogr', source_date=1234),
+            mock.call('foo/tasks/missing.shp', 'missing', 'ogr', source_date=1234),
+            mock.call('foo/tasks/r000.shp', 'r000', 'ogr', source_date=1234),
+            mock.call('foo/tasks/r002.shp', 'r002', 'ogr', source_date=1234),
+            mock.call('foo/tasks/u001.shp', 'u001', 'ogr', source_date=1234),
+            mock.call('foo/tasks/u003.shp', 'u003', 'ogr', source_date=1234),
         ])
-        comment = setup.changeset_tags['comment'] + ' AAA BBB x001'
+        comment = setup.changeset_tags['comment'] + ' AAA BBB u003'
         task.to_osm.assert_called_with(upload='yes', tags={'comment': comment})
-        self.assertEqual(self.m_app.merge_address.call_count, 4)
+        self.assertEqual(self.m_app.merge_address.call_count, 5)
         self.m_app.rustic_zoning.writer.deleteFeatures.assert_called_once_with([4])
 
     @mock.patch('catatom2osm.os')
