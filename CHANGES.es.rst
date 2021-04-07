@@ -1,6 +1,9 @@
 Registro de cambios
 ===================
 
+**06-04-2021 (1.3.4)**
+* Evita fallar por archivos de zonificación rotos con zonas faltantes en Catastro
+
 **09-03-2021 (1.3.3)**
 * Corrige pruebas rotas en d851c4b (#56)
 

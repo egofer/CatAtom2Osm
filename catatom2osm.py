@@ -196,34 +196,43 @@ class CatAtom2Osm(object):
         del other_gml
 
     def process_tasks(self, source):
+        """
+        Convert shp to osm for each task.
+        Remove zones without buildings (empty tasks).
+        """
         self.get_tasks(source)
-        for zoning in (self.rustic_zoning, self.urban_zoning):
-            to_clean = []
-            for zone in zoning.getFeatures():
-                label = zone['label']
-                comment = ' '.join((setup.changeset_tags['comment'], 
-                    report.mun_code, report.mun_name, label))
-                fn = os.path.join(self.path, 'tasks', label + '.shp')
-                if os.path.exists(fn):
-                    task = layer.ConsLayer(fn, label, 'ogr', 
-                        source_date=source.source_date)
-                    if task.featureCount() > 0:
-                        task_osm = task.to_osm(upload='yes', 
-                            tags={'comment': comment})
-                        del task
-                        self.delete_shp(fn, False)
-                        self.merge_address(task_osm, self.address_osm)
-                        report.address_stats(task_osm)
-                        report.cons_stats(task_osm, label)
-                        fn = os.path.join('tasks', label + '.osm')
-                        self.write_osm(task_osm, fn, compress=True)
-                        report.osm_stats(task_osm)
-                else:
-                    to_clean.append(zone.id())
-            if to_clean:
-                zoning.writer.deleteFeatures(to_clean)
+        zoning = [] if report.tasks_m == 0 else [('missing', None)]
+        zoning += [(zone['label'], zone.id()) for zone in self.rustic_zoning.getFeatures()]
+        zoning += [(zone['label'], zone.id()) for zone in self.urban_zoning.getFeatures()]
+        to_clean = {'r': [], 'u': []}
+        for zone in zoning:
+            label = zone[0]
+            comment = ' '.join((setup.changeset_tags['comment'], 
+                report.mun_code, report.mun_name, label))
+            fn = os.path.join(self.path, 'tasks', label + '.shp')
+            if os.path.exists(fn):
+                task = layer.ConsLayer(fn, label, 'ogr', source_date=source.source_date)
+                if task.featureCount() > 0:
+                    task_osm = task.to_osm(upload='yes', tags={'comment': comment})
+                    del task
+                    self.delete_shp(fn, False)
+                    self.merge_address(task_osm, self.address_osm)
+                    report.address_stats(task_osm)
+                    report.cons_stats(task_osm, label)
+                    fn = os.path.join('tasks', label + '.osm')
+                    self.write_osm(task_osm, fn, compress=True)
+                    report.osm_stats(task_osm)
+            else:
+                to_clean[label[0]].append(zone[1])
+        if to_clean['r']:
+            self.rustic_zoning.writer.deleteFeatures(to_clean['r'])
+        if to_clean['u']:
+            self.urban_zoning.writer.deleteFeatures(to_clean['u'])
 
     def get_tasks(self, source):
+        """
+        Put each building into a shp file named according to the field 'label'.
+        """
         base_path = os.path.join(self.path, 'tasks')
         if not os.path.exists(base_path):
             os.makedirs(base_path)
@@ -232,29 +241,38 @@ class CatAtom2Osm(object):
                 os.remove(os.path.join(base_path, fn))
         tasks_r = 0
         tasks_u = 0
-        last_task = ''
+        tasks_m = 0
+        last_task = None
         to_add = []
         fcount = source.featureCount()
         for i, feat in enumerate(source.getFeatures()):
             label = feat['task'] if isinstance(feat['task'], basestring) else ''
             f = source.copy_feature(feat, {}, {})
-            if i == fcount - 1 or last_task == '' or label == last_task:
+            if i == fcount - 1 or last_task is None or label == last_task:
                 to_add.append(f)
-            if i == fcount - 1 or (last_task != '' and label != last_task)  :
+            if i == fcount - 1 or (last_task is not None and label != last_task):
+                if last_task == '':
+                    last_task = 'missing'
+                    tasks_m += len(to_add)
                 fn = os.path.join(self.path, 'tasks', last_task + '.shp')
                 if not os.path.exists(fn):
                     layer.ConsLayer.create_shp(fn, source.crs())
                     if last_task[0] == 'r':
                         tasks_r += 1
-                    else:
+                    elif last_task[0] == 'u':
                         tasks_u += 1
                 task = layer.ConsLayer(fn, last_task, 'ogr', source_date=source.source_date)
                 task.writer.addFeatures(to_add)
                 to_add = [f]
             last_task = label
         log.debug(_("Generated %d rustic and %d urban tasks files"), tasks_r, tasks_u)
+        if tasks_m > 0:
+            msg = _("There are %d buildings without zone, check tasks/missing.osm") % tasks_m
+            log.warning(msg)
+            report.warnings.append(msg)
         report.tasks_r = tasks_r
         report.tasks_u = tasks_u
+        report.tasks_m = tasks_m
 
     def process_zoning(self):
         self.urban_zoning.topology()
