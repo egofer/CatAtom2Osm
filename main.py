@@ -46,8 +46,8 @@ def run():
     parser.add_argument("-v", "--version", action="version",
         help=terminal.encode(_("Show program's version number and exit")),
         version=setup.app_version)
-    parser.add_argument("-l", "--list", dest="list", metavar="prov",
-        default=False, help=terminal.encode(_("List available municipalities "
+    parser.add_argument("-l", "--list", dest="list", metavar="prov", nargs='?',
+        default=False, const=99, help=terminal.encode(_("List available municipalities "
         "given the two digits province code")))
     parser.add_argument("-t", "--tasks", dest="tasks", default=False,
         action="store_true", help=terminal.encode(_("Splits constructions into "
@@ -93,7 +93,6 @@ def run():
     log.setLevel(log_level)
     log.debug(_("Using Python %s.%s.%s"), *sys.version_info[:3])
     log.debug(compat.etreemsg)
-
     if len(options.path) > 1:
         log.error(_("Too many arguments, supply only a directory path."))
     elif len(options.path) == 0 and not options.list:
