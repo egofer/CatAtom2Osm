@@ -1,6 +1,9 @@
 Registro de cambios
 ===================
 
+**14-04-2021 (1.3.5)**
+* Añade la etiqueta 'generator' para identificar la versión en los conjuntos de cambios.
+
 **07-04-2021 (1.3.4)**
 * Evita fallar por archivos de zonificación rotos con zonas faltantes en Catastro.
 * La opcion '-l' muestra las oficionas territoriales si no se pasa parámetro.

@@ -11,7 +11,7 @@ import sys
 import compat
 
 app_name = 'CatAtom2Osm'
-app_version = '1.3.4'
+app_version = '1.3.5'
 app_author = 'Javier Sanchez Portero'
 app_copyright = '2017, Javier Sanchez Portero'
 app_desc = 'Tool to convert INSPIRE data sets from the Spanish Cadastre ATOM Services to OSM files'
@@ -76,7 +76,8 @@ changeset_tags = {
     'comment': "#Spanish_Cadastre_Buildings_Import",
     'source': u"Dirección General del Catastro",
     'type': 'import',
-    'url': "https://wiki.openstreetmap.org/wiki/Spanish_Cadastre/Buildings_Import" 
+    'url': "https://wiki.openstreetmap.org/wiki/Spanish_Cadastre/Buildings_Import",
+    'generator':  app_name + ' ' + app_version
 }
 
 base_url = {
