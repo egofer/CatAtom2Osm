@@ -1,6 +1,9 @@
 Change log
 ==========
 
+**2021-06-07 (1.3.6)**
+* Fixes syntax error in Python3.
+
 **2021-04-14 (1.3.5)**
 * Adds a 'generator' tag to identify the version in the changesets
 
