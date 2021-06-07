@@ -1,6 +1,9 @@
 Registro de cambios
 ===================
 
+**07-06-2021 (1.3.6)**
+* Corrige error de sintaxis en Python3.
+
 **14-04-2021 (1.3.5)**
 * Añade la etiqueta 'generator' para identificar la versión en los conjuntos de cambios.
 

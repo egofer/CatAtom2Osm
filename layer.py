@@ -1444,7 +1444,7 @@ class ConsLayer(PolygonLayer):
                             to_change_g[part.id()] = g
                         else:
                             to_clean_g.append(part.id())
-        if len(parts_for_level) > 1 and round(parts_area, 0) <> building_area:
+        if len(parts_for_level) > 1 and round(parts_area, 0) != building_area:
             outline['fixme'] = _("Building parts don't fill the building outline")
         to_change[outline.id()] = get_attributes(outline)
         return to_clean, to_clean_g, to_change, to_change_g
