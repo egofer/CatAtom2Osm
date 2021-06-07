@@ -1,6 +1,9 @@
 Change log
 ==========
 
+**2021-06-07 (1.3.7)**
+* Adds Docker authentication to Travis.
+
 **2021-06-07 (1.3.6)**
 * Fixes syntax error in Python3.
 
