@@ -1,6 +1,9 @@
 Change log
 ==========
 
+**2021-06-07 (1.3.8)**
+* Fixes Docker versioning error.
+
 **2021-06-07 (1.3.7)**
 * Adds Docker authentication to Travis.
 
