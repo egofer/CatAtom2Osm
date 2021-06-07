@@ -1,6 +1,9 @@
 Registro de cambios
 ===================
 
+**07-06-2021 (1.3.7)**
+* Añade autenticación de Docker en Travis.
+
 **07-06-2021 (1.3.6)**
 * Corrige error de sintaxis en Python3.
 
