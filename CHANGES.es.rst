@@ -1,6 +1,9 @@
 Registro de cambios
 ===================
 
+**12-06-2021 (1.3.9)**
+* Recomiendación para usar Docker.
+
 **07-06-2021 (1.3.8)**
 * Corrige error de versionado de Docker.
 

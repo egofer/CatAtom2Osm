@@ -1,6 +1,9 @@
 Change log
 ==========
 
+**2021-06-12 (1.3.9)**
+* Recomendation to use Docker.
+
 **2021-06-07 (1.3.8)**
 * Fixes Docker versioning error.
 
