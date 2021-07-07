@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from __future__ import division, unicode_literals
+from builtins import str, bytes
+import io
 import mock
 import unittest
 import os
@@ -18,29 +21,29 @@ class TestReport(unittest.TestCase):
 
     def test_init(self):
         r = report.Report(foo = 'bar')
-        self.assertEquals(r.foo, 'bar')
+        self.assertEqual(r.foo, 'bar')
 
     def test_setattr(self):
         r = report.Report()
         r.mun_name = 'foobar'
-        self.assertEquals(r.values['mun_name'], 'foobar')
+        self.assertEqual(r.values['mun_name'], 'foobar')
 
     def test_getattr(self):
         r = report.Report()
         r.values['mun_name'] = 'foobar'
-        self.assertEquals(r.mun_name, 'foobar')
-    
+        self.assertEqual(r.mun_name, 'foobar')
+
     def test_get(self):
         r = report.Report()
-        self.assertEquals(r.get('foo', 'bar'), 'bar')
-        self.assertEquals(r.get('bar'), 0)
+        self.assertEqual(r.get('foo', 'bar'), 'bar')
+        self.assertEqual(r.get('bar'), 0)
 
     def test_inc(self):
         r = report.Report()
         r.inc('foo')
-        self.assertEquals(r.foo, 1)
+        self.assertEqual(r.foo, 1)
         r.inc('foo', 2)
-        self.assertEquals(r.foo, 3)
+        self.assertEqual(r.foo, 3)
 
     def test_validate1(self):
         r = report.Report()
@@ -62,14 +65,14 @@ class TestReport(unittest.TestCase):
         r.inp_pools = 1
         r.building_counter = {'a': 1, 'b': 2}
         r.out_buildings = 3
-        r.out_features = 8 
+        r.out_features = 8
         r.orphand_parts = 1
         r.underground_parts = 1
-        r.new_footprints = 2
+        r.new_outlines = 2
         r.multipart_geoms_building = 2
         r.exploded_parts_building = 4
         r.validate()
-        self.assertEquals(len(r.errors), 0)
+        self.assertEqual(len(r.errors), 0)
 
     def test_validate2(self):
         r = report.Report()
@@ -91,7 +94,7 @@ class TestReport(unittest.TestCase):
         r.inp_pools = 1
         r.building_counter = {'a': 1, 'b': 2}
         r.out_buildings = 4
-        r.out_features = 8 
+        r.out_features = 8
         r.validate()
         msgs = [
             "Sum of address types should be equal to the input addresses",
@@ -109,7 +112,7 @@ class TestReport(unittest.TestCase):
         r = report.Report()
         output = r.to_string()
         expected = "Date: " + datetime.now().strftime('%x') + setup.eol
-        self.assertEquals(output, expected)
+        self.assertEqual(output, expected)
 
     def test_to_string1(self):
         r = report.Report()
@@ -123,7 +126,7 @@ class TestReport(unittest.TestCase):
             + "=Addresses=" + setup.eol + setup.eol \
             + "==Input data==" + setup.eol \
             + "Postal codes: " + report.int_format(1000) + setup.eol
-        self.assertEquals(output, expected)
+        self.assertEqual(output, expected)
 
     def test_to_string2(self):
         r = report.Report()
@@ -137,8 +140,8 @@ class TestReport(unittest.TestCase):
             + report.TAB + "f1" + setup.eol + report.TAB + "f2" + setup.eol \
             + "Warnings: 2" + setup.eol \
             + report.TAB + "w1" + setup.eol + report.TAB + "w2" + setup.eol
-        self.assertEquals(output, expected)
-    
+        self.assertEqual(output, expected)
+
     def test_to_string3(self):
         r = report.Report(sys_info=True)
         output = r.to_string()
@@ -147,13 +150,14 @@ class TestReport(unittest.TestCase):
 
     def test_to_file(self):
         r = report.Report()
-        r.mun_name = u"áéíóúñ"
+        r.mun_name = "áéíóúñ"
         output = r.to_string()
         fn = 'test_report.txt'
         r.to_file(fn)
-        with open(fn, 'r') as fo:
-            text = fo.read().decode(setup.encoding).replace('\n', setup.eol)
-        self.assertEquals(output, text)
+        with io.open(fn, 'r', encoding=setup.encoding) as fo:
+            text = str(fo.read())
+            text = text.replace('\n\n', setup.eol)
+        self.assertEqual(output, text)
         if os.path.exists(fn):
             os.remove(fn)
 
@@ -165,10 +169,10 @@ class TestReport(unittest.TestCase):
         ad.Way([], {'addr:street': 's3'})
         r = report.Report()
         r.address_stats(ad)
-        self.assertEquals(r.out_addr_str, 3)
-        self.assertEquals(r.out_addr_plc, 1)
-        self.assertEquals(r.out_address_entrance, 2)
-        self.assertEquals(r.out_address_building, 2)
+        self.assertEqual(r.out_addr_str, 3)
+        self.assertEqual(r.out_addr_plc, 1)
+        self.assertEqual(r.out_address_entrance, 2)
+        self.assertEqual(r.out_address_building, 2)
 
     def test_cons_end_stats(self):
         r = report.Report()
@@ -176,9 +180,9 @@ class TestReport(unittest.TestCase):
         r.min_level = {'a': 1, 'b': 1, 'c': 2}
         r.building_counter = {'a': 1, 'b': 2}
         r.cons_end_stats()
-        self.assertEquals(r.dlag, '1: 1, 2: 2')
-        self.assertEquals(r.dlbg, '1: 2, 2: 1')
-        self.assertEquals(r.building_types, 'a: 1, b: 2')
+        self.assertEqual(set(r.dlag.split(', ')), set('1: 1, 2: 2'.split(', ')))
+        self.assertEqual(set(r.dlbg.split(', ')), set('1: 2, 2: 1'.split(', ')))
+        self.assertEqual(set(r.building_types.split(', ')), set('a: 1, b: 2'.split(', ')))
 
     def test_cons_stats(self):
         r = report.Report()
@@ -190,20 +194,20 @@ class TestReport(unittest.TestCase):
         data.Node(0,0, {'building:part': 'yes', 'fixme': 'f2'})
         data.Node(0,0)
         r.cons_stats(data)
-        self.assertEquals(r.out_pools, 1)
-        self.assertEquals(r.out_buildings, 2)
-        self.assertEquals(r.out_parts, 1)
-        self.assertEquals(r.building_counter['a'], 1)
-        self.assertEquals(r.building_counter['b'], 1)
-        self.assertEquals(r.fixme_counter['f1'], 1)
-        self.assertEquals(r.fixme_counter['f2'], 2)
+        self.assertEqual(r.out_pools, 1)
+        self.assertEqual(r.out_buildings, 2)
+        self.assertEqual(r.out_parts, 1)
+        self.assertEqual(r.building_counter['a'], 1)
+        self.assertEqual(r.building_counter['b'], 1)
+        self.assertEqual(r.fixme_counter['f1'], 1)
+        self.assertEqual(r.fixme_counter['f2'], 2)
 
     def test_fixme_stats(self):
         r = report.Report()
         r.fixme_counter = {}
         r.fixme_stats()
-        self.assertEquals(r.fixme_stats(), 0)
+        self.assertEqual(r.fixme_stats(), 0)
         r.fixme_counter = {'a': 1, 'b': 2}
         r.fixme_stats()
-        self.assertEquals(r.fixme_stats(), 3)
-        self.assertEquals(len(r.fixmes), 2)
+        self.assertEqual(r.fixme_stats(), 3)
+        self.assertEqual(len(r.fixmes), 2)

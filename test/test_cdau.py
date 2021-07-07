@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+from builtins import str
 import unittest
 import mock
 import os
@@ -10,6 +12,9 @@ import layer
 from catatom2osm import QgsSingleton
 qgs = QgsSingleton()
 
+
+def get_func(f):
+    return getattr(f, '__func__', f)
 
 class TestCdau(unittest.TestCase):
 
@@ -47,12 +52,12 @@ class TestCdau(unittest.TestCase):
 
     @mock.patch('cdau.os')
     def test_init(self, m_os):
-        self.m_cdau.init = cdau.Reader.__init__.__func__
+        self.m_cdau.init = get_func(cdau.Reader.__init__)
         m_os.path.exists.return_value = True
         m_os.path.isdir.return_value = False
         with self.assertRaises(IOError) as cm:
             self.m_cdau.init(self.m_cdau, 'foobar')
-        self.assertIn('Not a directory', cm.exception.message)
+        self.assertIn('Not a directory', str(cm.exception))
         m_os.makedirs.assert_not_called()
         m_os.path.exists.return_value = False
         m_os.path.isdir.return_value = True
@@ -63,10 +68,10 @@ class TestCdau(unittest.TestCase):
     @mock.patch('cdau.layer')
     @mock.patch('cdau.download')
     def test_read(self, m_download, m_layer, m_os):
-        self.m_cdau.read = cdau.Reader.read.__func__
+        self.m_cdau.read = get_func(cdau.Reader.read)
         with self.assertRaises(ValueError) as cm:
             self.m_cdau.read(self.m_cdau, '38')
-        self.assertIn('Province code', cm.exception.message)
+        self.assertIn('Province code', str(cm.exception))
 
         m_os.path.join = lambda *args: '/'.join(args)
         m_os.path.exists.return_value = True
@@ -75,7 +80,7 @@ class TestCdau(unittest.TestCase):
         csv = mock.MagicMock()
         csv.isValid.return_value = True
         m_layer.BaseLayer.return_value = csv
-        self.assertEquals(self.m_cdau.read(self.m_cdau, '29'), csv)
+        self.assertEqual(self.m_cdau.read(self.m_cdau, '29'), csv)
         m_download.wget.assert_not_called()
         self.assertEqual(csv.source_date, 'taz')
 
@@ -83,7 +88,7 @@ class TestCdau(unittest.TestCase):
         csv.isValid.return_value = False
         with self.assertRaises(IOError) as cm:
             self.m_cdau.read(self.m_cdau, '29')
-        self.assertIn('Failed to load layer', cm.exception.message)
+        self.assertIn('Failed to load layer', str(cm.exception))
         fn = cdau.csv_name.format('Malaga')
         url = cdau.cdau_url.format(fn)
         m_download.wget.assert_called_once_with(url, 'foobar/'+fn)
@@ -98,7 +103,7 @@ class TestCdau(unittest.TestCase):
         fo = mock.MagicMock()
         m_open.return_value.__enter__.return_value = fo
         m_os.path.exists.return_value = False
-        self.m_cdau.get_metadata = cdau.Reader.get_metadata.__func__
+        self.m_cdau.get_metadata = get_func(cdau.Reader.get_metadata)
         self.m_cdau.get_metadata(self.m_cdau, 'xxx')
         self.assertEqual(self.m_cdau.src_date, '2018-03-05')
         m_open.assert_called_once_with('xxx', 'w')
@@ -107,7 +112,7 @@ class TestCdau(unittest.TestCase):
         with self.assertRaises(IOError):
             self.m_cdau.get_metadata(self.m_cdau, 'xxx')
         m_open.reset_mock()
-        m_open.return_value.read.return_value = 'foobar'
+        m_open.return_value.__enter__.return_value.read.return_value = 'foobar'
         m_os.path.exists.return_value = True
         self.m_cdau.get_metadata(self.m_cdau, 'xxx')
         self.assertEqual(self.m_cdau.src_date, 'foobar')
@@ -118,14 +123,14 @@ class TestCdau(unittest.TestCase):
             'dgc_via': '123', 
             'refcatparc': 'foobar',
             'nom_tip_via': 'CALLE',
-            'nom_via': u'Alegría',
+            'nom_via': "Alegría",
             'cod_postal': '12345',
             'num_por_desde': '10', 'ext_desde': 'A',
             'num_por_hasta': '', 'ext_hasta': ''
         }
         attr = cdau.get_cat_address(ad, '29900')
         self.assertEqual(attr['localId'], '29.900.123.foobar')
-        self.assertEqual(attr['TN_text'], u'CL Alegría')
+        self.assertEqual(attr['TN_text'], "CL Alegría")
         self.assertEqual(attr['postCode'], '12345')
         self.assertEqual(attr['spec'], 'Entrance')
         self.assertEqual(attr['designator'], '10A')

@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """Statistics report"""
 
+from __future__ import division, unicode_literals
+from builtins import int, object, str
 from collections import OrderedDict, Counter
 from datetime import datetime
-import codecs
+import io
 import locale
 import platform
 import time
@@ -27,7 +29,7 @@ class Report(object):
             'min_level': {},
             'max_level': {},
         }
-        for k,v in kwargs.items():
+        for k,v in list(kwargs.items()):
             self.values[k] = v
         self.titles = OrderedDict([
             ('mun_name', _('Municipality')),
@@ -35,7 +37,7 @@ class Report(object):
             ('mun_code', _('Code')),
             ('date', _('Date')),
             ('options', _('Options')),
-            ('mun_area', _(u'Area')),
+            ('mun_area', _("Area")),
             ('mun_population', _('Population')),
             ('mun_wikipedia', _('Wikipedia')),
             ('mun_wikidata', _('Wikidata')),
@@ -86,12 +88,12 @@ class Report(object):
             ('inp_parts', TAB + _('Building parts')),
             ('inp_pools', TAB + _('Swimming pools')),
             ('subgroup_bu_process', _('Process')),
-            ('orphand_parts', _("Parts outside footprint deleted")),
+            ('orphand_parts', _("Parts outside outline deleted")),
             ('underground_parts', _("Parts with no floors above ground")),
-            ('new_footprints', _("Building footprints created")),
+            ('new_outlines', _("Building outlines created")),
             ('multipart_geoms_building', _("Buildings with multipart geometries")),
             ('exploded_parts_building', _("Buildings resulting from splitting multiparts")),
-            ('parts_to_footprint', _("Parts merged to the footprint")),
+            ('parts_to_outline', _("Parts merged to the outline")),
             ('adjacent_parts', _("Adjacent parts merged")),
             ('buildings_in_pools', _("Buildings coincidents with a swimming pool deleted")),
             ('geom_rings_building', _('Invalid geometry rings deleted')),
@@ -118,6 +120,7 @@ class Report(object):
             ('dlbg', _("Min. levels below ground (level: # of buildings)")),
             ('tasks_r', _("Rustic tasks files")),
             ('tasks_u', _("Urban tasks files")),
+            ('tasks_m', _("Buildings without zone")),
             ('group_problems', _("Problems")),
             ('errors', _("Report validation:")),
             ('fixme_count', _("Fixmes")),
@@ -125,7 +128,7 @@ class Report(object):
             ('warnings', _("Warnings:")),
         ])
         self.formats = {
-            'mun_area': lambda v: locale.format_string(u'%.1f km²', v, True),
+            'mun_area': lambda v: locale.format_string("%.1f km²", v, True),
             'mun_population': lambda v: '{} hab. ({})'.format(*v),
             'mun_wikipedia': lambda v: 'https://www.wikipedia.org/wiki/' + v,
             'mun_wikidata': lambda v: 'https://www.wikidata.org/wiki/' + v,
@@ -186,18 +189,18 @@ class Report(object):
 
     def cons_end_stats(self):
         self.dlag = ', '.join(["%d: %d" % (l, c) for (l, c) in \
-            OrderedDict(Counter(self.max_level.values())).items()])
+            list(OrderedDict(Counter(list(self.max_level.values()))).items())])
         self.dlbg = ', '.join(["%d: %d" % (l, c) for (l, c) in \
-            OrderedDict(Counter(self.min_level.values())).items()])
+            list(OrderedDict(Counter(list(self.min_level.values()))).items())])
         self.building_types = ', '.join(['%s: %d' % (b, c) \
-            for (b, c) in self.building_counter.items()])
+            for (b, c) in list(self.building_counter.items())])
 
     def fixme_stats(self):
         fixme_count = sum(self.fixme_counter.values())
         if fixme_count:
             self.fixme_count = fixme_count
             self.fixmes = ['%s: %d' % (f, c) \
-                for (f, c) in self.fixme_counter.items()]
+                for (f, c) in list(self.fixme_counter.items())]
         return fixme_count
 
     def get(self, key, default=0):
@@ -250,9 +253,9 @@ class Report(object):
             self.errors.append(_("Sum of buildings, parts and pools should "
                 "be equal to the feature count"))
         if self.sum('out_features', 'orphand_parts', 'underground_parts', 
-                'multipart_geoms_building', 'parts_to_footprint',
+                'multipart_geoms_building', 'parts_to_outline',
                 'adjacent_parts', 'geom_invalid_building', 'buildings_in_pools') - \
-                self.sum('new_footprints', 'exploded_parts_building') != \
+                self.sum('new_outlines', 'exploded_parts_building') != \
                     self.get('inp_features'):
             self.errors.append(_("Sum of output and deleted minus created "
                 "building features should be equal to input features"))
@@ -269,7 +272,7 @@ class Report(object):
         groups = set()
         last_group = False
         last_subgroup = False
-        for key in self.titles.keys():
+        for key in list(self.titles.keys()):
             exists = key in self.values
             if exists and isinstance(self.values[key], list) and len(self.values[key]) == 0:
                 exists = False
@@ -283,7 +286,7 @@ class Report(object):
             if last_subgroup and exists:
                 groups.add(last_subgroup)
         output = u''
-        for key, title in self.titles.items():
+        for key, title in list(self.titles.items()):
             if key.startswith('group_') and key in groups:
                 output += setup.eol + '=' + self.titles[key] + '=' + setup.eol
             elif key.startswith('subgroup_') and key in groups:
@@ -300,16 +303,15 @@ class Report(object):
                     value = self.values[key]
                     if key in self.formats:
                         value = self.formats[key](value)
-                    elif isinstance(value, int) or isinstance(value, long):
+                    elif isinstance(value, int):
                         value = int_format(value)
                     output += title + SEP + value
                     output += setup.eol
         return output
 
     def to_file(self, fn):
-        with codecs.open(fn, "w", setup.encoding) as fo:
+        with io.open(fn, "w", encoding=setup.encoding) as fo:
             fo.write(self.to_string())
-        
+
 
 instance = Report()
-

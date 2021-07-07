@@ -1,6 +1,50 @@
 Change log
 ==========
 
+**2021-06-12 (1.3.9)**
+* Recomendation to use Docker.
+
+**2021-06-07 (1.3.8)**
+* Fixes Docker versioning error.
+
+**2021-06-07 (1.3.7)**
+* Adds Docker authentication to Travis.
+
+**2021-06-07 (1.3.6)**
+* Fixes syntax error in Python3.
+
+**2021-04-14 (1.3.5)**
+* Adds a 'generator' tag to identify the version in the changesets
+
+**2021-04-07 (1.3.4)**
+* Avoids to fail for broken zonification files with missing zones in Cadastre (issue #57)
+* Option '-l' list territorial offices if used without argument value
+
+**2021-03-09 (1.3.3)**
+* Fix tests broken in d851c4b (issue #56)
+
+**2021-03-09 (1.3.2)**
+* Update recommend python3 packages for the initial setup (issue #52)
+* Update URL in cdau.py (issue #54)
+
+
+**2021-03-09 (1.3.1)**
+* Add a 'fixme' when the building parts area is not equal to the building area (issue #56)
+
+**2021-03-08 (1.3)**
+* Keep all building parts to fulfill the Simple 3D Buildings scheme (issue #56)
+
+**2020-01-08 (1.2.2)**
+* Fix TypeError: expected string or bytes-like object #49
+* Infinite loop deleting invalid geometries #50
+
+**2020-01-07 (1.2.1)**
+* Fix circular reference translating compat.py
+* Add missing dev requisites
+
+**2020-01-07 (1.2)**
+* Qgis 3.x compatible version
+
 **2019-12-18 (1.1.14)**
 * Set docker app path owner
 

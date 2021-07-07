@@ -1,18 +1,22 @@
 # -*- coding: utf-8 -*-
 """OSM XML format serializer"""
 
-import setup
+from __future__ import unicode_literals
+from builtins import str
+from past.builtins import basestring
+
+from compat import etree
 import logging
 import osm
-from compat import etree
-log = logging.getLogger(setup.app_name + "." + __name__)
+import setup
+log = setup.log
 
 
 def write_elem(outfile, e):
     try:
-        outfile.write(etree.tostring(e, pretty_print=True))
+        outfile.write(etree.tostring(e, pretty_print=True).decode())
     except TypeError: # pragma: no cover
-        outfile.write(etree.tostring(e))
+        outfile.write(etree.tostring(e).decode())
 
 def serialize(outfile, data):
     """Output XML for an OSM data set"""
@@ -70,7 +74,7 @@ def deserialize(infile, data=None):
             data.tags = tags
             tags = {}
         elif elem.tag == 'note':
-            data.note = unicode(elem.text)
+            data.note = str(elem.text)
         elif elem.tag == 'meta':
             data.meta = dict(elem.attrib)
         elif elem.tag == 'node':

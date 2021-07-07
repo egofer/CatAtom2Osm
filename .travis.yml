@@ -8,6 +8,8 @@ addons:
     packages:
       - pass
 
+before_script:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 script:
   - docker build -t $DOCKER_USERNAME/catatom2osm:test --build-arg REQUISITES=requisites-dev.txt .
   - docker run --rm $DOCKER_USERNAME/catatom2osm:test /bin/bash -c "cd /opt/CatAtom2Osm && python -m unittest discover"

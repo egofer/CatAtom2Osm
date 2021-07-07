@@ -1,6 +1,50 @@
 Registro de cambios
 ===================
 
+**12-06-2021 (1.3.9)**
+* Recomiendación para usar Docker.
+
+**07-06-2021 (1.3.8)**
+* Corrige error de versionado de Docker.
+
+**07-06-2021 (1.3.7)**
+* Añade autenticación de Docker en Travis.
+
+**07-06-2021 (1.3.6)**
+* Corrige error de sintaxis en Python3.
+
+**14-04-2021 (1.3.5)**
+* Añade la etiqueta 'generator' para identificar la versión en los conjuntos de cambios.
+
+**07-04-2021 (1.3.4)**
+* Evita fallar por archivos de zonificación rotos con zonas faltantes en Catastro.
+* La opcion '-l' muestra las oficionas territoriales si no se pasa parámetro.
+
+**09-03-2021 (1.3.3)**
+* Corrige pruebas rotas en d851c4b (#56)
+
+**09-03-2021 (1.3.2)**
+* Actualiza los paquetes recomendados para python3 (#52)
+* Actualiza URL en cdau.py (#54)
+
+**09-03-2021 (1.3.1)**
+* Añade 'fixme' cuando el área de las partes no coincida con la del edificio (#56).
+
+**08-03-2021 (1.3)**
+* Conserva todas las partes de los edificios para ajustarse mejor al estandar 
+  de Edificios 3D Sencillos (#56).
+
+**08-01-2020 (1.2.2)**
+* Corrige TypeError: expected string or bytes-like object #49
+* Corrige Infinite loop deleting invalid geometries #50
+
+**07-01-2020 (1.2.1)**
+* Resuelve referencia circular traduciendo compat.py
+* Añade requisitos de desarrollo que faltaban
+
+**07-01-2020 (1.2)**
+* Versión compatible con Qgis 3.x
+
 **18-12-2019 (1.1.14)**
 * Asigna el dueño de la carpeta de la aplicación en docker
 

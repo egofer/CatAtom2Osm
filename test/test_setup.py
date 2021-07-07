@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import unittest
 import mock
 import locale
@@ -13,14 +14,14 @@ class TestSetup(unittest.TestCase):
         lang = os.getenv('LANG')
         setup.platform = 'linux2'
         setup.winenv()
-        self.assertEquals(setup.eol, '\n')
+        self.assertEqual(setup.eol, '\n')
         setup.platform = 'winx'
         setup.winenv()
-        self.assertEquals(setup.eol, '\r\n')
+        self.assertEqual(setup.eol, '\r\n')
         setup.language = 'foobar'
         del os.environ['LANG']
         setup.winenv()
-        self.assertEquals(os.getenv('LANG'), 'foobar')
+        self.assertEqual(os.getenv('LANG'), 'foobar')
         os.environ['LANG'] = lang
         setup.eol = eol
 

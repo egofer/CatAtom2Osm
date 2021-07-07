@@ -1,10 +1,13 @@
 """Reader of Cadastre ATOM GML files"""
+from __future__ import print_function, unicode_literals
+from builtins import next, object, str
 import json
 import logging
 import os
 import re
 import zipfile
 from qgis.core import QgsCoordinateReferenceSystem
+from requests.exceptions import ConnectionError
 
 import download
 import hgwnames
@@ -13,8 +16,8 @@ import overpass
 import setup
 from compat import etree
 from report import instance as report
+log = setup.log
 
-log = logging.getLogger(setup.app_name + "." + __name__)
 
 class Reader(object):
     """Class to download and read Cadastre ATOM GML files"""
@@ -25,7 +28,7 @@ class Reader(object):
             a_path (str): Directory where the source files are located.
         """
         self.path = a_path
-        m = re.match("^\d{5}$", os.path.split(a_path)[-1])
+        m = re.match(r"^\d{5}$", os.path.split(a_path)[-1])
         if not m:
             raise ValueError(_("Last directory name must be a 5 digits ZIP code"))
         self.zip_code = m.group()
@@ -41,7 +44,8 @@ class Reader(object):
     def get_metadata(self, md_path, zip_path=""):
         """Get the metadata of the source file"""
         if os.path.exists(md_path):
-            text = open(md_path, 'r').read()
+            with open(md_path, 'rb') as f:
+                text = f.read()
         else:
             try:
                 zf = zipfile.ZipFile(zip_path)
@@ -70,11 +74,11 @@ class Reader(object):
         Given the url of a Cadastre ATOM service, tries to download the ZIP
         file for self.zip_code
         """
-        s = re.search('INSPIRE/(\w+)/', url)
+        s = re.search(r'INSPIRE/(\w+)/', url)
         log.debug(_("Searching the url for the '%s' layer of '%s'..."), 
             s.group(1), self.zip_code)
         response = download.get_response(url)
-        s = re.search('http.+/%s.+zip' % self.zip_code, response.text)
+        s = re.search(r'http.+/%s.+zip' % self.zip_code, response.text)
         if not s:
             raise ValueError(_("Zip code '%s' don't exists") % self.zip_code)
         url = s.group(0)
@@ -94,9 +98,8 @@ class Reader(object):
         else:
             raise ValueError(_("Unknow layer name '%s'") % layername)
         gml_fn = ".".join((setup.fn_prefix, group, self.zip_code, layername, "gml"))
-        if group == 'AD':    
-            gml_fn = ".".join((setup.fn_prefix, group, self.zip_code, 
-                "gml|layername=%s" % layername))
+        if group == 'AD':
+            gml_fn = ".".join((setup.fn_prefix, group, self.zip_code, "gml"))
         md_fn = ".".join((setup.fn_prefix, group, "MD", self.zip_code, "xml"))
         if group == 'CP':
             md_fn = ".".join((setup.fn_prefix, group, "MD.", self.zip_code, "xml"))
@@ -115,14 +118,16 @@ class Reader(object):
             gml_fp = self.get_path_from_zip(zf, gml_path)
             f = zf.open(gml_fp, 'r')
         else:
-            f = open(gml_path, 'r')
+            f = open(gml_path, 'rb')
         context = etree.iterparse(f, events=('end',))
         try:
-            event, elem = context.next() # </something>
-            event, elem = context.next() # </featureMember>
-            event, elem = context.next() # </featureCollection>
+            event, elem = next(context) # </something>
+            event, elem = next(context) # </featureMember>
+            event, elem = next(context) # </featureCollection>
+            f.close()
             return False
         except StopIteration:
+            f.close()
             return True
 
     def get_path_from_zip(self, zf, a_path):
@@ -221,7 +226,7 @@ class Reader(object):
             data = json.loads(query.read())
             matching = hgwnames.dsmatch(self.cat_mun, data['elements'], 
                 lambda e: e['tags']['name'])
-        except Exception:
+        except ConnectionError:
             pass
         if matching:
             self.boundary_search_area = str(matching['id'])
@@ -237,16 +242,23 @@ class Reader(object):
 
 def list_municipalities(prov_code):
     """Get from the ATOM services a list of municipalities for a given province"""
-    if prov_code not in setup.valid_provinces:
+    if prov_code == '99':
+        url = setup.serv_url['BU']
+        title = _("Territorial office")
+    elif prov_code not in setup.valid_provinces:
         raise ValueError(_("Province code '%s' not valid") % prov_code)
-    url = setup.prov_url['BU'].format(code=prov_code)
+    else:
+        url = setup.prov_url['BU'].format(code=prov_code)
     response = download.get_response(url)
     root = etree.fromstring(response.content)
     ns = {'atom': 'http://www.w3.org/2005/Atom'}
-    office = root.find('atom:title', ns).text.split('Office ')[1]
-    title = _("Territorial office %s") % office
-    print title
-    print "=" * len(title)
+    if prov_code != '99':
+        office = root.find('atom:title', ns).text.split('Office ')[1]
+        title = _("Territorial office %s") % office
+    print(title)
+    print("=" * len(title))
     for entry in root.findall('atom:entry', namespaces=ns):
         row = entry.find('atom:title', ns).text.replace('buildings', '')
-        print row.encode(setup.encoding)
+        row = row.replace('Territorial office ', '')
+        print(row)
+

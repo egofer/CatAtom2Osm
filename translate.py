@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Translations from source fields to OSM tags"""
+from __future__ import unicode_literals
+from builtins import str
 
 import json
 import setup
@@ -8,7 +10,7 @@ def all_tags(feature):
     """All fields to tags translations"""
     tags = {}
     for attr in [f.name() for f in feature.fields()]:
-        tags[attr] = unicode(feature[attr])
+        tags[attr] = str(feature[attr])
     return tags
     
 def address_tags(feature):
@@ -64,8 +66,8 @@ def building_tags(feature):
     if '_' not in feature['localId']:
         tags['building'] = 'yes'
         tags['ref'] = feature['localId']
-    for field, action in translations.items():
-        for value, new_tags in action.items():
+    for field, action in list(translations.items()):
+        for value, new_tags in list(action.items()):
             if feature[field] == value:
                 tags.update(json.loads(new_tags))
     if feature['condition'] == 'ruin' and feature['currentUse'] == None:
